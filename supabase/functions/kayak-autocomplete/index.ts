@@ -224,7 +224,7 @@ const fetchKayakSuggestions = async (params: {
     headers: {
       Accept: "application/json, text/plain, */*",
       "User-Agent":
-        "Mozilla/5.0 (compatible; SecretStaysBot/1.0; +https://twcvlutykblgoatahobf.supabase.co)",
+        "Mozilla/5.0 (compatible; SecretBookingsBot/1.0; +https://twcvlutykblgoatahobf.supabase.co)",
     },
   });
 

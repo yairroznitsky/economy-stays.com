@@ -1,4 +1,4 @@
-# Secret Stays
+# Secret Bookings
 
 Kayak-first hotel monetization flow with Supabase Edge Function routing.
 

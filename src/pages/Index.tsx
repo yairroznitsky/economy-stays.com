@@ -183,9 +183,9 @@ const Index = () => {
       {/* Footer */}
       <footer className="border-t border-border bg-background py-10">
         <div className="container flex flex-col items-center justify-between gap-4 text-sm text-muted-foreground md:flex-row">
-          <p>© {new Date().getFullYear()} Secret Stays. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Secret Bookings. All rights reserved.</p>
           <p>
-            Secret Stays may earn a commission from qualifying Kayak-powered stay referrals.
+            Secret Bookings may earn a commission from qualifying Kayak-powered stay referrals.
           </p>
         </div>
       </footer>
