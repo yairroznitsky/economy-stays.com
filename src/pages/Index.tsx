@@ -22,17 +22,17 @@ const features = [
   {
     icon: Tag,
     title: "Unbeatable prices",
-    desc: "Compare millions of hotels and unlock secret deals up to 60% off.",
+    desc: "Compare hotels, apartments, and unique stays to unlock deals up to 60% off.",
   },
   {
     icon: Globe2,
     title: "2M+ properties worldwide",
-    desc: "From boutique hideaways to five-star resorts in every corner of the globe.",
+    desc: "From boutique hotels to full homes and serviced apartments in every corner of the globe.",
   },
   {
     icon: ShieldCheck,
     title: "Book with confidence",
-    desc: "Free cancellation on most rooms and 24/7 customer support.",
+    desc: "Flexible options on many stays with trusted partners and reliable support.",
   },
 ];
 
@@ -73,7 +73,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero */}
-      <section className="relative min-h-[760px] w-full">
+      <section className="relative min-h-[100svh] w-full md:min-h-[760px]">
         <img
           src={heroImage}
           alt="Luxury hotel infinity pool overlooking turquoise ocean at sunset"
@@ -86,20 +86,20 @@ const Index = () => {
 
         <Header />
 
-        <div className="container relative z-10 flex min-h-[760px] flex-col items-center justify-center pt-24 pb-32 text-center">
-          <span className="mb-5 inline-flex items-center gap-2 rounded-full border border-primary-foreground/30 bg-primary-foreground/10 px-4 py-1.5 text-xs font-medium text-primary-foreground backdrop-blur-md">
+        <div className="container relative z-10 flex min-h-[100svh] flex-col items-center justify-start pt-16 pb-10 text-center md:min-h-[760px] md:justify-center md:pt-24 md:pb-32">
+          <span className="mb-4 hidden items-center gap-2 rounded-full border border-primary-foreground/30 bg-primary-foreground/10 px-4 py-1.5 text-xs font-medium text-primary-foreground backdrop-blur-md sm:inline-flex md:mb-5">
             <Sparkles className="h-3.5 w-3.5" />
-            Members-only deals on 2M+ hotels
+            Members-only deals on 2M+ stays
           </span>
-          <h1 className="max-w-4xl font-display text-5xl font-bold leading-[1.05] text-primary-foreground drop-shadow-lg md:text-7xl">
-            Unlock the world's<br />best-kept hotel deals
+          <h1 className="max-w-3xl font-display text-4xl font-bold leading-[1.08] text-primary-foreground drop-shadow-lg md:max-w-4xl md:text-7xl md:leading-[1.05]">
+            Unlock the world's<br />best-kept stay deals
           </h1>
-          <p className="mt-6 max-w-2xl text-lg text-primary-foreground/90 md:text-xl">
-            Search and compare prices across thousands of hotels worldwide.
-            Save up to 60% on your next stay.
+          <p className="mt-4 max-w-xl text-base text-primary-foreground/90 md:mt-6 md:max-w-2xl md:text-xl">
+            Search and compare hotels, homes, and apartments worldwide.
+            Save up to 60% on your next trip.
           </p>
 
-          <div className="mt-12 w-full max-w-5xl">
+          <div className="mt-7 w-full max-w-5xl md:mt-12">
             <SearchForm />
           </div>
         </div>
@@ -175,7 +175,7 @@ const Index = () => {
             Ready to discover your next stay?
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-primary-foreground/90">
-            Scroll up and start your search — your perfect hotel is just a few clicks away.
+            Scroll up and start your search — your ideal stay is just a few clicks away.
           </p>
         </div>
       </section>
@@ -185,7 +185,7 @@ const Index = () => {
         <div className="container flex flex-col items-center justify-between gap-4 text-sm text-muted-foreground md:flex-row">
           <p>© {new Date().getFullYear()} Secret Stays. All rights reserved.</p>
           <p>
-            Secret Stays may earn a commission from qualifying Kayak-powered hotel referrals.
+            Secret Stays may earn a commission from qualifying Kayak-powered stay referrals.
           </p>
         </div>
       </footer>

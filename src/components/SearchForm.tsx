@@ -212,12 +212,14 @@ const SearchForm = () => {
     value,
     onChange,
     min = 0,
+    max,
   }: {
     label: string;
     sub?: string;
     value: number;
     onChange: (v: number) => void;
     min?: number;
+    max?: number;
   }) => (
     <div className="flex items-center justify-between py-2">
       <div>
@@ -242,6 +244,7 @@ const SearchForm = () => {
           size="icon"
           className="h-8 w-8 rounded-full"
           onClick={() => onChange(value + 1)}
+          disabled={typeof max === "number" ? value >= max : false}
         >
           <Plus className="h-4 w-4" />
         </Button>
@@ -311,7 +314,7 @@ const SearchForm = () => {
                   setActiveSuggestionIndex(-1);
                 }
               }}
-              placeholder="City, hotel or destination"
+              placeholder="City, stay, or destination"
               autoComplete="off"
               className="h-auto border-0 bg-transparent p-0 text-base shadow-none focus-visible:ring-0"
               required
@@ -428,12 +431,14 @@ const SearchForm = () => {
               value={adults}
               onChange={setAdults}
               min={1}
+              max={6}
             />
             <Stepper
               label="Children"
               sub="Age 0–12"
               value={children}
               onChange={setChildren}
+              max={6}
             />
             <Stepper
               label="Rooms"
@@ -449,9 +454,9 @@ const SearchForm = () => {
           type="submit"
           size="lg"
           disabled={isLoading}
-          className="h-auto rounded-xl bg-gradient-primary px-8 text-base font-semibold shadow-elevated transition-smooth hover:opacity-95 md:px-6"
+          className="h-12 rounded-xl bg-gradient-primary px-8 text-lg font-semibold shadow-elevated transition-smooth hover:opacity-95 active:scale-[0.99] md:h-auto md:px-6 md:text-base"
         >
-          <Search className="mr-2 h-5 w-5" />
+          <Search className="mr-2 h-5 w-5 md:h-5 md:w-5" />
           {isLoading ? "Searching..." : "Search"}
         </Button>
       </div>

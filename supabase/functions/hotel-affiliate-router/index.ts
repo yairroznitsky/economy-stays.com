@@ -81,10 +81,19 @@ const sanitizeDate = (value: string, fieldName: "checkin" | "checkout") => {
   return parsed.toISOString().slice(0, 10);
 };
 
-const parsePositiveInt = (value: unknown, fallback: number, fieldName: string, min = 0) => {
+const parsePositiveInt = (
+  value: unknown,
+  fallback: number,
+  fieldName: string,
+  min = 0,
+  max?: number
+) => {
   const parsed = Number(value ?? fallback);
   if (!Number.isFinite(parsed) || parsed < min) {
     throw new Error(`${fieldName} must be a number greater than or equal to ${min}.`);
+  }
+  if (typeof max === "number" && parsed > max) {
+    throw new Error(`${fieldName} must be less than or equal to ${max}.`);
   }
   return Math.floor(parsed);
 };
@@ -128,8 +137,8 @@ export const validateInput = (payload: unknown): ValidatedInput => {
   }
 
   const rooms = parsePositiveInt(input.rooms, 1, "rooms", 1);
-  const adults = parsePositiveInt(input.adults, 2, "adults", 1);
-  const children = parsePositiveInt(input.children, 0, "children", 0);
+  const adults = parsePositiveInt(input.adults, 2, "adults", 1, 6);
+  const children = parsePositiveInt(input.children, 0, "children", 0, 6);
   const childrenAges = parseChildrenAges(input.children_ages, children);
 
   if (rooms > 8) {
