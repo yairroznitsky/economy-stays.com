@@ -3,6 +3,13 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 interface HotelAffiliateRequest {
   query: string;
   destination_id?: string;
+  hotel_id?: string;
+  airport_place_id?: string;
+  airport_code?: string;
+  airport_name?: string;
+  city_name?: string;
+  state_name?: string;
+  country_name?: string;
   checkin: string;
   checkout: string;
   rooms?: number;
@@ -18,6 +25,13 @@ interface HotelAffiliateRequest {
 interface ValidatedInput {
   query: string;
   destination_id: string;
+  hotel_id?: string;
+  airport_place_id?: string;
+  airport_code?: string;
+  airport_name?: string;
+  city_name?: string;
+  state_name?: string;
+  country_name?: string;
   checkin: string;
   checkout: string;
   rooms: number;
@@ -160,6 +174,13 @@ export const validateInput = (payload: unknown): ValidatedInput => {
   const country = input.country?.trim() || "US";
   const destinationId =
     input.destination_id?.trim() || query.match(/-c(\d+)/i)?.[1] || "";
+  const hotelId = input.hotel_id?.trim() || undefined;
+  const airportPlaceId = input.airport_place_id?.trim() || undefined;
+  const airportCode = input.airport_code?.trim() || undefined;
+  const airportName = input.airport_name?.trim() || undefined;
+  const cityName = input.city_name?.trim() || undefined;
+  const stateName = input.state_name?.trim() || undefined;
+  const countryName = input.country_name?.trim() || undefined;
 
   if (!destinationId) {
     throw new Error(
@@ -170,6 +191,13 @@ export const validateInput = (payload: unknown): ValidatedInput => {
   return {
     query,
     destination_id: destinationId,
+    hotel_id: hotelId,
+    airport_place_id: airportPlaceId,
+    airport_code: airportCode,
+    airport_name: airportName,
+    city_name: cityName,
+    state_name: stateName,
+    country_name: countryName,
     checkin,
     checkout,
     rooms,
@@ -210,9 +238,11 @@ export const buildKayakDeeplink = (
     .split(",")
     .map((part) => removeDestinationCode(part))
     .filter(Boolean);
-  const city = queryParts[0] ?? removeDestinationCode(input.query);
-  const country = queryParts.length >= 2 ? queryParts[queryParts.length - 1] : input.country;
-  const state = queryParts.length >= 3 ? queryParts[1] : "";
+  const city = input.city_name ?? queryParts[0] ?? removeDestinationCode(input.query);
+  const country =
+    input.country_name ??
+    (queryParts.length >= 2 ? queryParts[queryParts.length - 1] : input.country);
+  const state = input.state_name ?? (queryParts.length >= 3 ? queryParts[1] : "");
   const normalizedCountry = country.trim().toLowerCase();
   const isUnitedStates = ["us", "usa", "united states", "united states of america"].includes(
     normalizedCountry
@@ -225,18 +255,30 @@ export const buildKayakDeeplink = (
       .replace(/[^a-zA-Z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "");
 
-  const locationSegments = isUnitedStates
+  const hotelName = input.hotel_id ? removeDestinationCode(input.query.split(",")[0] ?? input.query) : "";
+  const baseSegments = isUnitedStates
     ? [slugify(city), slugify(state), slugify(country)].filter(Boolean)
     : [slugify(city), slugify(country)].filter(Boolean);
+  const isAirportDeeplink =
+    Boolean(input.airport_place_id && input.airport_code && input.airport_name);
+  const locationSegments = isAirportDeeplink
+    ? [slugify(city), slugify(country), slugify(input.airport_name!)]
+    : input.hotel_id
+      ? [slugify(hotelName), ...baseSegments].filter(Boolean)
+      : baseSegments;
   const locationSlug = locationSegments.join(",");
-  const destinationCode = `c${destination.destination_id}`;
+  const destinationCode = isAirportDeeplink ? "" : `-c${destination.destination_id}`;
+  const hotelCode = input.hotel_id ? `-h${input.hotel_id}` : "";
+  const airportCode = isAirportDeeplink
+    ? `-p${input.airport_place_id}-l${input.airport_code}`
+    : "";
   const adultsSegment = `${input.adults}adults`;
   const childrenSegment =
     input.children > 0
       ? `/${input.children}children-${input.children_ages.join("-")}`
       : "";
   const roomsSegment = `${input.rooms}rooms`;
-  const kayakPath = `/hotels/${locationSlug}-${destinationCode}/${input.checkin}/${input.checkout}/${adultsSegment}${childrenSegment}/${roomsSegment}`;
+  const kayakPath = `/hotels/${locationSlug}${destinationCode}${hotelCode}${airportCode}/${input.checkin}/${input.checkout}/${adultsSegment}${childrenSegment}/${roomsSegment}`;
 
   const params = new URLSearchParams({
     a: KAYAK_AFFILIATE_ID,

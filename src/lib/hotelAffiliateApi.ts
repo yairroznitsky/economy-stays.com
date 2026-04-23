@@ -32,6 +32,13 @@ export const requestHotelRedirectUrl = async (
     body: {
       query: payload.search.destination,
       destination_id: payload.search.destinationId,
+      hotel_id: payload.search.hotelId,
+      airport_place_id: payload.search.airportPlaceId,
+      airport_code: payload.search.airportCode,
+      airport_name: payload.search.airportName,
+      city_name: payload.search.cityName,
+      state_name: payload.search.stateName,
+      country_name: payload.search.countryName,
       checkin: payload.search.checkIn,
       checkout: payload.search.checkOut,
       rooms: payload.search.rooms,

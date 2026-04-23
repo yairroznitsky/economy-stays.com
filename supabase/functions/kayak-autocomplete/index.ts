@@ -189,10 +189,19 @@ const normalizeKayakSuggestions = (payload: unknown): NormalizedSuggestion[] => 
       label,
       type: mappedType,
       subtitle: subtitle || undefined,
-      // Keep minimal raw payload to support future mapping updates.
+      // Keep provider metadata needed for deeplink composition.
       raw: {
         id: record["id"] ?? record["entityId"] ?? null,
         type: rawType || null,
+        hotel_id: record["hid"] ?? null,
+        city_id: record["ctid"] ?? record["id"] ?? null,
+        city: record["cityonly"] ?? record["cityname"] ?? null,
+        state: record["region"] ?? record["rc"] ?? null,
+        country: record["country"] ?? null,
+        name: record["name"] ?? record["hotelname"] ?? null,
+        place_id: record["placeID"] ?? record["indexId"] ?? null,
+        airport_code: record["apicode"] ?? record["ap"] ?? null,
+        airport_name: record["airportname"] ?? null,
       },
     });
 

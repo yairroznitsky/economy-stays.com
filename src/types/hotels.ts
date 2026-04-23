@@ -3,6 +3,13 @@ export type AffiliateSource = "kayak" | "fallback";
 export interface HotelSearchInput {
   destination: string;
   destinationId?: string;
+  hotelId?: string;
+  airportPlaceId?: string;
+  airportCode?: string;
+  airportName?: string;
+  cityName?: string;
+  stateName?: string;
+  countryName?: string;
   checkIn?: string;
   checkOut?: string;
   adults?: number;

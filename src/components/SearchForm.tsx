@@ -100,6 +100,11 @@ const SearchForm = () => {
     setActiveSuggestionIndex(-1);
   };
 
+  const readRawString = (raw: Record<string, unknown> | undefined, key: string) => {
+    const value = raw?.[key];
+    return typeof value === "string" && value.trim() ? value.trim() : undefined;
+  };
+
   useEffect(() => {
     if (isDestinationLocked) {
       setIsAutocompleteLoading(false);
@@ -160,6 +165,8 @@ const SearchForm = () => {
     setIsLoading(true);
     try {
       const deriveCountry = () => {
+        const rawCountry = readRawString(selectedSuggestion?.raw, "country");
+        if (rawCountry) return rawCountry;
         const candidate = selectedSuggestion?.subtitle || selectedSuggestion?.label || destination;
         const parts = candidate
           .split(",")
@@ -168,10 +175,30 @@ const SearchForm = () => {
         return parts.length > 0 ? parts[parts.length - 1] : "US";
       };
 
+      const destinationId =
+        readRawString(selectedSuggestion?.raw, "city_id") ?? selectedSuggestion?.id;
+      const hotelId = readRawString(selectedSuggestion?.raw, "hotel_id");
+      const airportPlaceId = readRawString(selectedSuggestion?.raw, "place_id");
+      const airportCode =
+        readRawString(selectedSuggestion?.raw, "airport_code") ??
+        readRawString(selectedSuggestion?.raw, "apicode");
+      const airportName = readRawString(selectedSuggestion?.raw, "airport_name");
+      const cityName =
+        readRawString(selectedSuggestion?.raw, "city") ??
+        selectedSuggestion?.label.split(",")[0]?.trim();
+      const stateName = readRawString(selectedSuggestion?.raw, "state");
+
       const response = await requestHotelRedirectUrl({
         search: {
           destination: destination.trim(),
-          destinationId: selectedSuggestion?.id,
+          destinationId,
+          hotelId,
+          airportPlaceId,
+          airportCode,
+          airportName,
+          cityName,
+          stateName,
+          countryName: deriveCountry(),
           checkIn: format(range.from, "yyyy-MM-dd"),
           checkOut: format(range.to, "yyyy-MM-dd"),
           adults,
