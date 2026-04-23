@@ -306,35 +306,14 @@ export const buildKayakDeeplink = (
   return baseUrl.toString();
 };
 
-export const logTrackingEvent = async (params: {
+export const logTrackingEvent = async (_params: {
   input: ValidatedInput;
   destination: NormalizedDestination;
   redirectUrl: string;
   requestId: string;
 }) => {
-  if (!ENABLE_TRACKING_LOGS || !supabase) return;
-
-  const { input, destination, redirectUrl, requestId } = params;
-  const { error } = await supabase.from("hotel_affiliate_events").insert({
-    request_id: requestId,
-    click_id: input.click_id,
-    landing_id: input.landing_id,
-    affiliate_source: "kayak",
-    query: input.query,
-    normalized_destination: destination,
-    checkin: input.checkin,
-    checkout: input.checkout,
-    rooms: input.rooms,
-    adults: input.adults,
-    children: input.children,
-    locale: input.locale,
-    country: input.country,
-    redirect_url: redirectUrl,
-  });
-
-  if (error) {
-    throw new Error(`Failed to log tracking event: ${error.message}`);
-  }
+  // Logging disabled by request: keep routing fast and stateless.
+  return;
 };
 
 const jsonResponse = (status: number, body: Record<string, unknown>) =>
