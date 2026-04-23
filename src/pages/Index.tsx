@@ -2,6 +2,10 @@ import { ShieldCheck, Tag, Globe2, Sparkles } from "lucide-react";
 import heroImage from "@/assets/hero-hotel.jpg";
 import Header from "@/components/Header";
 import SearchForm from "@/components/SearchForm";
+import { requestHotelRedirectUrl } from "@/lib/hotelAffiliateApi";
+import { getOrCreateClickId, getOrCreateLandingId } from "@/lib/tracking";
+import { toast } from "sonner";
+import { format } from "date-fns";
 
 const destinations = [
   { name: "Paris", country: "France", emoji: "🗼" },
@@ -33,10 +37,43 @@ const features = [
 ];
 
 const Index = () => {
+  const openDestination = async (destinationName: string) => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const dayAfter = new Date();
+    dayAfter.setDate(dayAfter.getDate() + 2);
+
+    try {
+      const response = await requestHotelRedirectUrl({
+        search: {
+          destination: destinationName,
+          checkIn: format(tomorrow, "yyyy-MM-dd"),
+          checkOut: format(dayAfter, "yyyy-MM-dd"),
+          adults: 2,
+          children: 0,
+          rooms: 1,
+        },
+        clickId: getOrCreateClickId(),
+        landingId: getOrCreateLandingId(),
+        affiliateSource: "kayak",
+        metadata: {
+          surface: "trending_destinations",
+          source_destination: destinationName,
+        },
+      });
+
+      window.open(response.redirectUrl, "_blank", "noopener,noreferrer");
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Unable to open destination deals.";
+      toast.error(message);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Hero */}
-      <section className="relative min-h-[760px] w-full overflow-hidden">
+      <section className="relative min-h-[760px] w-full">
         <img
           src={heroImage}
           alt="Luxury hotel infinity pool overlooking turquoise ocean at sunset"
@@ -114,13 +151,10 @@ const Index = () => {
 
           <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
             {destinations.map((d) => (
-              <a
+              <button
                 key={d.name}
-                href={`https://www.booking.com/searchresults.html?ss=${encodeURIComponent(
-                  d.name
-                )}&aid=YOUR_BOOKING_AID`}
-                target="_blank"
-                rel="noopener noreferrer sponsored"
+                type="button"
+                onClick={() => void openDestination(d.name)}
                 className="group rounded-2xl border border-border bg-card p-5 shadow-soft transition-smooth hover:-translate-y-1 hover:border-primary/40 hover:shadow-elevated"
               >
                 <div className="text-3xl">{d.emoji}</div>
@@ -128,7 +162,7 @@ const Index = () => {
                   {d.name}
                 </p>
                 <p className="text-sm text-muted-foreground">{d.country}</p>
-              </a>
+              </button>
             ))}
           </div>
         </div>
@@ -149,9 +183,9 @@ const Index = () => {
       {/* Footer */}
       <footer className="border-t border-border bg-background py-10">
         <div className="container flex flex-col items-center justify-between gap-4 text-sm text-muted-foreground md:flex-row">
-          <p>© {new Date().getFullYear()} Secret Bookings. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Secret Stays. All rights reserved.</p>
           <p>
-            Secret Bookings is an affiliate partner. We may earn a commission on bookings.
+            Secret Stays may earn a commission from qualifying Kayak-powered hotel referrals.
           </p>
         </div>
       </footer>

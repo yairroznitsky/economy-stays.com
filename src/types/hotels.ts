@@ -1,0 +1,49 @@
+export type AffiliateSource = "kayak" | "fallback";
+
+export interface HotelSearchInput {
+  destination: string;
+  destinationId?: string;
+  checkIn?: string;
+  checkOut?: string;
+  adults?: number;
+  children?: number;
+  childrenAges?: number[];
+  rooms?: number;
+  locale?: string;
+  country?: string;
+}
+
+export interface HotelRedirectRequest {
+  search: HotelSearchInput;
+  clickId: string;
+  landingId?: string;
+  affiliateSource?: AffiliateSource;
+  metadata?: Record<string, string | number | boolean | null | undefined>;
+}
+
+export interface HotelAutocompleteRequest {
+  query: string;
+  locale?: string;
+  country?: string;
+}
+
+export interface HotelDestinationSuggestion {
+  id: string;
+  label: string;
+  type: string;
+  subtitle?: string;
+  raw?: Record<string, unknown>;
+}
+
+export interface HotelAutocompleteResponse {
+  success: boolean;
+  query: string;
+  suggestions: HotelDestinationSuggestion[];
+  error?: string;
+}
+
+export interface HotelAffiliateRouteResponse {
+  redirectUrl: string;
+  provider: AffiliateSource;
+  clickId: string;
+}

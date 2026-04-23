@@ -1,6 +1,18 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { format } from "date-fns";
-import { CalendarIcon, MapPin, Users, Search, Minus, Plus } from "lucide-react";
+import {
+  CalendarIcon,
+  MapPin,
+  Users,
+  Search,
+  Minus,
+  Plus,
+  Plane,
+  BedDouble,
+  Building2,
+  Landmark,
+  Map,
+} from "lucide-react";
 import { DateRange } from "react-day-picker";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -12,8 +24,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-
-const AFFILIATE_ID = "YOUR_BOOKING_AID"; // Replace with your Booking.com affiliate ID
+import { toast } from "sonner";
+import {
+  requestHotelDestinationAutocomplete,
+  requestHotelRedirectUrl,
+} from "@/lib/hotelAffiliateApi";
+import { getOrCreateClickId, getOrCreateLandingId } from "@/lib/tracking";
+import type { HotelDestinationSuggestion } from "@/types/hotels";
 
 const SearchForm = () => {
   const today = new Date();
@@ -30,23 +47,159 @@ const SearchForm = () => {
   const [adults, setAdults] = useState(2);
   const [children, setChildren] = useState(0);
   const [rooms, setRooms] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [suggestions, setSuggestions] = useState<HotelDestinationSuggestion[]>([]);
+  const [selectedSuggestion, setSelectedSuggestion] =
+    useState<HotelDestinationSuggestion | null>(null);
+  const [isDestinationLocked, setIsDestinationLocked] = useState(false);
+  const [isAutocompleteLoading, setIsAutocompleteLoading] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
+  const destinationInputRef = useRef<HTMLInputElement>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const suggestionIcon = (type: string) => {
+    const normalizedType = type.toLowerCase();
+    if (normalizedType === "ap" || normalizedType.includes("airport")) {
+      return Plane;
+    }
+    if (normalizedType.includes("hotel") || normalizedType.includes("hostel")) {
+      return BedDouble;
+    }
+    if (
+      normalizedType === "city" ||
+      normalizedType === "ct" ||
+      normalizedType.includes("destination")
+    ) {
+      return Building2;
+    }
+    if (normalizedType === "reg" || normalizedType.includes("state")) {
+      return Map;
+    }
+    if (normalizedType === "lm" || normalizedType.includes("landmark")) {
+      return Landmark;
+    }
+    return MapPin;
+  };
+
+  const suggestionTypeLabel = (type: string) => {
+    const normalizedType = type.toLowerCase();
+    if (normalizedType === "reg") return "State";
+    if (normalizedType === "ap") return "Airport";
+    if (normalizedType === "lm") return "Landmark";
+    if (normalizedType === "ct") return "City";
+    return normalizedType.charAt(0).toUpperCase() + normalizedType.slice(1);
+  };
+
+  const handleSuggestionSelect = (suggestion: HotelDestinationSuggestion) => {
+    setDestination(suggestion.label);
+    setSelectedSuggestion(suggestion);
+    setIsDestinationLocked(true);
+    setSuggestions([]);
+    setIsDropdownOpen(false);
+    setIsAutocompleteLoading(false);
+    setActiveSuggestionIndex(-1);
+  };
+
+  useEffect(() => {
+    if (isDestinationLocked) {
+      setIsAutocompleteLoading(false);
+      setIsDropdownOpen(false);
+      return;
+    }
+
+    const query = destination.trim();
+    if (query.length < 3) {
+      setSuggestions([]);
+      setIsDropdownOpen(false);
+      setIsAutocompleteLoading(false);
+      setActiveSuggestionIndex(-1);
+      return;
+    }
+
+    let isCancelled = false;
+    const timeoutId = window.setTimeout(async () => {
+      setIsAutocompleteLoading(true);
+      try {
+        const results = await requestHotelDestinationAutocomplete({
+          query,
+          locale: "en",
+          country: "US",
+        });
+
+        if (isCancelled) return;
+        setSuggestions(results.slice(0, 10));
+        setIsDropdownOpen(results.length > 0);
+        setActiveSuggestionIndex(-1);
+      } catch {
+        if (isCancelled) return;
+        setSuggestions([]);
+        setIsDropdownOpen(false);
+      } finally {
+        if (!isCancelled) {
+          setIsAutocompleteLoading(false);
+        }
+      }
+    }, 300);
+
+    return () => {
+      isCancelled = true;
+      window.clearTimeout(timeoutId);
+    };
+  }, [destination, isDestinationLocked]);
+
+  useEffect(() => {
+    if (selectedSuggestion && selectedSuggestion.label !== destination.trim()) {
+      setSelectedSuggestion(null);
+    }
+  }, [destination, selectedSuggestion]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!destination.trim() || !range?.from || !range?.to) return;
 
-    const params = new URLSearchParams({
-      ss: destination.trim(),
-      checkin: format(range.from, "yyyy-MM-dd"),
-      checkout: format(range.to, "yyyy-MM-dd"),
-      group_adults: String(adults),
-      group_children: String(children),
-      no_rooms: String(rooms),
-      aid: AFFILIATE_ID,
-    });
+    setIsLoading(true);
+    try {
+      const deriveCountry = () => {
+        const candidate = selectedSuggestion?.subtitle || selectedSuggestion?.label || destination;
+        const parts = candidate
+          .split(",")
+          .map((part) => part.trim())
+          .filter(Boolean);
+        return parts.length > 0 ? parts[parts.length - 1] : "US";
+      };
 
-    const url = `https://www.booking.com/searchresults.html?${params.toString()}`;
-    window.open(url, "_blank", "noopener,noreferrer");
+      const response = await requestHotelRedirectUrl({
+        search: {
+          destination: destination.trim(),
+          destinationId: selectedSuggestion?.id,
+          checkIn: format(range.from, "yyyy-MM-dd"),
+          checkOut: format(range.to, "yyyy-MM-dd"),
+          adults,
+          children,
+          // TODO: Replace with explicit child age picker once available.
+          childrenAges: children > 0 ? Array.from({ length: children }, () => 8) : [],
+          rooms,
+          locale: "en",
+          country: deriveCountry(),
+        },
+        clickId: getOrCreateClickId(),
+        landingId: getOrCreateLandingId(),
+        affiliateSource: "kayak",
+        metadata: {
+          surface: "search_form",
+          destination_type: selectedSuggestion?.type ?? "free_text",
+          destination_id: selectedSuggestion?.id ?? "",
+        },
+      });
+
+      window.open(response.redirectUrl, "_blank", "noopener,noreferrer");
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Could not open hotel results.";
+      toast.error(message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const guestSummary = `${adults + children} guest${
@@ -110,13 +263,99 @@ const SearchForm = () => {
           <div className="mt-1 flex items-center gap-2">
             <MapPin className="h-4 w-4 shrink-0 text-primary" />
             <Input
+              ref={destinationInputRef}
               value={destination}
               onChange={(e) => setDestination(e.target.value)}
+              readOnly={isDestinationLocked}
+              onClick={() => {
+                if (!isDestinationLocked) return;
+                setIsDestinationLocked(false);
+                setSelectedSuggestion(null);
+                setActiveSuggestionIndex(-1);
+                destinationInputRef.current?.focus();
+              }}
+              onFocus={() => {
+                if (isDestinationLocked) return;
+                if (destination.trim().length >= 3 && suggestions.length > 0) {
+                  setIsDropdownOpen(true);
+                }
+              }}
+              onBlur={() => {
+                window.setTimeout(() => {
+                  setIsDropdownOpen(false);
+                  setActiveSuggestionIndex(-1);
+                }, 120);
+              }}
+              onKeyDown={(event) => {
+                if (!isDropdownOpen || suggestions.length === 0) {
+                  if (event.key === "Escape") {
+                    setIsDropdownOpen(false);
+                  }
+                  return;
+                }
+
+                if (event.key === "ArrowDown") {
+                  event.preventDefault();
+                  setActiveSuggestionIndex((current) =>
+                    Math.min(current + 1, suggestions.length - 1)
+                  );
+                } else if (event.key === "ArrowUp") {
+                  event.preventDefault();
+                  setActiveSuggestionIndex((current) => Math.max(current - 1, 0));
+                } else if (event.key === "Enter" && activeSuggestionIndex >= 0) {
+                  event.preventDefault();
+                  handleSuggestionSelect(suggestions[activeSuggestionIndex]);
+                } else if (event.key === "Escape") {
+                  event.preventDefault();
+                  setIsDropdownOpen(false);
+                  setActiveSuggestionIndex(-1);
+                }
+              }}
               placeholder="City, hotel or destination"
+              autoComplete="off"
               className="h-auto border-0 bg-transparent p-0 text-base shadow-none focus-visible:ring-0"
               required
             />
           </div>
+          {isAutocompleteLoading && (
+            <p className="mt-2 text-xs text-muted-foreground">Finding destinations...</p>
+          )}
+          {isDropdownOpen && destination.trim().length >= 3 && suggestions.length > 0 && (
+            <div className="absolute top-full left-0 z-50 mt-2 w-full rounded-xl border border-border bg-popover p-1 shadow-elevated">
+              <ul role="listbox" className="max-h-72 overflow-auto">
+                {suggestions.map((suggestion, index) => (
+                  <li key={`${suggestion.type}-${suggestion.id}-${index}`}>
+                    <button
+                      type="button"
+                      onMouseDown={() => handleSuggestionSelect(suggestion)}
+                      className={cn(
+                        "flex w-full items-start gap-3 rounded-lg px-3 py-2 text-left transition-smooth",
+                        activeSuggestionIndex === index
+                          ? "bg-accent text-accent-foreground"
+                          : "hover:bg-accent/70"
+                      )}
+                    >
+                      <span className="mt-0.5 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
+                        {(() => {
+                          const Icon = suggestionIcon(suggestion.type);
+                          return <Icon className="h-4 w-4" />;
+                        })()}
+                      </span>
+                      <span className="min-w-0">
+                        <p className="truncate text-sm font-medium text-foreground">
+                          {suggestion.label}
+                        </p>
+                        <p className="truncate text-xs capitalize text-muted-foreground">
+                          {suggestionTypeLabel(suggestion.type)}
+                          {suggestion.subtitle ? ` · ${suggestion.subtitle}` : ""}
+                        </p>
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
 
         {/* Dates */}
@@ -209,10 +448,11 @@ const SearchForm = () => {
         <Button
           type="submit"
           size="lg"
+          disabled={isLoading}
           className="h-auto rounded-xl bg-gradient-primary px-8 text-base font-semibold shadow-elevated transition-smooth hover:opacity-95 md:px-6"
         >
           <Search className="mr-2 h-5 w-5" />
-          Search
+          {isLoading ? "Searching..." : "Search"}
         </Button>
       </div>
     </form>

@@ -9,7 +9,7 @@ const Header = () => {
             <Sparkles className="h-5 w-5 text-primary-foreground" />
           </div>
           <span className="font-display text-xl font-bold tracking-tight">
-            Secret Bookings
+            Secret Stays
           </span>
         </a>
         <nav className="hidden items-center gap-8 text-sm font-medium text-primary-foreground/90 md:flex">
