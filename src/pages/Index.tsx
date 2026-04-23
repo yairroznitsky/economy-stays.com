@@ -1,6 +1,7 @@
 import { ShieldCheck, Tag, Globe2, Sparkles } from "lucide-react";
 import heroImage from "@/assets/hero-hotel.jpg";
 import Header from "@/components/Header";
+import BrandLogo from "@/components/BrandLogo";
 import SearchForm from "@/components/SearchForm";
 import { requestHotelRedirectUrl } from "@/lib/hotelAffiliateApi";
 import { getOrCreateClickId, getOrCreateLandingId } from "@/lib/tracking";
@@ -183,7 +184,10 @@ const Index = () => {
       {/* Footer */}
       <footer className="border-t border-border bg-background py-10">
         <div className="container flex flex-col items-center justify-between gap-4 text-sm text-muted-foreground md:flex-row">
-          <p>© {new Date().getFullYear()} Secret Bookings. All rights reserved.</p>
+          <div className="flex items-center gap-3">
+            <BrandLogo compact variant="dark" className="gap-2" iconClassName="h-8 w-8 rounded-lg" />
+            <p>© {new Date().getFullYear()} Secret Bookings. All rights reserved.</p>
+          </div>
           <p>
             Secret Bookings may earn a commission from qualifying Kayak-powered stay referrals.
           </p>

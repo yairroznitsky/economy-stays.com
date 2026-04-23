@@ -1,0 +1,22 @@
+{
+  "name": "Secret Bookings",
+  "short_name": "SecretBookings",
+  "description": "Find hotel and stay deals worldwide.",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "64x64",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/apple-touch-icon.svg",
+      "sizes": "180x180",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "theme_color": "#003580",
+  "background_color": "#ffffff",
+  "display": "standalone"
+}
