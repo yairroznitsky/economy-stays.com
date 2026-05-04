@@ -1,23 +1,134 @@
+import { useState } from "react";
 import { ShieldCheck, Tag, Globe2, Sparkles } from "lucide-react";
 import heroImage from "@/assets/hero-hotel.jpg";
 import Header from "@/components/Header";
 import BrandLogo from "@/components/BrandLogo";
 import SearchForm from "@/components/SearchForm";
-import { requestHotelRedirectUrl } from "@/lib/hotelAffiliateApi";
+import {
+  requestHotelDestinationAutocomplete,
+  requestHotelRedirectUrl,
+} from "@/lib/hotelAffiliateApi";
+import {
+  buildHotelSearchInputFromSuggestion,
+  getDefaultHotelStayDateStrings,
+  getDeviceKayakAutocompleteContext,
+  withTrendingDeeplinkPlace,
+} from "@/lib/kayakDestinationSearch";
 import { getOrCreateClickId, getOrCreateLandingId } from "@/lib/tracking";
 import { toast } from "sonner";
-import { format } from "date-fns";
 
-const destinations = [
-  { name: "Paris", country: "France", emoji: "🗼" },
-  { name: "Bali", country: "Indonesia", emoji: "🌴" },
-  { name: "New York", country: "USA", emoji: "🗽" },
-  { name: "Tokyo", country: "Japan", emoji: "🗾" },
-  { name: "Dubai", country: "UAE", emoji: "🏙️" },
-  { name: "Santorini", country: "Greece", emoji: "🏖️" },
-  { name: "Rome", country: "Italy", emoji: "🏛️" },
-  { name: "Maldives", country: "Maldives", emoji: "🏝️" },
+type TrendingDestination = {
+  /** Card heading */
+  title: string;
+  /** Card subheading (usually state / D.C.) */
+  subtitle: string;
+  /** Kayak deeplink: city segment */
+  city: string;
+  /** Kayak deeplink: state segment */
+  state: string;
+  /** Kayak deeplink: country segment (full name) */
+  country: string;
+  image: string;
+  imageAlt: string;
+  /** CSS `object-position` so the crop matches the landmark (e.g. skyline vs sign). */
+  imageObjectPosition?: string;
+};
+
+const US_COUNTRY = "United States";
+
+/** Top U.S. leisure markets — autocomplete + affiliate `query` use `city, state, country`. */
+const destinations: TrendingDestination[] = [
+  {
+    title: "New York City",
+    subtitle: "New York",
+    city: "New York City",
+    state: "New York",
+    country: US_COUNTRY,
+    image:
+      "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&w=800&q=80",
+    imageAlt: "Manhattan skyline with the Empire State Building",
+  },
+  {
+    title: "Las Vegas",
+    subtitle: "Nevada",
+    city: "Las Vegas",
+    state: "Nevada",
+    country: US_COUNTRY,
+    image:
+      "https://images.pexels.com/photos/4424678/pexels-photo-4424678.jpeg?auto=compress&cs=tinysrgb&w=1200",
+    imageAlt:
+      "Golden-hour sunset on a palm-lined boulevard with resort towers and traffic, evoking the Las Vegas Strip",
+    imageObjectPosition: "center 38%",
+  },
+  {
+    title: "Orlando",
+    subtitle: "Florida",
+    city: "Orlando",
+    state: "Florida",
+    country: US_COUNTRY,
+    image:
+      "https://images.pexels.com/photos/1860618/pexels-photo-1860618.jpeg?auto=compress&cs=tinysrgb&w=1200",
+    imageAlt: "Theme park visitor holding a Universal Orlando Resort guide and tickets",
+    imageObjectPosition: "center 45%",
+  },
+  {
+    title: "Los Angeles",
+    subtitle: "California",
+    city: "Los Angeles",
+    state: "California",
+    country: US_COUNTRY,
+    image:
+      "https://images.pexels.com/photos/33642186/pexels-photo-33642186.jpeg?auto=compress&cs=tinysrgb&w=1200",
+    imageAlt: "Hollywood Sign on the hillside above Los Angeles",
+    imageObjectPosition: "center 35%",
+  },
+  {
+    title: "San Francisco",
+    subtitle: "California",
+    city: "San Francisco",
+    state: "California",
+    country: US_COUNTRY,
+    image:
+      "https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&w=800&q=80",
+    imageAlt: "Golden Gate Bridge and San Francisco Bay",
+  },
+  {
+    title: "Miami",
+    subtitle: "Florida",
+    city: "Miami",
+    state: "Florida",
+    country: US_COUNTRY,
+    image:
+      "https://images.pexels.com/photos/20187867/pexels-photo-20187867.jpeg?auto=compress&cs=tinysrgb&w=1200",
+    imageAlt:
+      "Ocean Drive in South Beach, Miami Beach — palm trees, art deco hotels, and the Atlantic shore",
+    imageObjectPosition: "center 42%",
+  },
+  {
+    title: "Washington DC",
+    subtitle: "D.C.",
+    city: "Washington",
+    state: "District of Columbia",
+    country: US_COUNTRY,
+    image:
+      "https://images.unsplash.com/photo-1617581629397-a72507c3de9e?auto=format&fit=crop&w=800&q=80",
+    imageAlt: "United States Capitol dome on a clear day",
+  },
+  {
+    title: "Chicago",
+    subtitle: "Illinois",
+    city: "Chicago",
+    state: "Illinois",
+    country: US_COUNTRY,
+    image:
+      "https://images.pexels.com/photos/167200/pexels-photo-167200.jpeg?auto=compress&cs=tinysrgb&w=1200",
+    imageAlt: "Chicago River and downtown skyscrapers on a clear day",
+    imageObjectPosition: "center 30%",
+  },
 ];
+
+const trendingAutocompleteQuery = (d: TrendingDestination) =>
+  `${d.city}, ${d.state}, ${d.country}`;
 
 const features = [
   {
@@ -38,28 +149,51 @@ const features = [
 ];
 
 const Index = () => {
-  const openDestination = async (destinationName: string) => {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const dayAfter = new Date();
-    dayAfter.setDate(dayAfter.getDate() + 2);
+  const [openingDestination, setOpeningDestination] = useState<string | null>(null);
+
+  const openDestination = async (d: TrendingDestination) => {
+    setOpeningDestination(d.title);
+    const { locale, marketCountry } = getDeviceKayakAutocompleteContext();
+    const { checkIn, checkOut } = getDefaultHotelStayDateStrings();
 
     try {
+      const suggestions = await requestHotelDestinationAutocomplete({
+        query: trendingAutocompleteQuery(d),
+        locale,
+        country: marketCountry,
+      });
+      const suggestion = suggestions[0];
+      if (!suggestion) {
+        toast.error(`No matches for ${d.title}. Try the search above.`);
+        return;
+      }
+
+      const baseSearch = buildHotelSearchInputFromSuggestion(suggestion, {
+        checkIn,
+        checkOut,
+        adults: 2,
+        children: 0,
+        rooms: 1,
+        locale,
+        marketCountry,
+        fallbackCountryName: d.country,
+      });
+
+      const search = withTrendingDeeplinkPlace(baseSearch, {
+        city: d.city,
+        state: d.state,
+        country: d.country,
+      });
+
       const response = await requestHotelRedirectUrl({
-        search: {
-          destination: destinationName,
-          checkIn: format(tomorrow, "yyyy-MM-dd"),
-          checkOut: format(dayAfter, "yyyy-MM-dd"),
-          adults: 2,
-          children: 0,
-          rooms: 1,
-        },
+        search,
         clickId: getOrCreateClickId(),
         landingId: getOrCreateLandingId(),
         affiliateSource: "kayak",
         metadata: {
           surface: "trending_destinations",
-          source_destination: destinationName,
+          source_destination: d.title,
+          destination_id: search.destinationId ?? "",
         },
       });
 
@@ -68,6 +202,8 @@ const Index = () => {
       const message =
         error instanceof Error ? error.message : "Unable to open destination deals.";
       toast.error(message);
+    } finally {
+      setOpeningDestination(null);
     }
   };
 
@@ -106,36 +242,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Features */}
-      <section id="how" className="border-b border-border bg-background py-20">
-        <div className="container">
-          <div className="mx-auto max-w-2xl text-center">
-            <h2 className="font-display text-3xl font-bold text-foreground md:text-4xl">
-              Why travelers choose us
-            </h2>
-            <p className="mt-3 text-muted-foreground">
-              We hunt the web for the lowest prices so you don't have to.
-            </p>
-          </div>
-          <div className="mt-12 grid gap-6 md:grid-cols-3">
-            {features.map((f) => (
-              <div
-                key={f.title}
-                className="rounded-2xl border border-border bg-card p-7 shadow-soft transition-smooth hover:-translate-y-1 hover:shadow-elevated"
-              >
-                <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-primary text-primary-foreground">
-                  <f.icon className="h-6 w-6" />
-                </div>
-                <h3 className="text-lg font-semibold text-foreground">
-                  {f.title}
-                </h3>
-                <p className="mt-2 text-muted-foreground">{f.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Destinations */}
       <section id="destinations" className="bg-secondary/40 py-20">
         <div className="container">
@@ -153,17 +259,66 @@ const Index = () => {
           <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
             {destinations.map((d) => (
               <button
-                key={d.name}
+                key={d.title}
                 type="button"
-                onClick={() => void openDestination(d.name)}
-                className="group rounded-2xl border border-border bg-card p-5 shadow-soft transition-smooth hover:-translate-y-1 hover:border-primary/40 hover:shadow-elevated"
+                disabled={openingDestination !== null}
+                aria-busy={openingDestination === d.title}
+                onClick={() => void openDestination(d)}
+                className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card p-0 text-left shadow-soft transition-smooth hover:-translate-y-1 hover:border-primary/40 hover:shadow-elevated disabled:pointer-events-none disabled:opacity-60"
               >
-                <div className="text-3xl">{d.emoji}</div>
-                <p className="mt-3 font-semibold text-foreground group-hover:text-primary">
-                  {d.name}
-                </p>
-                <p className="text-sm text-muted-foreground">{d.country}</p>
+                <div className="relative aspect-[4/3] w-full overflow-hidden bg-muted">
+                  <img
+                    src={d.image}
+                    alt={d.imageAlt}
+                    width={800}
+                    height={600}
+                    loading="lazy"
+                    decoding="async"
+                    style={
+                      d.imageObjectPosition
+                        ? { objectPosition: d.imageObjectPosition }
+                        : undefined
+                    }
+                    className="h-full w-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
+                  />
+                </div>
+                <div className="p-4">
+                  <p className="font-semibold text-foreground group-hover:text-primary">
+                    {d.title}
+                  </p>
+                  <p className="text-sm text-muted-foreground">{d.subtitle}</p>
+                </div>
               </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Features */}
+      <section id="how" className="border-b border-border bg-background py-20">
+        <div className="container">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="font-display text-3xl font-bold text-foreground md:text-4xl">
+              Why travelers choose us
+            </h2>
+            <p className="mt-3 text-muted-foreground">
+              We hunt the web for the lowest prices so you don't have to.
+            </p>
+          </div>
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
+            {features.map((f) => (
+              <div
+                key={f.title}
+                className="rounded-2xl border border-border bg-card p-7 shadow-soft"
+              >
+                <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-primary text-primary-foreground">
+                  <f.icon className="h-6 w-6" />
+                </div>
+                <h3 className="text-lg font-semibold text-foreground">
+                  {f.title}
+                </h3>
+                <p className="mt-2 text-muted-foreground">{f.desc}</p>
+              </div>
             ))}
           </div>
         </div>

@@ -17,7 +17,6 @@ import { DateRange } from "react-day-picker";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Popover,
@@ -31,6 +30,21 @@ import {
 } from "@/lib/hotelAffiliateApi";
 import { getOrCreateClickId, getOrCreateLandingId } from "@/lib/tracking";
 import type { HotelDestinationSuggestion } from "@/types/hotels";
+
+/** Bold the first case-insensitive match of `query` inside `text` (autocomplete mirror). */
+const HighlightQuery = ({ text, query }: { text: string; query: string }) => {
+  const q = query.trim();
+  if (!q) return <>{text}</>;
+  const idx = text.toLowerCase().indexOf(q.toLowerCase());
+  if (idx < 0) return <>{text}</>;
+  return (
+    <>
+      {text.slice(0, idx)}
+      <strong className="font-bold">{text.slice(idx, idx + q.length)}</strong>
+      {text.slice(idx + q.length)}
+    </>
+  );
+};
 
 const SearchForm = () => {
   const today = new Date();
@@ -287,16 +301,22 @@ const SearchForm = () => {
       <div className="grid grid-cols-1 gap-2 md:grid-cols-[1.5fr_1.5fr_1fr_auto]">
         {/* Destination */}
         <div className="relative rounded-xl border border-border bg-background px-4 py-3 transition-smooth hover:border-primary/40">
-          <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          <Label
+            htmlFor="search-destination"
+            className="text-xs font-semibold uppercase tracking-wide text-muted-foreground"
+          >
             Where
           </Label>
-          <div className="mt-1 flex items-center gap-2">
-            <MapPin className="h-4 w-4 shrink-0 text-primary" />
-            <Input
+          <div className="mt-1 flex min-w-0 items-center gap-2">
+            <MapPin className="h-4 w-4 shrink-0 text-primary" aria-hidden />
+            <input
+              id="search-destination"
               ref={destinationInputRef}
+              type="text"
               value={destination}
               onChange={(e) => setDestination(e.target.value)}
               readOnly={isDestinationLocked}
+              spellCheck={false}
               onClick={() => {
                 if (!isDestinationLocked) return;
                 setIsDestinationLocked(false);
@@ -343,7 +363,11 @@ const SearchForm = () => {
               }}
               placeholder="City, stay, or destination"
               autoComplete="off"
-              className="h-auto border-0 bg-transparent p-0 text-base shadow-none focus-visible:ring-0"
+              className={cn(
+                "min-w-0 flex-1 border-0 bg-transparent p-0 text-base text-foreground shadow-none outline-none",
+                "placeholder:text-muted-foreground",
+                "focus-visible:ring-0 focus-visible:ring-offset-0"
+              )}
               required
             />
           </div>
@@ -373,11 +397,21 @@ const SearchForm = () => {
                       </span>
                       <span className="min-w-0">
                         <p className="truncate text-sm font-medium text-foreground">
-                          {suggestion.label}
+                          <HighlightQuery text={suggestion.label} query={destination} />
                         </p>
-                        <p className="truncate text-xs capitalize text-muted-foreground">
-                          {suggestionTypeLabel(suggestion.type)}
-                          {suggestion.subtitle ? ` · ${suggestion.subtitle}` : ""}
+                        <p className="truncate text-xs text-muted-foreground">
+                          <span className="capitalize">
+                            <HighlightQuery
+                              text={suggestionTypeLabel(suggestion.type)}
+                              query={destination}
+                            />
+                          </span>
+                          {suggestion.subtitle ? (
+                            <>
+                              <span> · </span>
+                              <HighlightQuery text={suggestion.subtitle} query={destination} />
+                            </>
+                          ) : null}
                         </p>
                       </span>
                     </button>
