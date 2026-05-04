@@ -438,7 +438,10 @@ const SearchForm = () => {
           )}
           {isDropdownOpen && destination.trim().length >= 3 && suggestions.length > 0 && (
             <div className="absolute top-full left-0 z-50 mt-2 w-full rounded-xl border border-border bg-popover p-1 shadow-elevated">
-              <ul role="listbox" className="max-h-72 overflow-auto">
+              <ul
+                role="listbox"
+                className="max-h-60 overflow-auto md:max-h-72"
+              >
                 {suggestions.map((suggestion, index) => (
                   <li key={`${suggestion.type}-${suggestion.id}-${index}`}>
                     <button
