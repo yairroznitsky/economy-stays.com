@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ShieldCheck, Tag, Globe2, Sparkles } from "lucide-react";
+import { ExternalLink, ShieldCheck, Tag, Globe2, Sparkles } from "lucide-react";
 import heroImage from "@/assets/hero-hotel.jpg";
 import Header from "@/components/Header";
 import BrandLogo from "@/components/BrandLogo";
@@ -226,14 +226,13 @@ const Index = () => {
         <div className="container relative z-10 flex min-h-[100svh] flex-col items-center justify-start pt-16 pb-10 text-center md:min-h-[760px] md:justify-center md:pt-24 md:pb-32">
           <span className="mb-4 hidden items-center gap-2 rounded-full border border-primary-foreground/30 bg-primary-foreground/10 px-4 py-1.5 text-xs font-medium text-primary-foreground backdrop-blur-md sm:inline-flex md:mb-5">
             <Sparkles className="h-3.5 w-3.5" />
-            Members-only deals on 2M+ stays
+            Save up to 60%
           </span>
           <h1 className="max-w-3xl font-display text-4xl font-bold leading-[1.08] text-primary-foreground drop-shadow-lg md:max-w-4xl md:text-7xl md:leading-[1.05]">
-            Unlock the world's<br />best-kept stay deals
+            Unlock hidden stay deals
           </h1>
-          <p className="mt-4 max-w-xl text-base text-primary-foreground/90 md:mt-6 md:max-w-2xl md:text-xl">
-            Search and compare hotels, homes, and apartments worldwide.
-            Save up to 60% on your next trip.
+          <p className="mt-4 max-w-xl text-base text-primary-foreground/90 md:mt-5 md:max-w-xl md:text-lg">
+            Hotels and homes worldwide in one search.
           </p>
 
           <div className="mt-7 w-full max-w-5xl md:mt-12">
@@ -264,7 +263,7 @@ const Index = () => {
                 disabled={openingDestination !== null}
                 aria-busy={openingDestination === d.title}
                 onClick={() => void openDestination(d)}
-                className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card p-0 text-left shadow-soft transition-smooth hover:-translate-y-1 hover:border-primary/40 hover:shadow-elevated disabled:pointer-events-none disabled:opacity-60"
+                className="group flex h-full min-w-0 flex-col overflow-hidden rounded-2xl border border-border bg-card p-0 text-left shadow-soft transition-smooth hover:-translate-y-1 hover:border-primary/40 hover:shadow-elevated disabled:pointer-events-none disabled:opacity-60"
               >
                 <div className="relative aspect-[4/3] w-full overflow-hidden bg-muted">
                   <img
@@ -282,11 +281,23 @@ const Index = () => {
                     className="h-full w-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
                   />
                 </div>
-                <div className="p-4">
-                  <p className="font-semibold text-foreground group-hover:text-primary">
-                    {d.title}
-                  </p>
-                  <p className="text-sm text-muted-foreground">{d.subtitle}</p>
+                <div className="flex flex-1 items-center gap-2 p-3 text-left sm:gap-3 sm:p-4">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold leading-snug text-foreground group-hover:text-primary">
+                      {d.title}
+                    </p>
+                    <p className="text-sm text-muted-foreground">{d.subtitle}</p>
+                  </div>
+                  <span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-lg bg-gradient-primary px-2.5 py-2 text-[11px] font-semibold leading-none text-primary-foreground shadow-sm transition-opacity group-hover:opacity-95 sm:gap-1.5 sm:rounded-xl sm:px-3 sm:py-2.5 sm:text-sm">
+                    {openingDestination === d.title ? (
+                      "Opening…"
+                    ) : (
+                      <>
+                        View deals
+                        <ExternalLink className="h-3.5 w-3.5 shrink-0 opacity-90 sm:h-4 sm:w-4" aria-hidden />
+                      </>
+                    )}
+                  </span>
                 </div>
               </button>
             ))}
@@ -327,11 +338,11 @@ const Index = () => {
       {/* CTA strip */}
       <section id="deals" className="relative overflow-hidden bg-gradient-primary py-16">
         <div className="container text-center">
-          <h2 className="font-display text-3xl font-bold text-primary-foreground md:text-4xl">
+          <h2 className="font-display text-4xl font-bold text-primary-foreground md:text-5xl">
             Ready to discover your next stay?
           </h2>
-          <p className="mx-auto mt-3 max-w-xl text-primary-foreground/90">
-            Scroll up and start your search — your ideal stay is just a few clicks away.
+          <p className="mx-auto mt-4 max-w-xl text-base text-primary-foreground/90 md:text-lg">
+            Scroll up and start your search. Your ideal stay is just a few clicks away.
           </p>
         </div>
       </section>

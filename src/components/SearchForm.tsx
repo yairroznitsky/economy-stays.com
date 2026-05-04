@@ -4,7 +4,6 @@ import {
   CalendarIcon,
   MapPin,
   Users,
-  Search,
   Minus,
   Plus,
   Plane,
@@ -296,7 +295,7 @@ const SearchForm = () => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-full rounded-2xl bg-card p-3 shadow-search md:p-4"
+      className="w-full rounded-2xl bg-booking-yellow p-3 shadow-search md:p-4"
     >
       <div className="grid grid-cols-1 gap-2 md:grid-cols-[1.5fr_1.5fr_1fr_auto]">
         {/* Destination */}
@@ -515,9 +514,8 @@ const SearchForm = () => {
           type="submit"
           size="lg"
           disabled={isLoading}
-          className="h-12 rounded-xl bg-gradient-primary px-8 text-lg font-semibold shadow-elevated transition-smooth hover:opacity-95 active:scale-[0.99] md:h-auto md:px-6 md:text-base"
+          className="h-12 rounded-xl bg-gradient-primary px-8 text-xl font-semibold shadow-elevated transition-smooth hover:opacity-95 active:scale-[0.99] md:h-auto md:px-8 md:text-2xl"
         >
-          <Search className="mr-2 h-5 w-5 md:h-5 md:w-5" />
           {isLoading ? "Searching..." : "Search"}
         </Button>
       </div>
