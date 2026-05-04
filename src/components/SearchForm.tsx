@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { format } from "date-fns";
 import {
   CalendarIcon,
@@ -69,6 +69,40 @@ const SearchForm = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
   const destinationInputRef = useRef<HTMLInputElement>(null);
+  /** Wrapper for destination field + dropdown; used to scroll above mobile keyboard. */
+  const destinationFieldRef = useRef<HTMLDivElement>(null);
+
+  const alignDestinationFieldToVisualViewport = useCallback(() => {
+    const el = destinationFieldRef.current;
+    if (!el || typeof window === "undefined") return;
+
+    const vv = window.visualViewport;
+    const padding = 12;
+    if (vv) {
+      const rect = el.getBoundingClientRect();
+      const targetTop = vv.offsetTop + padding;
+      const delta = rect.top - targetTop;
+      if (Math.abs(delta) > 2) {
+        window.scrollTo({
+          top: window.scrollY + delta,
+          behavior: "auto",
+        });
+      }
+    } else {
+      el.scrollIntoView({ block: "start", behavior: "auto", inline: "nearest" });
+    }
+  }, []);
+
+  const scrollDestinationFieldIntoMobileView = useCallback(() => {
+    if (typeof window === "undefined") return;
+    if (!window.matchMedia("(max-width: 767px)").matches) return;
+
+    alignDestinationFieldToVisualViewport();
+    requestAnimationFrame(alignDestinationFieldToVisualViewport);
+    window.setTimeout(alignDestinationFieldToVisualViewport, 50);
+    window.setTimeout(alignDestinationFieldToVisualViewport, 200);
+    window.setTimeout(alignDestinationFieldToVisualViewport, 450);
+  }, [alignDestinationFieldToVisualViewport]);
 
   const suggestionIcon = (type: string) => {
     const normalizedType = type.toLowerCase();
@@ -170,6 +204,31 @@ const SearchForm = () => {
       setSelectedSuggestion(null);
     }
   }, [destination, selectedSuggestion]);
+
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+
+    const onViewportChange = () => {
+      if (document.activeElement !== destinationInputRef.current) return;
+      if (!window.matchMedia("(max-width: 767px)").matches) return;
+      alignDestinationFieldToVisualViewport();
+    };
+
+    vv.addEventListener("resize", onViewportChange);
+    vv.addEventListener("scroll", onViewportChange);
+    return () => {
+      vv.removeEventListener("resize", onViewportChange);
+      vv.removeEventListener("scroll", onViewportChange);
+    };
+  }, [alignDestinationFieldToVisualViewport]);
+
+  useEffect(() => {
+    if (!isDropdownOpen || suggestions.length === 0) return;
+    if (!window.matchMedia("(max-width: 767px)").matches) return;
+    const id = window.requestAnimationFrame(() => scrollDestinationFieldIntoMobileView());
+    return () => window.cancelAnimationFrame(id);
+  }, [isDropdownOpen, suggestions.length, scrollDestinationFieldIntoMobileView]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -299,7 +358,10 @@ const SearchForm = () => {
     >
       <div className="grid grid-cols-1 gap-2 md:grid-cols-[1.5fr_1.5fr_1fr_auto]">
         {/* Destination */}
-        <div className="relative rounded-xl border border-border bg-background px-4 py-3 transition-smooth hover:border-primary/40">
+        <div
+          ref={destinationFieldRef}
+          className="relative rounded-xl border border-border bg-background px-4 py-3 transition-smooth hover:border-primary/40"
+        >
           <Label
             htmlFor="search-destination"
             className="text-xs font-semibold uppercase tracking-wide text-muted-foreground"
@@ -325,6 +387,7 @@ const SearchForm = () => {
               }}
               onFocus={() => {
                 if (isDestinationLocked) return;
+                scrollDestinationFieldIntoMobileView();
                 if (destination.trim().length >= 3 && suggestions.length > 0) {
                   setIsDropdownOpen(true);
                 }
