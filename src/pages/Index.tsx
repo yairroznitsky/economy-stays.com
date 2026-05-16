@@ -281,14 +281,14 @@ const Index = () => {
                     className="h-full w-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
                   />
                 </div>
-                <div className="flex flex-1 items-center gap-2 p-3 text-left sm:gap-3 sm:p-4">
-                  <div className="min-w-0 flex-1">
+                <div className="flex flex-1 flex-col gap-3 p-3 text-left sm:p-4">
+                  <div className="min-w-0">
                     <p className="font-semibold leading-snug text-foreground group-hover:text-primary">
                       {d.title}
                     </p>
-                    <p className="text-sm text-muted-foreground">{d.subtitle}</p>
+                    <p className="mt-0.5 text-sm text-muted-foreground">{d.subtitle}</p>
                   </div>
-                  <span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-lg bg-gradient-primary px-2.5 py-2 text-[11px] font-semibold leading-none text-primary-foreground shadow-sm transition-opacity group-hover:opacity-95 sm:gap-1.5 sm:rounded-xl sm:px-3 sm:py-2.5 sm:text-sm">
+                  <span className="inline-flex w-full items-center justify-center gap-1 whitespace-nowrap rounded-lg bg-gradient-primary px-2.5 py-2 text-[11px] font-semibold leading-none text-primary-foreground shadow-sm transition-opacity group-hover:opacity-95 sm:gap-1.5 sm:rounded-xl sm:px-3 sm:py-2.5 sm:text-sm">
                     {openingDestination === d.title ? (
                       "Opening…"
                     ) : (
