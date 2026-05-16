@@ -537,21 +537,21 @@ const SearchForm = () => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-full rounded-2xl bg-booking-yellow p-3 shadow-search md:p-4"
+      className="w-full rounded-2xl bg-booking-yellow p-3 text-left shadow-search md:p-4"
     >
       <div className="grid grid-cols-1 gap-2 md:grid-cols-[1.5fr_1.5fr_1fr_auto]">
         {/* Destination */}
         <div
           ref={destinationFieldRef}
-          className="relative rounded-xl border border-border bg-background px-4 py-3 transition-smooth hover:border-primary/40"
+          className="relative rounded-xl border border-border bg-background px-4 py-3 text-left transition-smooth hover:border-primary/40"
         >
           <Label
             htmlFor="search-destination"
-            className="text-xs font-semibold uppercase tracking-wide text-muted-foreground"
+            className="block text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground"
           >
             Where
           </Label>
-          <div className="mt-1 flex min-w-0 items-center gap-2">
+          <div className="mt-1 flex min-w-0 items-center justify-start gap-2 text-left">
             <MapPin className="h-4 w-4 shrink-0 text-primary" aria-hidden />
             <input
               id="search-destination"
@@ -609,8 +609,8 @@ const SearchForm = () => {
               placeholder="City, stay, or destination"
               autoComplete="off"
               className={cn(
-                "min-w-0 flex-1 border-0 bg-transparent p-0 text-base text-foreground shadow-none outline-none",
-                "placeholder:text-muted-foreground",
+                "min-w-0 flex-1 border-0 bg-transparent p-0 text-left text-base text-foreground shadow-none outline-none",
+                "placeholder:text-left placeholder:text-muted-foreground",
                 "focus-visible:ring-0 focus-visible:ring-offset-0"
               )}
               required
@@ -678,14 +678,14 @@ const SearchForm = () => {
               onClick={openDatePicker}
               className="rounded-xl border border-border bg-background px-4 py-3 text-left transition-smooth hover:border-primary/40"
             >
-              <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              <Label className="block text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                 When
               </Label>
-              <div className="mt-1 flex items-center gap-2">
+              <div className="mt-1 flex items-center justify-start gap-2 text-left">
                 <CalendarIcon className="h-4 w-4 shrink-0 text-primary" />
                 <span
                   className={cn(
-                    "text-base",
+                    "text-left text-base",
                     !range?.from && "text-muted-foreground"
                   )}
                 >
@@ -720,14 +720,14 @@ const SearchForm = () => {
                 type="button"
                 className="rounded-xl border border-border bg-background px-4 py-3 text-left transition-smooth hover:border-primary/40"
               >
-                <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                <Label className="block text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                   When
                 </Label>
-                <div className="mt-1 flex items-center gap-2">
+                <div className="mt-1 flex items-center justify-start gap-2 text-left">
                   <CalendarIcon className="h-4 w-4 shrink-0 text-primary" />
                   <span
                     className={cn(
-                      "text-base",
+                      "text-left text-base",
                       !range?.from && "text-muted-foreground"
                     )}
                   >
@@ -757,12 +757,12 @@ const SearchForm = () => {
               type="button"
               className="rounded-xl border border-border bg-background px-4 py-3 text-left transition-smooth hover:border-primary/40"
             >
-              <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              <Label className="block text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                 Who
               </Label>
-              <div className="mt-1 flex items-center gap-2">
+              <div className="mt-1 flex items-center justify-start gap-2 text-left">
                 <Users className="h-4 w-4 shrink-0 text-primary" />
-                <span className="text-base">{guestSummary}</span>
+                <span className="text-left text-base">{guestSummary}</span>
               </div>
             </button>
           </PopoverTrigger>
