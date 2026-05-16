@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { format } from "date-fns";
+import { format, isBefore, isSameDay, startOfDay } from "date-fns";
 import {
   CalendarIcon,
   MapPin,
@@ -22,6 +22,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { toast } from "sonner";
 import {
   requestHotelDestinationAutocomplete,
@@ -29,6 +36,62 @@ import {
 } from "@/lib/hotelAffiliateApi";
 import { getOrCreateClickId, getOrCreateLandingId } from "@/lib/tracking";
 import type { HotelDestinationSuggestion } from "@/types/hotels";
+
+const DateRangeStepHeader = ({
+  value,
+  phase,
+  className,
+}: {
+  value: DateRange | undefined;
+  phase: "check-in" | "check-out";
+  className?: string;
+}) => (
+  <div className={cn("grid grid-cols-2 gap-2", className)}>
+    <div
+      className={cn(
+        "rounded-xl border px-3 py-2.5 transition-colors",
+        phase === "check-in"
+          ? "border-primary bg-primary/5 ring-1 ring-primary/25"
+          : value?.from
+            ? "border-primary/50 bg-primary/5"
+            : "border-border bg-muted/40"
+      )}
+    >
+      <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        Check-in
+      </p>
+      <p
+        className={cn(
+          "mt-0.5 text-sm font-semibold",
+          value?.from ? "text-foreground" : "text-muted-foreground"
+        )}
+      >
+        {value?.from ? format(value.from, "MMM d, yyyy") : "Select date"}
+      </p>
+    </div>
+    <div
+      className={cn(
+        "rounded-xl border px-3 py-2.5 transition-colors",
+        phase === "check-out"
+          ? "border-primary bg-primary/5 ring-1 ring-primary/25"
+          : "border-border bg-muted/40",
+        !value?.from && "opacity-60"
+      )}
+    >
+      <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        Check-out
+      </p>
+      <p
+        className={cn(
+          "mt-0.5 text-sm font-semibold",
+          value?.to ? "text-foreground" : "text-muted-foreground"
+        )}
+      >
+        {value?.to ? format(value.to, "MMM d, yyyy") : "Select date"}
+      </p>
+    </div>
+  </div>
+);
 
 /** Bold the first case-insensitive match of `query` inside `text` (autocomplete mirror). */
 const HighlightQuery = ({ text, query }: { text: string; query: string }) => {
@@ -71,6 +134,126 @@ const SearchForm = () => {
   const destinationInputRef = useRef<HTMLInputElement>(null);
   /** Wrapper for destination field + dropdown; used to scroll above mobile keyboard. */
   const destinationFieldRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
+  const [datesOpen, setDatesOpen] = useState(false);
+  const [draftRange, setDraftRange] = useState<DateRange | undefined>(range);
+  const [calendarMonth, setCalendarMonth] = useState<Date>(range?.from ?? today);
+
+  const startOfToday = startOfDay(new Date());
+  const datePickerPhase: "check-in" | "check-out" =
+    !draftRange?.from || draftRange?.to ? "check-in" : "check-out";
+
+  const isDateDisabled = useCallback(
+    (date: Date) => {
+      const day = startOfDay(date);
+      if (isBefore(day, startOfToday)) return true;
+      if (draftRange?.from && !draftRange?.to) {
+        const from = startOfDay(draftRange.from);
+        return isBefore(day, from) || isSameDay(day, from);
+      }
+      return false;
+    },
+    [draftRange?.from, draftRange?.to, startOfToday]
+  );
+
+  const formatDateRangeLabel = (value: DateRange | undefined) => {
+    if (!value?.from) return "Add dates";
+    if (!value.to) return format(value.from, "MMM d, yyyy");
+    return `${format(value.from, "MMM d")} — ${format(value.to, "MMM d, yyyy")}`;
+  };
+
+  const openDatePicker = () => {
+    setDraftRange(range);
+    setCalendarMonth(range?.from ?? today);
+    setDatesOpen(true);
+  };
+
+  const handleDatesOpenChange = (open: boolean) => {
+    if (open) {
+      setDraftRange(range);
+      setCalendarMonth(range?.from ?? today);
+    } else {
+      setDraftRange(range);
+    }
+    setDatesOpen(open);
+  };
+
+  const handleRangeDaySelect = useCallback(
+    (day: Date) => {
+      const clicked = startOfDay(day);
+      if (isBefore(clicked, startOfToday)) return;
+
+      const from = draftRange?.from ? startOfDay(draftRange.from) : undefined;
+      const to = draftRange?.to ? startOfDay(draftRange.to) : undefined;
+
+      if (!from || to) {
+        setDraftRange({ from: clicked, to: undefined });
+        return;
+      }
+
+      if (isBefore(clicked, from) || isSameDay(clicked, from)) {
+        setDraftRange({ from: clicked, to: undefined });
+        return;
+      }
+
+      const completed = { from, to: clicked };
+      setDraftRange(completed);
+      setRange(completed);
+      setDatesOpen(false);
+    },
+    [draftRange?.from, draftRange?.to, startOfToday]
+  );
+
+  const mobileCalendarClassNames = {
+    months: "flex w-full flex-col",
+    month: "w-full space-y-3",
+    caption: "relative mb-1 flex items-center justify-center pt-1",
+    caption_label: "text-base font-semibold",
+    nav: "flex items-center gap-1",
+    nav_button: cn(
+      "inline-flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background text-foreground shadow-sm transition-colors hover:bg-accent"
+    ),
+    nav_button_previous: "absolute left-0",
+    nav_button_next: "absolute right-0",
+    table: "w-full border-collapse",
+    head_row: "flex w-full",
+    head_cell: "w-[14.28%] text-center text-xs font-medium text-muted-foreground",
+    row: "mt-1 flex w-full",
+    cell: cn(
+      "relative flex h-11 w-[14.28%] items-center justify-center p-0 text-center text-sm",
+      "[&:has([aria-selected].day-range-start)]:rounded-l-full",
+      "[&:has([aria-selected].day-range-end)]:rounded-r-full",
+      "[&:has([aria-selected])]:bg-primary/10"
+    ),
+    day: cn(
+      "h-10 w-10 rounded-full p-0 text-base font-normal transition-colors",
+      "aria-selected:opacity-100"
+    ),
+    day_selected:
+      "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground",
+    day_today: "bg-primary/15 font-semibold text-primary",
+    day_outside: "text-muted-foreground/40 aria-selected:text-muted-foreground",
+    day_disabled: "text-muted-foreground/25 opacity-35",
+    day_range_start:
+      "day-range-start rounded-full bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground",
+    day_range_end:
+      "day-range-end rounded-full bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground",
+    day_range_middle: "rounded-none bg-primary/15 aria-selected:bg-primary/15",
+  };
+
+  const dateRangeCalendar = (
+    <Calendar
+      mode="range"
+      selected={draftRange}
+      onDayClick={handleRangeDaySelect}
+      numberOfMonths={isMobile ? 1 : 2}
+      month={calendarMonth}
+      onMonthChange={setCalendarMonth}
+      disabled={isDateDisabled}
+      className={cn("pointer-events-auto", isMobile ? "p-2" : "p-3")}
+      classNames={isMobile ? mobileCalendarClassNames : undefined}
+    />
+  );
 
   const alignDestinationFieldToVisualViewport = useCallback(() => {
     const el = destinationFieldRef.current;
@@ -488,10 +671,11 @@ const SearchForm = () => {
         </div>
 
         {/* Dates */}
-        <Popover>
-          <PopoverTrigger asChild>
+        {isMobile ? (
+          <>
             <button
               type="button"
+              onClick={openDatePicker}
               className="rounded-xl border border-border bg-background px-4 py-3 text-left transition-smooth hover:border-primary/40"
             >
               <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
@@ -505,34 +689,66 @@ const SearchForm = () => {
                     !range?.from && "text-muted-foreground"
                   )}
                 >
-                  {range?.from ? (
-                    range.to ? (
-                      <>
-                        {format(range.from, "MMM d")} —{" "}
-                        {format(range.to, "MMM d, yyyy")}
-                      </>
-                    ) : (
-                      format(range.from, "MMM d, yyyy")
-                    )
-                  ) : (
-                    "Add dates"
-                  )}
+                  {formatDateRangeLabel(range)}
                 </span>
               </div>
             </button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <Calendar
-              mode="range"
-              selected={range}
-              onSelect={setRange}
-              numberOfMonths={2}
-              disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-              initialFocus
-              className={cn("p-3 pointer-events-auto")}
-            />
-          </PopoverContent>
-        </Popover>
+          <Sheet open={datesOpen} onOpenChange={handleDatesOpenChange}>
+            <SheetContent
+              side="bottom"
+              className="max-h-[92dvh] gap-0 rounded-t-2xl px-0 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-3"
+            >
+              <SheetHeader className="space-y-3 px-4 text-left">
+                <SheetTitle className="text-lg">Select dates</SheetTitle>
+                <DateRangeStepHeader value={draftRange} phase={datePickerPhase} />
+                <p className="text-sm text-muted-foreground">
+                  {datePickerPhase === "check-in"
+                    ? "Tap your check-in date"
+                    : "Tap your check-out date"}
+                </p>
+              </SheetHeader>
+              <div className="flex justify-center overflow-x-auto px-2 py-2">
+                {dateRangeCalendar}
+              </div>
+            </SheetContent>
+          </Sheet>
+          </>
+        ) : (
+          <Popover open={datesOpen} onOpenChange={handleDatesOpenChange}>
+            <PopoverTrigger asChild>
+              <button
+                type="button"
+                className="rounded-xl border border-border bg-background px-4 py-3 text-left transition-smooth hover:border-primary/40"
+              >
+                <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  When
+                </Label>
+                <div className="mt-1 flex items-center gap-2">
+                  <CalendarIcon className="h-4 w-4 shrink-0 text-primary" />
+                  <span
+                    className={cn(
+                      "text-base",
+                      !range?.from && "text-muted-foreground"
+                    )}
+                  >
+                    {formatDateRangeLabel(range)}
+                  </span>
+                </div>
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <div className="border-b border-border p-3">
+                <DateRangeStepHeader value={draftRange} phase={datePickerPhase} />
+                <p className="mt-2 text-center text-xs text-muted-foreground">
+                  {datePickerPhase === "check-in"
+                    ? "Select check-in, then check-out"
+                    : "Select check-out to finish"}
+                </p>
+              </div>
+              {dateRangeCalendar}
+            </PopoverContent>
+          </Popover>
+        )}
 
         {/* Guests */}
         <Popover>
