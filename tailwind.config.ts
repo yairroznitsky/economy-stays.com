@@ -49,6 +49,7 @@ export default {
           foreground: "hsl(var(--card-foreground))",
         },
         booking: {
+          blue: "#003580",
           yellow: "#febb02",
         },
         sidebar: {

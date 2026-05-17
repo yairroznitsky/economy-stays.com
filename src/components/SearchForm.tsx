@@ -118,6 +118,11 @@ const HighlightQuery = ({ text, query }: { text: string; query: string }) => {
   );
 };
 
+const desktopFieldPad = "md:px-[1.15rem] md:py-[0.8625rem]";
+const desktopFieldLabel = "md:text-[0.8625rem]";
+const desktopFieldText = "md:text-[1.15rem]";
+const desktopFieldIcon = "md:h-[1.15rem] md:w-[1.15rem]";
+
 const SearchForm = () => {
   const today = new Date();
   const tomorrow = new Date();
@@ -605,14 +610,15 @@ const SearchForm = () => {
     <form
       onSubmit={handleSubmit}
       noValidate
-      className="w-full rounded-2xl bg-booking-yellow p-3 text-left shadow-search md:p-4"
+      className="w-full rounded-2xl bg-booking-yellow p-3 text-left shadow-search md:p-[1.15rem]"
     >
-      <div className="grid grid-cols-1 gap-2 md:grid-cols-[1.5fr_1.5fr_1fr_auto]">
+      <div className="grid grid-cols-1 gap-2 md:grid-cols-[1.5fr_1.5fr_1fr_auto] md:gap-[0.575rem]">
         {/* Destination */}
         <div
           ref={destinationFieldRef}
           className={cn(
             "relative rounded-xl border bg-background px-4 py-3 text-left transition-smooth hover:border-primary/40",
+            desktopFieldPad,
             destinationError
               ? "border-destructive ring-1 ring-destructive/30"
               : "border-border"
@@ -620,12 +626,15 @@ const SearchForm = () => {
         >
           <Label
             htmlFor="search-destination"
-            className="block text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground"
+            className={cn(
+              "block text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground",
+              desktopFieldLabel
+            )}
           >
             Where
           </Label>
           <div className="mt-1 flex min-w-0 items-center justify-start gap-2 text-left">
-            <MapPin className="h-4 w-4 shrink-0 text-primary" aria-hidden />
+            <MapPin className={cn("h-4 w-4 shrink-0 text-primary", desktopFieldIcon)} aria-hidden />
             <input
               id="search-destination"
               ref={destinationInputRef}
@@ -688,6 +697,7 @@ const SearchForm = () => {
               aria-describedby={destinationError ? "search-destination-error" : undefined}
               className={cn(
                 "min-w-0 flex-1 border-0 bg-transparent p-0 text-left text-base text-foreground shadow-none outline-none",
+                desktopFieldText,
                 "placeholder:text-left placeholder:text-muted-foreground",
                 "focus-visible:ring-0 focus-visible:ring-offset-0"
               )}
@@ -762,16 +772,25 @@ const SearchForm = () => {
             <button
               type="button"
               onClick={openDatePicker}
-              className="rounded-xl border border-border bg-background px-4 py-3 text-left transition-smooth hover:border-primary/40"
+              className={cn(
+                "rounded-xl border border-border bg-background px-4 py-3 text-left transition-smooth hover:border-primary/40",
+                desktopFieldPad
+              )}
             >
-              <Label className="block text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              <Label
+                className={cn(
+                  "block text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground",
+                  desktopFieldLabel
+                )}
+              >
                 When
               </Label>
               <div className="mt-1 flex items-center justify-start gap-2 text-left">
-                <CalendarIcon className="h-4 w-4 shrink-0 text-primary" />
+                <CalendarIcon className={cn("h-4 w-4 shrink-0 text-primary", desktopFieldIcon)} />
                 <span
                   className={cn(
                     "text-left text-base",
+                    desktopFieldText,
                     !range?.from && "text-muted-foreground"
                   )}
                 >
@@ -804,16 +823,25 @@ const SearchForm = () => {
             <PopoverTrigger asChild>
               <button
                 type="button"
-                className="rounded-xl border border-border bg-background px-4 py-3 text-left transition-smooth hover:border-primary/40"
+                className={cn(
+                "rounded-xl border border-border bg-background px-4 py-3 text-left transition-smooth hover:border-primary/40",
+                desktopFieldPad
+              )}
               >
-                <Label className="block text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                <Label
+                  className={cn(
+                    "block text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground",
+                    desktopFieldLabel
+                  )}
+                >
                   When
                 </Label>
                 <div className="mt-1 flex items-center justify-start gap-2 text-left">
-                  <CalendarIcon className="h-4 w-4 shrink-0 text-primary" />
+                  <CalendarIcon className={cn("h-4 w-4 shrink-0 text-primary", desktopFieldIcon)} />
                   <span
                     className={cn(
                       "text-left text-base",
+                      desktopFieldText,
                       !range?.from && "text-muted-foreground"
                     )}
                   >
@@ -841,14 +869,22 @@ const SearchForm = () => {
           <PopoverTrigger asChild>
             <button
               type="button"
-              className="rounded-xl border border-border bg-background px-4 py-3 text-left transition-smooth hover:border-primary/40"
+              className={cn(
+                "rounded-xl border border-border bg-background px-4 py-3 text-left transition-smooth hover:border-primary/40",
+                desktopFieldPad
+              )}
             >
-              <Label className="block text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              <Label
+                className={cn(
+                  "block text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground",
+                  desktopFieldLabel
+                )}
+              >
                 Who
               </Label>
               <div className="mt-1 flex items-center justify-start gap-2 text-left">
-                <Users className="h-4 w-4 shrink-0 text-primary" />
-                <span className="text-left text-base">{guestSummary}</span>
+                <Users className={cn("h-4 w-4 shrink-0 text-primary", desktopFieldIcon)} />
+                <span className={cn("text-left text-base", desktopFieldText)}>{guestSummary}</span>
               </div>
             </button>
           </PopoverTrigger>
@@ -882,7 +918,7 @@ const SearchForm = () => {
           type="submit"
           size="lg"
           disabled={isLoading}
-          className="h-12 rounded-xl bg-gradient-primary px-8 text-xl font-semibold shadow-elevated transition-smooth hover:opacity-95 active:scale-[0.99] md:h-auto md:px-8 md:text-2xl"
+          className="h-12 rounded-xl bg-gradient-primary px-8 text-xl font-semibold shadow-elevated transition-smooth hover:opacity-95 active:scale-[0.99] md:h-auto md:px-[2.3rem] md:py-4 md:text-[1.725rem]"
         >
           {isLoading ? "Searching..." : "Search"}
         </Button>

@@ -257,19 +257,19 @@ const Index = () => {
 
         <Header />
 
-        <div className="container relative z-10 flex min-h-[100svh] flex-col items-center justify-start pt-16 pb-10 text-center md:min-h-[760px] md:justify-center md:pt-24 md:pb-32">
+        <div className="container relative z-10 flex min-h-[100svh] flex-col items-center justify-start pt-28 pb-10 text-center md:min-h-[760px] md:justify-center md:pt-20 md:pb-32">
           <span className="mb-4 hidden items-center gap-2 rounded-full border border-primary-foreground/30 bg-primary-foreground/10 px-4 py-1.5 text-xs font-medium text-primary-foreground backdrop-blur-md sm:inline-flex md:mb-5">
             <Sparkles className="h-3.5 w-3.5" />
-            Save up to 60%
+            Save up to 75%
           </span>
-          <h1 className="max-w-3xl font-display text-4xl font-bold leading-[1.08] text-primary-foreground drop-shadow-lg md:max-w-4xl md:text-7xl md:leading-[1.05]">
-            Unlock hidden stay deals
+          <h1 className="mt-4 max-w-3xl font-display text-2xl font-bold leading-[1.1] text-primary-foreground drop-shadow-lg md:mt-0 md:max-w-3xl md:text-5xl md:leading-[1.08]">
+            Unlock secret stay deals
           </h1>
-          <p className="mt-4 max-w-xl text-base text-primary-foreground/90 md:mt-5 md:max-w-xl md:text-lg">
+          <p className="mt-4 hidden max-w-xl text-base text-primary-foreground/90 md:mt-5 md:block md:max-w-xl md:text-lg">
             Hotels and homes worldwide in one search.
           </p>
 
-          <div className="mt-7 w-full max-w-5xl md:mt-12">
+          <div className="mt-7 w-full max-w-5xl md:mt-12 md:max-w-[73.6rem]">
             <SearchForm />
           </div>
         </div>
@@ -278,15 +278,13 @@ const Index = () => {
       {/* Destinations */}
       <section id="destinations" className="bg-secondary/40 py-20">
         <div className="container">
-          <div className="flex flex-col items-start justify-between gap-2 md:flex-row md:items-end">
-            <div>
-              <h2 className="font-display text-3xl font-bold text-foreground md:text-4xl">
-                Trending destinations
-              </h2>
-              <p className="mt-2 text-muted-foreground">
-                Popular spots travelers love right now.
-              </p>
-            </div>
+          <div className="text-center">
+            <h2 className="font-display text-3xl font-bold text-foreground md:text-4xl">
+              Trending destinations
+            </h2>
+            <p className="mt-2 text-muted-foreground">
+              Popular spots travelers love right now.
+            </p>
           </div>
 
           <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
