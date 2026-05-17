@@ -19,6 +19,10 @@ import {
   buildHotelClickSearchParams,
   trackPartnerExit,
 } from "@/lib/partnerClickTracking";
+import {
+  DESTINATION_PICK_LIST_TOAST,
+  isDestinationPickRequiredMessage,
+} from "@/lib/hotelSearchErrors";
 import { toast } from "sonner";
 
 type TrendingDestination = {
@@ -223,7 +227,15 @@ const Index = () => {
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Unable to open destination deals.";
-      toast.error(message);
+      if (isDestinationPickRequiredMessage(message)) {
+        toast.error(DESTINATION_PICK_LIST_TOAST.title, {
+          description: DESTINATION_PICK_LIST_TOAST.description,
+        });
+      } else {
+        toast.error("Could not open destination deals", {
+          description: "Please try again from the search bar above.",
+        });
+      }
     } finally {
       setOpeningDestination(null);
     }

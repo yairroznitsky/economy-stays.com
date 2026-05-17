@@ -34,6 +34,12 @@ import {
   requestHotelDestinationAutocomplete,
   requestHotelRedirectUrl,
 } from "@/lib/hotelAffiliateApi";
+import {
+  DESTINATION_PICK_LIST_TOAST,
+  isDestinationPickRequiredMessage,
+} from "@/lib/hotelSearchErrors";
+import { resolveFirstDestinationSuggestion } from "@/lib/hotelSearchDestination";
+import { buildHotelSearchInputFromSuggestion } from "@/lib/kayakDestinationSearch";
 import { generateClickId, LandingTrackingService } from "@/lib/landingTrackingService";
 import {
   buildHotelClickSearchParams,
@@ -135,6 +141,7 @@ const SearchForm = () => {
   const [isAutocompleteLoading, setIsAutocompleteLoading] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
+  const [destinationError, setDestinationError] = useState(false);
   const destinationInputRef = useRef<HTMLInputElement>(null);
   /** Wrapper for destination field + dropdown; used to scroll above mobile keyboard. */
   const destinationFieldRef = useRef<HTMLDivElement>(null);
@@ -334,10 +341,19 @@ const SearchForm = () => {
     setActiveSuggestionIndex(-1);
   };
 
-  const readRawString = (raw: Record<string, unknown> | undefined, key: string) => {
-    const value = raw?.[key];
-    return typeof value === "string" && value.trim() ? value.trim() : undefined;
-  };
+  const promptPickFromList = useCallback(() => {
+    setDestinationError(true);
+    setIsDestinationLocked(false);
+    setSelectedSuggestion(null);
+    toast.error(DESTINATION_PICK_LIST_TOAST.title, {
+      description: DESTINATION_PICK_LIST_TOAST.description,
+    });
+    destinationInputRef.current?.focus();
+    scrollDestinationFieldIntoMobileView();
+    if (destination.trim().length >= 3 && suggestions.length > 0) {
+      setIsDropdownOpen(true);
+    }
+  }, [destination, suggestions.length, scrollDestinationFieldIntoMobileView]);
 
   useEffect(() => {
     if (isDestinationLocked) {
@@ -419,54 +435,75 @@ const SearchForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!destination.trim() || !range?.from || !range?.to) return;
 
+    if (!destination.trim()) {
+      setDestinationError(true);
+      if (isDestinationLocked) {
+        setIsDestinationLocked(false);
+        setSelectedSuggestion(null);
+      }
+      destinationInputRef.current?.focus();
+      scrollDestinationFieldIntoMobileView();
+      return;
+    }
+
+    if (!range?.from || !range?.to) {
+      toast.error("Add your travel dates", {
+        description: "Choose check-in and check-out so we can find the right stays.",
+      });
+      openDatePicker();
+      return;
+    }
+
+    const trimmedDestination = destination.trim();
+
+    if (trimmedDestination.length < 3) {
+      setDestinationError(true);
+      toast.error("Keep typing your destination", {
+        description: "Enter at least 3 characters, then choose a match from the list.",
+      });
+      if (isDestinationLocked) {
+        setIsDestinationLocked(false);
+        setSelectedSuggestion(null);
+      }
+      destinationInputRef.current?.focus();
+      scrollDestinationFieldIntoMobileView();
+      return;
+    }
+
+    setDestinationError(false);
     setIsLoading(true);
     try {
-      const deriveCountry = () => {
-        const rawCountry = readRawString(selectedSuggestion?.raw, "country");
-        if (rawCountry) return rawCountry;
-        const candidate = selectedSuggestion?.subtitle || selectedSuggestion?.label || destination;
-        const parts = candidate
-          .split(",")
-          .map((part) => part.trim())
-          .filter(Boolean);
-        return parts.length > 0 ? parts[parts.length - 1] : "US";
-      };
+      let suggestion = selectedSuggestion;
+      if (!suggestion) {
+        suggestion = await resolveFirstDestinationSuggestion(
+          trimmedDestination,
+          suggestions
+        );
+      }
 
-      const destinationId =
-        readRawString(selectedSuggestion?.raw, "city_id") ?? selectedSuggestion?.id;
-      const hotelId = readRawString(selectedSuggestion?.raw, "hotel_id");
-      const airportPlaceId = readRawString(selectedSuggestion?.raw, "place_id");
-      const airportCode =
-        readRawString(selectedSuggestion?.raw, "airport_code") ??
-        readRawString(selectedSuggestion?.raw, "apicode");
-      const airportName = readRawString(selectedSuggestion?.raw, "airport_name");
-      const cityName =
-        readRawString(selectedSuggestion?.raw, "city") ??
-        selectedSuggestion?.label.split(",")[0]?.trim();
-      const stateName = readRawString(selectedSuggestion?.raw, "state");
+      if (!suggestion) {
+        promptPickFromList();
+        return;
+      }
 
-      const search = {
-        destination: destination.trim(),
-        destinationId,
-        hotelId,
-        airportPlaceId,
-        airportCode,
-        airportName,
-        cityName,
-        stateName,
-        countryName: deriveCountry(),
+      if (!selectedSuggestion) {
+        setDestination(suggestion.label);
+        setSelectedSuggestion(suggestion);
+        setIsDestinationLocked(true);
+        setSuggestions([]);
+        setIsDropdownOpen(false);
+      }
+
+      const search = buildHotelSearchInputFromSuggestion(suggestion, {
         checkIn: format(range.from, "yyyy-MM-dd"),
         checkOut: format(range.to, "yyyy-MM-dd"),
         adults,
         children,
-        // TODO: Replace with explicit child age picker once available.
-        childrenAges: children > 0 ? Array.from({ length: children }, () => 8) : [],
         rooms,
         locale: "en",
-        country: deriveCountry(),
-      };
+        marketCountry: "US",
+      });
 
       const clickId = generateClickId();
       const landingId = await LandingTrackingService.getOrCreateLandingId();
@@ -478,8 +515,8 @@ const SearchForm = () => {
         affiliateSource: "kayak",
         metadata: {
           surface: "search_form",
-          destination_type: selectedSuggestion?.type ?? "free_text",
-          destination_id: selectedSuggestion?.id ?? "",
+          destination_type: suggestion.type ?? "free_text",
+          destination_id: suggestion.id ?? "",
         },
       });
 
@@ -489,20 +526,26 @@ const SearchForm = () => {
         placement: "redirect",
         clickId,
         landingId,
-        iataCode: airportCode ?? null,
-        locationId: destinationId ?? null,
+        iataCode: search.airportCode ?? null,
+        locationId: search.destinationId ?? null,
         pickupDateNew: search.checkIn ?? null,
         dropoffDateNew: search.checkOut ?? null,
         searchParams: buildHotelClickSearchParams(search, {
           surface: "search_form",
-          destination_type: selectedSuggestion?.type ?? "free_text",
+          destination_type: suggestion.type ?? "free_text",
         }),
         autoParams: false,
       });
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Could not open hotel results.";
-      toast.error(message);
+      if (isDestinationPickRequiredMessage(message)) {
+        promptPickFromList();
+      } else {
+        toast.error("Could not open hotel results", {
+          description: "Please try again or pick a destination from the list.",
+        });
+      }
     } finally {
       setIsLoading(false);
     }
@@ -561,13 +604,19 @@ const SearchForm = () => {
   return (
     <form
       onSubmit={handleSubmit}
+      noValidate
       className="w-full rounded-2xl bg-booking-yellow p-3 text-left shadow-search md:p-4"
     >
       <div className="grid grid-cols-1 gap-2 md:grid-cols-[1.5fr_1.5fr_1fr_auto]">
         {/* Destination */}
         <div
           ref={destinationFieldRef}
-          className="relative rounded-xl border border-border bg-background px-4 py-3 text-left transition-smooth hover:border-primary/40"
+          className={cn(
+            "relative rounded-xl border bg-background px-4 py-3 text-left transition-smooth hover:border-primary/40",
+            destinationError
+              ? "border-destructive ring-1 ring-destructive/30"
+              : "border-border"
+          )}
         >
           <Label
             htmlFor="search-destination"
@@ -582,7 +631,10 @@ const SearchForm = () => {
               ref={destinationInputRef}
               type="text"
               value={destination}
-              onChange={(e) => setDestination(e.target.value)}
+              onChange={(e) => {
+                setDestination(e.target.value);
+                if (destinationError) setDestinationError(false);
+              }}
               readOnly={isDestinationLocked}
               spellCheck={false}
               onClick={() => {
@@ -632,14 +684,24 @@ const SearchForm = () => {
               }}
               placeholder="City, stay, or destination"
               autoComplete="off"
+              aria-invalid={destinationError}
+              aria-describedby={destinationError ? "search-destination-error" : undefined}
               className={cn(
                 "min-w-0 flex-1 border-0 bg-transparent p-0 text-left text-base text-foreground shadow-none outline-none",
                 "placeholder:text-left placeholder:text-muted-foreground",
                 "focus-visible:ring-0 focus-visible:ring-offset-0"
               )}
-              required
             />
           </div>
+          {destinationError && (
+            <p
+              id="search-destination-error"
+              className="mt-2 text-xs font-medium text-destructive"
+              role="alert"
+            >
+              Add a destination to continue
+            </p>
+          )}
           {isAutocompleteLoading && (
             <p className="mt-2 text-xs text-muted-foreground">Finding destinations...</p>
           )}

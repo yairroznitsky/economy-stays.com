@@ -1,3 +1,4 @@
+import { parseEdgeFunctionInvokeError } from "@/lib/hotelSearchErrors";
 import { hasSupabaseClientConfig, supabase } from "@/lib/supabaseClient";
 import type {
   HotelAffiliateRouteResponse,
@@ -53,11 +54,11 @@ export const requestHotelRedirectUrl = async (
   });
 
   if (error) {
-    throw new Error(error.message || "Unable to generate affiliate redirect URL.");
+    throw new Error(await parseEdgeFunctionInvokeError(error));
   }
 
   if (!data?.success || !data.redirect_url) {
-    throw new Error(data?.error || "Edge Function returned an invalid redirect response.");
+    throw new Error(data?.error || "Unable to generate affiliate redirect URL.");
   }
 
   return {
