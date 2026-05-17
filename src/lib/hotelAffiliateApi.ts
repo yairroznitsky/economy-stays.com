@@ -11,7 +11,7 @@ const AFFILIATE_EDGE_FUNCTION_NAME = "hotel-affiliate-router";
 const AUTOCOMPLETE_EDGE_FUNCTION_NAME = "kayak-autocomplete";
 
 const assertSupabaseConfigured = () => {
-  if (!hasSupabaseClientConfig || !supabase) {
+  if (!hasSupabaseClientConfig) {
     throw new Error(
       "Supabase client configuration missing. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY."
     );

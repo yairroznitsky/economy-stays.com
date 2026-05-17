@@ -14,7 +14,11 @@ import {
   getDeviceKayakAutocompleteContext,
   withTrendingDeeplinkPlace,
 } from "@/lib/kayakDestinationSearch";
-import { getOrCreateClickId, getOrCreateLandingId } from "@/lib/tracking";
+import { generateClickId, LandingTrackingService } from "@/lib/landingTrackingService";
+import {
+  buildHotelClickSearchParams,
+  trackPartnerExit,
+} from "@/lib/partnerClickTracking";
 import { toast } from "sonner";
 
 type TrendingDestination = {
@@ -185,10 +189,13 @@ const Index = () => {
         country: d.country,
       });
 
+      const clickId = generateClickId();
+      const landingId = await LandingTrackingService.getOrCreateLandingId();
+
       const response = await requestHotelRedirectUrl({
         search,
-        clickId: getOrCreateClickId(),
-        landingId: getOrCreateLandingId(),
+        clickId,
+        landingId,
         affiliateSource: "kayak",
         metadata: {
           surface: "trending_destinations",
@@ -197,7 +204,22 @@ const Index = () => {
         },
       });
 
-      window.open(response.redirectUrl, "_blank", "noopener,noreferrer");
+      await trackPartnerExit({
+        partner: "kayak",
+        redirectUrl: response.redirectUrl,
+        placement: "new_tab",
+        clickId,
+        landingId,
+        iataCode: search.airportCode ?? null,
+        locationId: search.destinationId ?? null,
+        pickupDateNew: search.checkIn ?? null,
+        dropoffDateNew: search.checkOut ?? null,
+        searchParams: buildHotelClickSearchParams(search, {
+          surface: "trending_destinations",
+          source_destination: d.title,
+        }),
+        autoParams: true,
+      });
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Unable to open destination deals.";

@@ -34,7 +34,11 @@ import {
   requestHotelDestinationAutocomplete,
   requestHotelRedirectUrl,
 } from "@/lib/hotelAffiliateApi";
-import { getOrCreateClickId, getOrCreateLandingId } from "@/lib/tracking";
+import { generateClickId, LandingTrackingService } from "@/lib/landingTrackingService";
+import {
+  buildHotelClickSearchParams,
+  trackPartnerExit,
+} from "@/lib/partnerClickTracking";
 import type { HotelDestinationSuggestion } from "@/types/hotels";
 
 const DateRangeStepHeader = ({
@@ -443,29 +447,34 @@ const SearchForm = () => {
         selectedSuggestion?.label.split(",")[0]?.trim();
       const stateName = readRawString(selectedSuggestion?.raw, "state");
 
+      const search = {
+        destination: destination.trim(),
+        destinationId,
+        hotelId,
+        airportPlaceId,
+        airportCode,
+        airportName,
+        cityName,
+        stateName,
+        countryName: deriveCountry(),
+        checkIn: format(range.from, "yyyy-MM-dd"),
+        checkOut: format(range.to, "yyyy-MM-dd"),
+        adults,
+        children,
+        // TODO: Replace with explicit child age picker once available.
+        childrenAges: children > 0 ? Array.from({ length: children }, () => 8) : [],
+        rooms,
+        locale: "en",
+        country: deriveCountry(),
+      };
+
+      const clickId = generateClickId();
+      const landingId = await LandingTrackingService.getOrCreateLandingId();
+
       const response = await requestHotelRedirectUrl({
-        search: {
-          destination: destination.trim(),
-          destinationId,
-          hotelId,
-          airportPlaceId,
-          airportCode,
-          airportName,
-          cityName,
-          stateName,
-          countryName: deriveCountry(),
-          checkIn: format(range.from, "yyyy-MM-dd"),
-          checkOut: format(range.to, "yyyy-MM-dd"),
-          adults,
-          children,
-          // TODO: Replace with explicit child age picker once available.
-          childrenAges: children > 0 ? Array.from({ length: children }, () => 8) : [],
-          rooms,
-          locale: "en",
-          country: deriveCountry(),
-        },
-        clickId: getOrCreateClickId(),
-        landingId: getOrCreateLandingId(),
+        search,
+        clickId,
+        landingId,
         affiliateSource: "kayak",
         metadata: {
           surface: "search_form",
@@ -474,7 +483,22 @@ const SearchForm = () => {
         },
       });
 
-      window.open(response.redirectUrl, "_blank", "noopener,noreferrer");
+      await trackPartnerExit({
+        partner: "kayak",
+        redirectUrl: response.redirectUrl,
+        placement: "new_tab",
+        clickId,
+        landingId,
+        iataCode: airportCode ?? null,
+        locationId: destinationId ?? null,
+        pickupDateNew: search.checkIn ?? null,
+        dropoffDateNew: search.checkOut ?? null,
+        searchParams: buildHotelClickSearchParams(search, {
+          surface: "search_form",
+          destination_type: selectedSuggestion?.type ?? "free_text",
+        }),
+        autoParams: false,
+      });
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Could not open hotel results.";
