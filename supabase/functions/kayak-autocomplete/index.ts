@@ -23,6 +23,7 @@ const KAYAK_AUTOCOMPLETE_BASE_URL =
   "https://www.kayak.com/mvm/smartyv2/search";
 const KAYAK_AUTOCOMPLETE_SIZE = Number(Deno.env.get("KAYAK_AUTOCOMPLETE_SIZE") ?? "50");
 const MAX_SUGGESTIONS = 10;
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
 
 const jsonResponse = (status: number, body: Record<string, unknown>) =>
   new Response(JSON.stringify(body), {
@@ -223,8 +224,7 @@ const fetchKayakSuggestions = async (params: {
     method: "GET",
     headers: {
       Accept: "application/json, text/plain, */*",
-      "User-Agent":
-        "Mozilla/5.0 (compatible; SecretBookingsBot/1.0; +https://twcvlutykblgoatahobf.supabase.co)",
+      "User-Agent": `Mozilla/5.0 (compatible; SecretBookingsBot/1.0; +${SUPABASE_URL || "https://secret-bookings.com"})`,
     },
   });
 
