@@ -383,7 +383,7 @@ const Index = () => {
       <footer className="border-t border-border bg-background py-10">
         <div className="container flex flex-col items-center justify-between gap-4 text-sm text-muted-foreground md:flex-row">
           <div className="flex items-center gap-3">
-            <BrandLogo compact variant="dark" className="gap-2" iconClassName="h-8 w-8 rounded-lg" />
+            <BrandLogo compact variant="dark" className="gap-2" iconClassName="h-[2.6rem] w-[2.6rem] rounded-lg" />
             <p>© {new Date().getFullYear()} Secret Bookings. All rights reserved.</p>
           </div>
           <p>

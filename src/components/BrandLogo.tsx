@@ -16,14 +16,14 @@ const BrandLogo = ({
   compact = false,
 }: BrandLogoProps) => {
   const wordmarkClass =
-    "font-display font-bold leading-none tracking-tight text-booking-yellow";
+    "font-brand text-[1.05em] font-extrabold leading-none tracking-[-0.02em] text-booking-yellow";
 
   return (
     <span
       aria-label="Secret Bookings"
       className={cn(
         "inline-flex items-center leading-none",
-        !compact && ["gap-2 text-[2.625rem] md:gap-3 md:text-[3.825rem]", textClassName],
+        !compact && ["gap-0.5 text-[2.625rem] md:gap-1 md:text-[3.825rem]", textClassName],
         className
       )}
     >
@@ -39,7 +39,7 @@ const BrandLogo = ({
             alt=""
             aria-hidden
             className={cn(
-              "h-[1em] w-[1em] shrink-0 self-center bg-transparent object-contain",
+              "h-[1.3em] w-[1.3em] shrink-0 self-center bg-transparent object-contain",
               iconClassName
             )}
           />
@@ -56,7 +56,7 @@ const BrandLogo = ({
           role="img"
           aria-label="Secret Bookings"
           className={cn(
-            "h-[1em] w-[1em] shrink-0 self-center bg-transparent object-contain",
+            "h-[1.3em] w-[1.3em] shrink-0 self-center bg-transparent object-contain",
             iconClassName
           )}
         />

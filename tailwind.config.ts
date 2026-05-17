@@ -80,6 +80,7 @@ export default {
       },
       fontFamily: {
         display: ["'Playfair Display'", "serif"],
+        brand: ['"Plus Jakarta Sans"', "Inter", "system-ui", "sans-serif"],
         sans: ["Inter", "system-ui", "sans-serif"],
       },
       keyframes: {
