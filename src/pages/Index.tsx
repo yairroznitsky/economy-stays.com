@@ -269,7 +269,7 @@ const Index = () => {
             Hotels and homes worldwide in one search.
           </p>
 
-          <div className="mt-7 w-full max-w-5xl md:mt-12 md:max-w-[73.6rem]">
+          <div className="mt-7 w-full max-w-5xl desktop:mt-12 desktop:max-w-[73.6rem]">
             <SearchForm />
           </div>
         </div>

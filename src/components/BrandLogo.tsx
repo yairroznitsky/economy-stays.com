@@ -8,6 +8,10 @@ interface BrandLogoProps {
   compact?: boolean;
 }
 
+/** Scales wordmark + icon to fit typical container padding (2rem per side) on narrow viewports. */
+const fluidWordmarkSize =
+  "text-[clamp(1.125rem,calc((100vw-4rem)/14),2.775rem)] md:text-[3.825rem]";
+
 const BrandLogo = ({
   className,
   textClassName,
@@ -16,14 +20,14 @@ const BrandLogo = ({
   compact = false,
 }: BrandLogoProps) => {
   const wordmarkClass =
-    "font-brand text-[1.05em] font-extrabold leading-none tracking-[-0.02em] text-booking-yellow";
+    "font-brand whitespace-nowrap text-[1.05em] font-extrabold leading-none tracking-[-0.02em] text-booking-yellow";
 
   return (
     <span
       aria-label="Secret Bookings"
       className={cn(
-        "inline-flex items-center leading-none",
-        !compact && ["gap-0.5 text-[2.625rem] md:gap-1 md:text-[3.825rem]", textClassName],
+        "inline-flex max-w-full items-center justify-center leading-none",
+        !compact && ["gap-0.5", fluidWordmarkSize, "md:gap-1", textClassName],
         className
       )}
     >

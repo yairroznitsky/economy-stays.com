@@ -13,6 +13,10 @@ export default {
       },
     },
     extend: {
+      screens: {
+        /** Search form and hero: stacked below this width, horizontal bar at/above. */
+        desktop: "1160px",
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

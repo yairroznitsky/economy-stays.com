@@ -28,7 +28,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { FORM_DESKTOP_BREAKPOINT, useIsMobile } from "@/hooks/use-mobile";
 import { toast } from "sonner";
 import {
   requestHotelDestinationAutocomplete,
@@ -118,10 +118,10 @@ const HighlightQuery = ({ text, query }: { text: string; query: string }) => {
   );
 };
 
-const desktopFieldPad = "md:px-[1.15rem] md:py-[0.8625rem]";
-const desktopFieldLabel = "md:text-[0.8625rem]";
-const desktopFieldText = "md:text-[1.15rem]";
-const desktopFieldIcon = "md:h-[1.15rem] md:w-[1.15rem]";
+const desktopFieldPad = "desktop:px-[1.15rem] desktop:py-[0.8625rem]";
+const desktopFieldLabel = "desktop:text-[0.8625rem]";
+const desktopFieldText = "desktop:text-[1.15rem]";
+const desktopFieldIcon = "desktop:h-[1.15rem] desktop:w-[1.15rem]";
 
 const SearchForm = () => {
   const today = new Date();
@@ -150,7 +150,7 @@ const SearchForm = () => {
   const destinationInputRef = useRef<HTMLInputElement>(null);
   /** Wrapper for destination field + dropdown; used to scroll above mobile keyboard. */
   const destinationFieldRef = useRef<HTMLDivElement>(null);
-  const isMobile = useIsMobile();
+  const isMobile = useIsMobile(FORM_DESKTOP_BREAKPOINT);
   const [datesOpen, setDatesOpen] = useState(false);
   const [draftRange, setDraftRange] = useState<DateRange | undefined>(range);
   const [calendarMonth, setCalendarMonth] = useState<Date>(range?.from ?? today);
@@ -610,9 +610,9 @@ const SearchForm = () => {
     <form
       onSubmit={handleSubmit}
       noValidate
-      className="w-full rounded-2xl bg-booking-yellow p-3 text-left shadow-search md:p-[1.15rem]"
+      className="w-full rounded-2xl bg-booking-yellow p-3 text-left shadow-search desktop:p-[1.15rem]"
     >
-      <div className="grid grid-cols-1 gap-2 md:grid-cols-[1.5fr_1.5fr_1fr_auto] md:gap-[0.575rem]">
+      <div className="grid grid-cols-1 gap-2 desktop:grid-cols-[1.5fr_1.5fr_1fr_auto] desktop:gap-[0.575rem]">
         {/* Destination */}
         <div
           ref={destinationFieldRef}
@@ -719,7 +719,7 @@ const SearchForm = () => {
             <div className="absolute top-full left-0 z-50 mt-2 w-full rounded-xl border border-border bg-popover p-1 shadow-elevated">
               <ul
                 role="listbox"
-                className="max-h-60 overflow-auto md:max-h-72"
+                className="max-h-60 overflow-auto desktop:max-h-72"
               >
                 {suggestions.map((suggestion, index) => (
                   <li key={`${suggestion.type}-${suggestion.id}-${index}`}>
@@ -918,7 +918,7 @@ const SearchForm = () => {
           type="submit"
           size="lg"
           disabled={isLoading}
-          className="h-12 rounded-xl bg-gradient-primary px-8 text-xl font-semibold shadow-elevated transition-smooth hover:opacity-95 active:scale-[0.99] md:h-auto md:px-[2.3rem] md:py-4 md:text-[1.725rem]"
+          className="h-12 rounded-xl bg-gradient-primary px-8 text-xl font-semibold shadow-elevated transition-smooth hover:opacity-95 active:scale-[0.99] desktop:h-auto desktop:px-[2.3rem] desktop:py-4 desktop:text-[1.725rem]"
         >
           {isLoading ? "Searching..." : "Search"}
         </Button>
