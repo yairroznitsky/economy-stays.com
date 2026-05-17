@@ -207,7 +207,7 @@ const Index = () => {
       await trackPartnerExit({
         partner: "kayak",
         redirectUrl: response.redirectUrl,
-        placement: "new_tab",
+        placement: "redirect",
         clickId,
         landingId,
         iataCode: search.airportCode ?? null,

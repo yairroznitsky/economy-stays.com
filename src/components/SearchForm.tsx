@@ -486,7 +486,7 @@ const SearchForm = () => {
       await trackPartnerExit({
         partner: "kayak",
         redirectUrl: response.redirectUrl,
-        placement: "new_tab",
+        placement: "redirect",
         clickId,
         landingId,
         iataCode: airportCode ?? null,
