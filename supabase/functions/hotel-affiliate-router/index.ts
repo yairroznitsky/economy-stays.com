@@ -61,12 +61,7 @@ const corsHeaders = {
 
 const KAYAK_AFFILIATE_ID = Deno.env.get("KAYAK_AFFILIATE_ID") ?? "YOUR_KAYAK_AFFILIATE_ID";
 const KAYAK_DEEPLINK_BASE = Deno.env.get("KAYAK_DEEPLINK_BASE") ?? "https://www.kayak.com/in";
-const KAYAK_ENCODER = Deno.env.get("KAYAK_ENCODER") ?? "27_1";
-const KAYAK_ENC_EID = Deno.env.get("KAYAK_ENC_EID") ?? "0";
-const KAYAK_ENC_PID = Deno.env.get("KAYAK_ENC_PID") ?? "deeplinks";
-const KAYAK_UTM_CAMPAIGN = Deno.env.get("KAYAK_UTM_CAMPAIGN") ?? "deeplinks";
 const KAYAK_UTM_MEDIUM = Deno.env.get("KAYAK_UTM_MEDIUM") ?? "affiliate";
-const KAYAK_UTM_TERM = Deno.env.get("KAYAK_UTM_TERM") ?? "rev";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 const ENABLE_TRACKING_LOGS = Deno.env.get("ENABLE_TRACKING_LOGS") === "true";
@@ -283,16 +278,11 @@ export const buildKayakDeeplink = (
   const params = new URLSearchParams({
     a: KAYAK_AFFILIATE_ID,
     enc_cid: input.click_id,
-    enc_eid: KAYAK_ENC_EID,
-    enc_lid: input.landing_id,
-    enc_pid: KAYAK_ENC_PID,
-    encoder: KAYAK_ENCODER,
+    enc_lid: "hotels",
+    enc_pid: "deeplinks",
+    encoder: "27_1",
     url: kayakPath,
-    utm_campaign: KAYAK_UTM_CAMPAIGN,
-    utm_content: input.landing_id,
     utm_medium: KAYAK_UTM_MEDIUM,
-    utm_source: KAYAK_AFFILIATE_ID,
-    utm_term: KAYAK_UTM_TERM,
   });
 
   const baseUrl = new URL(KAYAK_DEEPLINK_BASE);
