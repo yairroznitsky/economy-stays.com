@@ -8,3 +8,12 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
+
+interface Window {
+  fbq?: (
+    action: string,
+    event: string,
+    params?: Record<string, string | number>,
+    options?: { eventID?: string }
+  ) => void;
+}

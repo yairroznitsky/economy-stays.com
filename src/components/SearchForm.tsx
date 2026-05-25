@@ -45,6 +45,7 @@ import {
   buildHotelClickSearchParams,
   trackPartnerExit,
 } from "@/lib/partnerClickTracking";
+import { trackMetaSearch } from "@/lib/metaPixelTracking";
 import type { HotelDestinationSuggestion } from "@/types/hotels";
 
 const DateRangeStepHeader = ({
@@ -150,6 +151,7 @@ const SearchForm = () => {
   const destinationInputRef = useRef<HTMLInputElement>(null);
   /** Wrapper for destination field + dropdown; used to scroll above mobile keyboard. */
   const destinationFieldRef = useRef<HTMLDivElement>(null);
+  const searchSubmitInFlightRef = useRef(false);
   const isMobile = useIsMobile(FORM_DESKTOP_BREAKPOINT);
   const [datesOpen, setDatesOpen] = useState(false);
   const [draftRange, setDraftRange] = useState<DateRange | undefined>(range);
@@ -441,6 +443,8 @@ const SearchForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (isLoading || searchSubmitInFlightRef.current) return;
+
     if (!destination.trim()) {
       setDestinationError(true);
       if (isDestinationLocked) {
@@ -477,6 +481,7 @@ const SearchForm = () => {
     }
 
     setDestinationError(false);
+    searchSubmitInFlightRef.current = true;
     setIsLoading(true);
     try {
       let suggestion = selectedSuggestion;
@@ -525,6 +530,8 @@ const SearchForm = () => {
         },
       });
 
+      trackMetaSearch(search);
+
       await trackPartnerExit({
         partner: "kayak",
         redirectUrl: response.redirectUrl,
@@ -552,6 +559,7 @@ const SearchForm = () => {
         });
       }
     } finally {
+      searchSubmitInFlightRef.current = false;
       setIsLoading(false);
     }
   };

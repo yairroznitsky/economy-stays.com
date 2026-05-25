@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ExternalLink, ShieldCheck, Tag, Globe2, Sparkles } from "lucide-react";
 import heroImage from "@/assets/hero-hotel.jpg";
 import Header from "@/components/Header";
@@ -19,6 +19,7 @@ import {
   buildHotelClickSearchParams,
   trackPartnerExit,
 } from "@/lib/partnerClickTracking";
+import { trackMetaSearch } from "@/lib/metaPixelTracking";
 import {
   DESTINATION_PICK_LIST_TOAST,
   isDestinationPickRequiredMessage,
@@ -158,8 +159,12 @@ const features = [
 
 const Index = () => {
   const [openingDestination, setOpeningDestination] = useState<string | null>(null);
+  const trendingSearchInFlightRef = useRef(false);
 
   const openDestination = async (d: TrendingDestination) => {
+    if (openingDestination || trendingSearchInFlightRef.current) return;
+
+    trendingSearchInFlightRef.current = true;
     setOpeningDestination(d.title);
     const { locale, marketCountry } = getDeviceKayakAutocompleteContext();
     const { checkIn, checkOut } = getDefaultHotelStayDateStrings();
@@ -208,6 +213,8 @@ const Index = () => {
         },
       });
 
+      trackMetaSearch(search);
+
       await trackPartnerExit({
         partner: "kayak",
         redirectUrl: response.redirectUrl,
@@ -237,6 +244,7 @@ const Index = () => {
         });
       }
     } finally {
+      trendingSearchInFlightRef.current = false;
       setOpeningDestination(null);
     }
   };
