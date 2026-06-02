@@ -2,7 +2,9 @@ import type { HotelSearchInput } from "@/types/hotels";
 
 const inferTrafficType = (): "tiktok" | "unknown" => {
   const params = new URLSearchParams(window.location.search);
-  return params.get("ttclid") ? "tiktok" : "unknown";
+  const ttclid = params.get("ttclid");
+  const utmSource = (params.get("utm_source") ?? "").toLowerCase();
+  return ttclid || utmSource === "tiktok" ? "tiktok" : "unknown";
 };
 
 export const buildTikTokSearchParams = (

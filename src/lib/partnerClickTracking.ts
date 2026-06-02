@@ -25,6 +25,16 @@ const parseWindowSearchParams = (): Record<string, string> => {
   new URLSearchParams(window.location.search).forEach((value, key) => {
     params[key] = value;
   });
+
+  const utmSource = (params.utm_source ?? "").toLowerCase();
+  const isTikTokTraffic = Boolean(params.ttclid) || utmSource === "tiktok";
+
+  // Mirror the Meta "fbclid means Facebook traffic" convention for TikTok:
+  // if we can infer TikTok traffic, add `tk=1` for downstream attribution filters.
+  if (isTikTokTraffic && !params.tk) {
+    params.tk = "1";
+  }
+
   return params;
 };
 
