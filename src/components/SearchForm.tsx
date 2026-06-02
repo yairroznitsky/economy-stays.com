@@ -46,6 +46,7 @@ import {
   trackPartnerExit,
 } from "@/lib/partnerClickTracking";
 import { trackMetaSearch } from "@/lib/metaPixelTracking";
+import { trackTikTokSearch } from "@/lib/tiktokPixelTracking";
 import type { HotelDestinationSuggestion } from "@/types/hotels";
 
 const DateRangeStepHeader = ({
@@ -531,6 +532,7 @@ const SearchForm = () => {
       });
 
       trackMetaSearch(search);
+      trackTikTokSearch(search);
 
       await trackPartnerExit({
         partner: "kayak",

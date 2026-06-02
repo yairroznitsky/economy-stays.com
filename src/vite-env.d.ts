@@ -16,4 +16,8 @@ interface Window {
     params?: Record<string, string | number>,
     options?: { eventID?: string }
   ) => void;
+  ttq?: {
+    track: (event: string, params?: Record<string, unknown>) => void;
+    page: () => void;
+  };
 }
