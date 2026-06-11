@@ -11,9 +11,8 @@ import {
 import {
   buildHotelSearchInputFromSuggestion,
   getDefaultHotelStayDateStrings,
-  getDeviceKayakAutocompleteContext,
-  withTrendingDeeplinkPlace,
-} from "@/lib/kayakDestinationSearch";
+  getDeviceSkyscannerContext,
+} from "@/lib/skyscannerDestinationSearch";
 import { generateClickId, LandingTrackingService } from "@/lib/landingTrackingService";
 import {
   buildHotelClickSearchParams,
@@ -31,11 +30,11 @@ type TrendingDestination = {
   title: string;
   /** Card subheading (usually state / D.C.) */
   subtitle: string;
-  /** Kayak deeplink: city segment */
+  /** Autocomplete query: city segment */
   city: string;
-  /** Kayak deeplink: state segment */
+  /** Autocomplete query: state segment */
   state: string;
-  /** Kayak deeplink: country segment (full name) */
+  /** Autocomplete query: country segment (full name) */
   country: string;
   image: string;
   imageAlt: string;
@@ -166,14 +165,14 @@ const Index = () => {
 
     trendingSearchInFlightRef.current = true;
     setOpeningDestination(d.title);
-    const { locale, marketCountry } = getDeviceKayakAutocompleteContext();
+    const { locale, market } = getDeviceSkyscannerContext();
     const { checkIn, checkOut } = getDefaultHotelStayDateStrings();
 
     try {
       const suggestions = await requestHotelDestinationAutocomplete({
         query: trendingAutocompleteQuery(d),
         locale,
-        country: marketCountry,
+        country: market,
       });
       const suggestion = suggestions[0];
       if (!suggestion) {
@@ -181,21 +180,15 @@ const Index = () => {
         return;
       }
 
-      const baseSearch = buildHotelSearchInputFromSuggestion(suggestion, {
+      const search = buildHotelSearchInputFromSuggestion(suggestion, {
         checkIn,
         checkOut,
         adults: 2,
         children: 0,
         rooms: 1,
         locale,
-        marketCountry,
+        market,
         fallbackCountryName: d.country,
-      });
-
-      const search = withTrendingDeeplinkPlace(baseSearch, {
-        city: d.city,
-        state: d.state,
-        country: d.country,
       });
 
       const clickId = generateClickId();
@@ -205,7 +198,7 @@ const Index = () => {
         search,
         clickId,
         landingId,
-        affiliateSource: "kayak",
+        affiliateSource: "skyscanner",
         metadata: {
           surface: "trending_destinations",
           source_destination: d.title,
@@ -216,7 +209,7 @@ const Index = () => {
       trackMetaSearch(search);
 
       await trackPartnerExit({
-        partner: "kayak",
+        partner: "skyscanner-hotels",
         redirectUrl: response.redirectUrl,
         placement: "redirect",
         clickId,
@@ -395,7 +388,7 @@ const Index = () => {
             <p>© {new Date().getFullYear()} Secret Bookings. All rights reserved.</p>
           </div>
           <p>
-            Secret Bookings may earn a commission from qualifying Kayak-powered stay referrals.
+            Secret Bookings may earn a commission from qualifying Skyscanner stay referrals.
           </p>
         </div>
       </footer>

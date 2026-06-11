@@ -39,7 +39,11 @@ import {
   isDestinationPickRequiredMessage,
 } from "@/lib/hotelSearchErrors";
 import { resolveFirstDestinationSuggestion } from "@/lib/hotelSearchDestination";
-import { buildHotelSearchInputFromSuggestion } from "@/lib/kayakDestinationSearch";
+import {
+  buildHotelSearchInputFromSuggestion,
+  getDeviceSkyscannerContext,
+} from "@/lib/skyscannerDestinationSearch";
+import { validateHotelSearch } from "@/lib/skyscannerHotels";
 import { generateClickId, LandingTrackingService } from "@/lib/landingTrackingService";
 import {
   buildHotelClickSearchParams,
@@ -358,7 +362,7 @@ const SearchForm = () => {
     });
     destinationInputRef.current?.focus();
     scrollDestinationFieldIntoMobileView();
-    if (destination.trim().length >= 3 && suggestions.length > 0) {
+    if (destination.trim().length >= 2 && suggestions.length > 0) {
       setIsDropdownOpen(true);
     }
   }, [destination, suggestions.length, scrollDestinationFieldIntoMobileView]);
@@ -371,7 +375,7 @@ const SearchForm = () => {
     }
 
     const query = destination.trim();
-    if (query.length < 3) {
+    if (query.length < 2) {
       setSuggestions([]);
       setIsDropdownOpen(false);
       setIsAutocompleteLoading(false);
@@ -383,10 +387,11 @@ const SearchForm = () => {
     const timeoutId = window.setTimeout(async () => {
       setIsAutocompleteLoading(true);
       try {
+        const { market, locale } = getDeviceSkyscannerContext();
         const results = await requestHotelDestinationAutocomplete({
           query,
-          locale: "en",
-          country: "US",
+          locale,
+          country: market,
         });
 
         if (isCancelled) return;
@@ -467,10 +472,10 @@ const SearchForm = () => {
 
     const trimmedDestination = destination.trim();
 
-    if (trimmedDestination.length < 3) {
+    if (trimmedDestination.length < 2) {
       setDestinationError(true);
       toast.error("Keep typing your destination", {
-        description: "Enter at least 3 characters, then choose a match from the list.",
+        description: "Enter at least 2 characters, then choose a match from the list.",
       });
       if (isDestinationLocked) {
         setIsDestinationLocked(false);
@@ -498,6 +503,19 @@ const SearchForm = () => {
         return;
       }
 
+      const checkIn = format(range.from, "yyyy-MM-dd");
+      const checkOut = format(range.to, "yyyy-MM-dd");
+      const validationError = validateHotelSearch({
+        checkin: checkIn,
+        checkout: checkOut,
+        adults,
+        rooms,
+      });
+      if (validationError) {
+        toast.error(validationError);
+        return;
+      }
+
       if (!selectedSuggestion) {
         setDestination(suggestion.label);
         setSelectedSuggestion(suggestion);
@@ -506,14 +524,15 @@ const SearchForm = () => {
         setIsDropdownOpen(false);
       }
 
+      const { market, locale } = getDeviceSkyscannerContext();
       const search = buildHotelSearchInputFromSuggestion(suggestion, {
-        checkIn: format(range.from, "yyyy-MM-dd"),
-        checkOut: format(range.to, "yyyy-MM-dd"),
+        checkIn,
+        checkOut,
         adults,
         children,
         rooms,
-        locale: "en",
-        marketCountry: "US",
+        locale,
+        market,
       });
 
       const clickId = generateClickId();
@@ -523,7 +542,7 @@ const SearchForm = () => {
         search,
         clickId,
         landingId,
-        affiliateSource: "kayak",
+        affiliateSource: "skyscanner",
         metadata: {
           surface: "search_form",
           destination_type: suggestion.type ?? "free_text",
@@ -535,7 +554,7 @@ const SearchForm = () => {
       trackTikTokSearch(search);
 
       await trackPartnerExit({
-        partner: "kayak",
+        partner: "skyscanner-hotels",
         redirectUrl: response.redirectUrl,
         placement: "redirect",
         clickId,
@@ -666,7 +685,7 @@ const SearchForm = () => {
               onFocus={() => {
                 if (isDestinationLocked) return;
                 scrollDestinationFieldIntoMobileView();
-                if (destination.trim().length >= 3 && suggestions.length > 0) {
+                if (destination.trim().length >= 2 && suggestions.length > 0) {
                   setIsDropdownOpen(true);
                 }
               }}
@@ -725,7 +744,7 @@ const SearchForm = () => {
           {isAutocompleteLoading && (
             <p className="mt-2 text-xs text-muted-foreground">Finding destinations...</p>
           )}
-          {isDropdownOpen && destination.trim().length >= 3 && suggestions.length > 0 && (
+          {isDropdownOpen && destination.trim().length >= 2 && suggestions.length > 0 && (
             <div className="absolute top-full left-0 z-50 mt-2 w-full rounded-xl border border-border bg-popover p-1 shadow-elevated">
               <ul
                 role="listbox"

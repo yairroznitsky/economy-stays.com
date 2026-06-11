@@ -62,6 +62,8 @@ const corsHeaders = {
 const KAYAK_AFFILIATE_ID = Deno.env.get("KAYAK_AFFILIATE_ID") ?? "YOUR_KAYAK_AFFILIATE_ID";
 const KAYAK_DEEPLINK_BASE = Deno.env.get("KAYAK_DEEPLINK_BASE") ?? "https://www.kayak.com/in";
 const KAYAK_UTM_MEDIUM = Deno.env.get("KAYAK_UTM_MEDIUM") ?? "affiliate";
+const SKYSCANNER_MEDIA_PARTNER_ID = Deno.env.get("SKYSCANNER_MEDIA_PARTNER_ID") ?? "3495464";
+const SKYSCANNER_UTM_SOURCE = Deno.env.get("SKYSCANNER_UTM_SOURCE") ?? "secret-bookings";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 const ENABLE_TRACKING_LOGS = Deno.env.get("ENABLE_TRACKING_LOGS") === "true";
@@ -156,6 +158,9 @@ export const validateInput = (payload: unknown): ValidatedInput => {
   if (adults > 28) {
     throw new Error("adults cannot exceed 28.");
   }
+  if (adults < rooms) {
+    throw new Error("Number of adults must be greater than or equal to number of rooms.");
+  }
   if (adults < children) {
     throw new Error("At least one adult is required per child.");
   }
@@ -180,6 +185,12 @@ export const validateInput = (payload: unknown): ValidatedInput => {
   if (!destinationId) {
     throw new Error(
       "destination_id is required. Select a destination from autocomplete before searching."
+    );
+  }
+
+  if (!/^\d+$/.test(destinationId)) {
+    throw new Error(
+      "destination_id must be a numeric Skyscanner entity ID. Select a destination from the list."
     );
   }
 
@@ -217,6 +228,36 @@ export const normalizeDestination = (input: ValidatedInput): NormalizedDestinati
     locale: input.locale,
     country: input.country,
   };
+};
+
+const resolveSkyscannerEntityId = (destinationId: string): string | null => {
+  if (/^\d+$/.test(destinationId)) return destinationId;
+  return null;
+};
+
+export const buildSkyscannerHotelDeeplink = (input: ValidatedInput) => {
+  const entityId = resolveSkyscannerEntityId(input.destination_id);
+  if (!entityId) {
+    throw new Error("Could not resolve destination. Please select a different result.");
+  }
+
+  const qs = new URLSearchParams({
+    entity_id: entityId,
+    checkin: input.checkin,
+    checkout: input.checkout,
+    adults: String(input.adults),
+    rooms: String(input.rooms),
+  });
+
+  if (SKYSCANNER_MEDIA_PARTNER_ID) {
+    qs.set("mediaPartnerId", SKYSCANNER_MEDIA_PARTNER_ID);
+    qs.set("utm_term", input.click_id);
+    qs.set("utm_source", SKYSCANNER_UTM_SOURCE);
+    qs.set("utm_medium", "affiliate");
+    return `https://skyscanner.net/g/referrals/v1/hotels/day-view?${qs.toString()}`;
+  }
+
+  return `https://www.skyscanner.net/hotels/search?${qs.toString()}`;
 };
 
 export const buildKayakDeeplink = (
@@ -333,7 +374,7 @@ Deno.serve(async (request) => {
     const payload = await request.json();
     const validated = validateInput(payload);
     const normalizedDestination = normalizeDestination(validated);
-    const redirectUrl = buildKayakDeeplink(validated, normalizedDestination);
+    const redirectUrl = buildSkyscannerHotelDeeplink(validated);
 
     await logTrackingEvent({
       input: validated,
@@ -350,7 +391,7 @@ Deno.serve(async (request) => {
         request_id: requestId,
         click_id: validated.click_id,
         landing_id: validated.landing_id,
-        affiliate_source: "kayak",
+        affiliate_source: "skyscanner",
         locale: validated.locale,
         country: validated.country,
         query: validated.query,

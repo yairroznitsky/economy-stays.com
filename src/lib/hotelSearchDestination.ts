@@ -10,11 +10,11 @@ export const resolveFirstDestinationSuggestion = async (
   const trimmed = query.trim();
   if (!trimmed) return null;
 
-  if (trimmed.length >= 3 && cachedSuggestions.length > 0) {
+  if (trimmed.length >= 2 && cachedSuggestions.length > 0) {
     return cachedSuggestions[0];
   }
 
-  if (trimmed.length < 3) return null;
+  if (trimmed.length < 2) return null;
 
   const results = await requestHotelDestinationAutocomplete({
     query: trimmed,

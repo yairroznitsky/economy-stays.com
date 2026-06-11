@@ -1,4 +1,4 @@
-export type AffiliateSource = "kayak" | "fallback";
+export type AffiliateSource = "skyscanner" | "kayak" | "fallback";
 
 export interface HotelSearchInput {
   destination: string;
