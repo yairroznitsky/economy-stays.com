@@ -49,8 +49,25 @@ export interface HotelAutocompleteResponse {
   error?: string;
 }
 
+export interface HotelAffiliateRouterSuccessResponse {
+  success: true;
+  entity_id: string;
+  redirect_url: string;
+  tracking_payload?: { click_id?: string };
+}
+
+export interface HotelAffiliateRouterErrorResponse {
+  success: false;
+  error: string;
+}
+
+export type HotelAffiliateRouterResponse =
+  | HotelAffiliateRouterSuccessResponse
+  | HotelAffiliateRouterErrorResponse;
+
 export interface HotelAffiliateRouteResponse {
   redirectUrl: string;
+  entityId: string;
   provider: AffiliateSource;
   clickId: string;
 }

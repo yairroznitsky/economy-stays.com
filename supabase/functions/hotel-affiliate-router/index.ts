@@ -73,10 +73,12 @@ const supabase =
     ? createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
     : null;
 
-const createRequestId = () =>
-  typeof crypto !== "undefined" && "randomUUID" in crypto
-    ? crypto.randomUUID()
-    : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+const createRequestId = () => {
+  if (typeof crypto?.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+  return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+};
 
 const sanitizeDate = (value: string, fieldName: "checkin" | "checkout") => {
   const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
@@ -385,6 +387,7 @@ Deno.serve(async (request) => {
 
     return jsonResponse(200, {
       success: true,
+      entity_id: validated.destination_id,
       normalized_destination: normalizedDestination,
       redirect_url: redirectUrl,
       tracking_payload: {

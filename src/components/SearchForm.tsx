@@ -37,6 +37,7 @@ import {
 import {
   DESTINATION_PICK_LIST_TOAST,
   isDestinationPickRequiredMessage,
+  isSearchValidationMessage,
 } from "@/lib/hotelSearchErrors";
 import { resolveFirstDestinationSuggestion } from "@/lib/hotelSearchDestination";
 import {
@@ -490,11 +491,13 @@ const SearchForm = () => {
     searchSubmitInFlightRef.current = true;
     setIsLoading(true);
     try {
+      const { market, locale } = getDeviceSkyscannerContext();
       let suggestion = selectedSuggestion;
       if (!suggestion) {
         suggestion = await resolveFirstDestinationSuggestion(
           trimmedDestination,
-          suggestions
+          suggestions,
+          { locale, country: market }
         );
       }
 
@@ -524,7 +527,6 @@ const SearchForm = () => {
         setIsDropdownOpen(false);
       }
 
-      const { market, locale } = getDeviceSkyscannerContext();
       const search = buildHotelSearchInputFromSuggestion(suggestion, {
         checkIn,
         checkOut,
@@ -550,8 +552,12 @@ const SearchForm = () => {
         },
       });
 
-      trackMetaSearch(search);
-      trackTikTokSearch(search);
+      try {
+        trackMetaSearch(search);
+        trackTikTokSearch(search);
+      } catch {
+        // Pixel tracking must not block the redirect.
+      }
 
       await trackPartnerExit({
         partner: "skyscanner-hotels",
@@ -560,7 +566,7 @@ const SearchForm = () => {
         clickId,
         landingId,
         iataCode: search.airportCode ?? null,
-        locationId: search.destinationId ?? null,
+        locationId: response.entityId,
         pickupDateNew: search.checkIn ?? null,
         dropoffDateNew: search.checkOut ?? null,
         searchParams: buildHotelClickSearchParams(search, {
@@ -574,9 +580,11 @@ const SearchForm = () => {
         error instanceof Error ? error.message : "Could not open hotel results.";
       if (isDestinationPickRequiredMessage(message)) {
         promptPickFromList();
+      } else if (isSearchValidationMessage(message)) {
+        toast.error("Check your search details", { description: message });
       } else {
         toast.error("Could not open hotel results", {
-          description: "Please try again or pick a destination from the list.",
+          description: message || "Please try again or pick a destination from the list.",
         });
       }
     } finally {

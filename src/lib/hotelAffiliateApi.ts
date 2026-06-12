@@ -1,7 +1,9 @@
 import { parseEdgeFunctionInvokeError } from "@/lib/hotelSearchErrors";
 import { hasSupabaseClientConfig, supabase } from "@/lib/supabaseClient";
+import { parseNumericEntityId } from "@/lib/skyscannerHotels";
 import type {
   HotelAffiliateRouteResponse,
+  HotelAffiliateRouterResponse,
   HotelAutocompleteRequest,
   HotelDestinationSuggestion,
   HotelRedirectRequest,
@@ -37,18 +39,26 @@ const toSkyscannerLocale = (locale: string | undefined, market: string) => {
 
 const mapSkyscannerPlaceToSuggestion = (
   place: SkyscannerPlaceSuggestion
-): HotelDestinationSuggestion => {
+): HotelDestinationSuggestion | null => {
+  const entityId = parseNumericEntityId(
+    place.partnerMetadata?.entityId,
+    place.id
+  );
+  if (!entityId) {
+    return null;
+  }
+
   const skyscannerClass = place.partnerMetadata?.skyscannerClass?.toLowerCase() ?? "";
   const type = skyscannerClass === "hotel" ? "hotel" : place.type;
 
   return {
-    id: place.id,
+    id: entityId,
     label: place.name,
     type,
     subtitle:
       place.displayName && place.displayName !== place.name ? place.displayName : undefined,
     raw: {
-      entity_id: place.partnerMetadata?.entityId ?? place.id,
+      entity_id: entityId,
       city: place.city,
       country: place.country,
       code: place.code,
@@ -66,50 +76,75 @@ const assertSupabaseConfigured = () => {
   }
 };
 
+const assertValidDestinationId = (destinationId: string | undefined): string => {
+  const entityId = parseNumericEntityId(destinationId);
+  if (!entityId) {
+    throw new Error(
+      "destination_id is required. Select a destination from autocomplete before searching."
+    );
+  }
+  return entityId;
+};
+
+const resolveRouterEntityId = (
+  responseEntityId: unknown,
+  requestDestinationId: string
+): string => {
+  const entityId = parseNumericEntityId(responseEntityId, requestDestinationId);
+  if (!entityId) {
+    throw new Error("Invalid redirect response: missing entity_id.");
+  }
+  return entityId;
+};
+
 export const requestHotelRedirectUrl = async (
   payload: HotelRedirectRequest
 ): Promise<HotelAffiliateRouteResponse> => {
   assertSupabaseConfigured();
+  const requestDestinationId = assertValidDestinationId(payload.search.destinationId);
 
-  const { data, error } = await supabase.functions.invoke<{
-    success: boolean;
-    redirect_url?: string;
-    error?: string;
-    tracking_payload?: { click_id?: string };
-  }>(AFFILIATE_EDGE_FUNCTION_NAME, {
-    body: {
-      query: payload.search.destination,
-      destination_id: payload.search.destinationId,
-      hotel_id: payload.search.hotelId,
-      airport_place_id: payload.search.airportPlaceId,
-      airport_code: payload.search.airportCode,
-      airport_name: payload.search.airportName,
-      city_name: payload.search.cityName,
-      state_name: payload.search.stateName,
-      country_name: payload.search.countryName,
-      checkin: payload.search.checkIn,
-      checkout: payload.search.checkOut,
-      rooms: payload.search.rooms,
-      adults: payload.search.adults,
-      children: payload.search.children,
-      children_ages: payload.search.childrenAges,
-      click_id: payload.clickId,
-      landing_id: payload.landingId,
-      locale: payload.search.locale ?? "en",
-      country: payload.search.country ?? "US",
-    },
-  });
+  const { data, error } = await supabase.functions.invoke<HotelAffiliateRouterResponse>(
+    AFFILIATE_EDGE_FUNCTION_NAME,
+    {
+      body: {
+        query: payload.search.destination,
+        destination_id: requestDestinationId,
+        hotel_id: payload.search.hotelId,
+        airport_place_id: payload.search.airportPlaceId,
+        airport_code: payload.search.airportCode,
+        airport_name: payload.search.airportName,
+        city_name: payload.search.cityName,
+        state_name: payload.search.stateName,
+        country_name: payload.search.countryName,
+        checkin: payload.search.checkIn,
+        checkout: payload.search.checkOut,
+        rooms: payload.search.rooms,
+        adults: payload.search.adults,
+        children: payload.search.children,
+        children_ages: payload.search.childrenAges,
+        click_id: payload.clickId,
+        landing_id: payload.landingId,
+        locale: payload.search.locale ?? "en",
+        country: payload.search.country ?? "US",
+      },
+    }
+  );
 
   if (error) {
     throw new Error(await parseEdgeFunctionInvokeError(error));
   }
 
   if (!data?.success || !data.redirect_url) {
-    throw new Error(data?.error || "Unable to generate affiliate redirect URL.");
+    const message =
+      data && !data.success && data.error
+        ? data.error
+        : "Unable to generate affiliate redirect URL.";
+    throw new Error(message);
   }
 
   return {
     redirectUrl: data.redirect_url,
+    entityId: resolveRouterEntityId(data.entity_id, requestDestinationId),
     provider: payload.affiliateSource ?? "skyscanner",
     clickId: data.tracking_payload?.click_id ?? payload.clickId,
   };
@@ -168,6 +203,7 @@ export const requestHotelDestinationAutocomplete = async (
 
   const results = (data as SkyscannerPlaceSuggestion[])
     .map(mapSkyscannerPlaceToSuggestion)
+    .filter((suggestion): suggestion is HotelDestinationSuggestion => suggestion !== null)
     .slice(0, 10);
 
   autosuggestCache.set(cacheKey, {

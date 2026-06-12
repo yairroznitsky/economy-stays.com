@@ -1,11 +1,10 @@
+import { generateClickId } from "@/lib/landingTrackingService";
 import type { HotelSearchInput } from "@/types/hotels";
 
 const inferTrafficType = (): "facebook" | "unknown" => {
   const params = new URLSearchParams(window.location.search);
   return params.get("fbclid") ? "facebook" : "unknown";
 };
-
-const generateMetaEventId = (): string => crypto.randomUUID();
 
 export const buildMetaSearchParams = (
   search: HotelSearchInput
@@ -33,7 +32,7 @@ export const buildMetaSearchParams = (
 
 /** Fires Meta Pixel Search once per call. Returns event_id for optional CAPI dedup. */
 export const trackMetaSearch = (search: HotelSearchInput): string => {
-  const eventId = generateMetaEventId();
+  const eventId = generateClickId();
   const params = buildMetaSearchParams(search);
 
   if (typeof window.fbq === "function") {

@@ -9,11 +9,29 @@ const PICK_FROM_LIST_PATTERNS = [
   "select a destination",
   "autocomplete before searching",
   "invalid redirect response",
+  "missing entity_id",
+  "could not resolve destination",
+  "select a city or hotel",
+];
+
+const SEARCH_VALIDATION_PATTERNS = [
+  "checkout must be after checkin",
+  "children_ages",
+  "check-out must be after check-in",
+  "number of adults",
+  "maximum 4 guests",
+  "invalid checkin",
+  "invalid checkout",
 ];
 
 export const isDestinationPickRequiredMessage = (message: string): boolean => {
   const lower = message.toLowerCase();
   return PICK_FROM_LIST_PATTERNS.some((pattern) => lower.includes(pattern));
+};
+
+export const isSearchValidationMessage = (message: string): boolean => {
+  const lower = message.toLowerCase();
+  return SEARCH_VALIDATION_PATTERNS.some((pattern) => lower.includes(pattern));
 };
 
 export const parseEdgeFunctionInvokeError = async (

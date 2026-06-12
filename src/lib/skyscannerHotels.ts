@@ -26,15 +26,26 @@ export interface SelectedLocation {
   partnerMetadata?: { entityId?: string };
 }
 
-export const resolveEntityId = (location: SelectedLocation): string | null => {
-  if (/^\d+$/.test(location.id)) {
-    return location.id;
-  }
-  const entityId = location.partnerMetadata?.entityId;
-  if (typeof entityId === "string" && /^\d+$/.test(entityId)) {
-    return entityId;
+export const parseNumericEntityId = (...candidates: unknown[]): string | null => {
+  for (const candidate of candidates) {
+    if (typeof candidate === "number" && Number.isInteger(candidate) && candidate >= 0) {
+      return String(candidate);
+    }
+    if (typeof candidate === "string") {
+      const trimmed = candidate.trim();
+      if (/^\d+$/.test(trimmed)) {
+        return trimmed;
+      }
+    }
   }
   return null;
+};
+
+export const resolveEntityId = (location: SelectedLocation): string | null => {
+  return parseNumericEntityId(
+    location.partnerMetadata?.entityId,
+    location.id
+  );
 };
 
 export const validateHotelSearch = (params: HotelSearchParams): string | null => {

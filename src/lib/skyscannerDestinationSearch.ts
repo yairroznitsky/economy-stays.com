@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import { resolveEntityId } from "@/lib/skyscannerHotels";
+import { parseNumericEntityId } from "@/lib/skyscannerHotels";
 import type { HotelDestinationSuggestion, HotelSearchInput } from "@/types/hotels";
 
 const readRawString = (raw: Record<string, unknown> | undefined, key: string) => {
@@ -52,13 +52,16 @@ export const buildHotelSearchInputFromSuggestion = (
     fallbackCountryName?: string;
   }
 ): HotelSearchInput => {
-  const entityId =
-    resolveEntityId({
-      id: suggestion.id,
-      partnerMetadata: {
-        entityId: readRawString(suggestion.raw, "entity_id"),
-      },
-    }) ?? suggestion.id;
+  const entityId = parseNumericEntityId(
+    readRawString(suggestion.raw, "entity_id"),
+    suggestion.id
+  );
+  if (!entityId) {
+    throw new Error(
+      "Could not resolve destination. Select a city or hotel from the suggestions list."
+    );
+  }
+
   const countryName =
     readRawString(suggestion.raw, "country") ??
     params.fallbackCountryName ??

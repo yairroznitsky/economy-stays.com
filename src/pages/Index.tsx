@@ -22,6 +22,7 @@ import { trackMetaSearch } from "@/lib/metaPixelTracking";
 import {
   DESTINATION_PICK_LIST_TOAST,
   isDestinationPickRequiredMessage,
+  isSearchValidationMessage,
 } from "@/lib/hotelSearchErrors";
 import { toast } from "sonner";
 
@@ -206,7 +207,11 @@ const Index = () => {
         },
       });
 
-      trackMetaSearch(search);
+      try {
+        trackMetaSearch(search);
+      } catch {
+        // Pixel tracking must not block the redirect.
+      }
 
       await trackPartnerExit({
         partner: "skyscanner-hotels",
@@ -215,7 +220,7 @@ const Index = () => {
         clickId,
         landingId,
         iataCode: search.airportCode ?? null,
-        locationId: search.destinationId ?? null,
+        locationId: response.entityId,
         pickupDateNew: search.checkIn ?? null,
         dropoffDateNew: search.checkOut ?? null,
         searchParams: buildHotelClickSearchParams(search, {
@@ -231,9 +236,11 @@ const Index = () => {
         toast.error(DESTINATION_PICK_LIST_TOAST.title, {
           description: DESTINATION_PICK_LIST_TOAST.description,
         });
+      } else if (isSearchValidationMessage(message)) {
+        toast.error("Check your search details", { description: message });
       } else {
         toast.error("Could not open destination deals", {
-          description: "Please try again from the search bar above.",
+          description: message || "Please try again from the search bar above.",
         });
       }
     } finally {
