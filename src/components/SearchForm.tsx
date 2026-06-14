@@ -53,8 +53,8 @@ import {
 import { trackMetaSearch } from "@/lib/metaPixelTracking";
 import {
   isSpiderMode,
+  pickRandomSpiderDestination,
   SPIDER_DEADLINE_MS,
-  SPIDER_DESTINATION_QUERY,
 } from "@/lib/spiderMode";
 import { trackTikTokSearch } from "@/lib/tiktokPixelTracking";
 import type { HotelDestinationSuggestion } from "@/types/hotels";
@@ -474,13 +474,14 @@ const SearchForm = () => {
 
     const deadlineTimer = window.setTimeout(submitSearch, SPIDER_DEADLINE_MS);
 
-    setDestination(SPIDER_DESTINATION_QUERY);
+    const destinationQuery = pickRandomSpiderDestination();
+    setDestination(destinationQuery);
 
     void (async () => {
       try {
         const { market, locale } = getDeviceSkyscannerContext();
         const results = await requestHotelDestinationAutocomplete({
-          query: SPIDER_DESTINATION_QUERY,
+          query: destinationQuery,
           locale,
           country: market,
         });
