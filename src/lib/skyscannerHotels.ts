@@ -61,6 +61,12 @@ export const validateHotelSearch = (params: HotelSearchParams): string | null =>
   return null;
 };
 
+const SKYSCANNER_LOCALIZATION = {
+  market: "US",
+  locale: "en-US",
+  currency: "USD",
+} as const;
+
 export const buildHotelDeepLink = (
   location: SelectedLocation,
   params: HotelSearchParams
@@ -74,6 +80,9 @@ export const buildHotelDeepLink = (
     checkout: params.checkout,
     adults: String(params.adults),
     rooms: String(params.rooms),
+    market: SKYSCANNER_LOCALIZATION.market,
+    locale: SKYSCANNER_LOCALIZATION.locale,
+    currency: SKYSCANNER_LOCALIZATION.currency,
   });
 
   return `https://www.skyscanner.net/hotels/search?${qs.toString()}`;
@@ -97,6 +106,9 @@ export const buildAffiliateHotelDeepLink = (
     checkout: params.checkout,
     adults: String(params.adults),
     rooms: String(params.rooms),
+    market: SKYSCANNER_LOCALIZATION.market,
+    locale: SKYSCANNER_LOCALIZATION.locale,
+    currency: SKYSCANNER_LOCALIZATION.currency,
     mediaPartnerId: options.mediaPartnerId,
     utm_term: options.clickId ?? "",
     utm_source: options.utmSource ?? "your-site",

@@ -7,24 +7,15 @@ const readRawString = (raw: Record<string, unknown> | undefined, key: string) =>
   return typeof value === "string" && value.trim() ? value.trim() : undefined;
 };
 
-/** Skyscanner market + locale for hotels autosuggest (e.g. US / en-US). */
-export const getDeviceSkyscannerContext = () => {
-  if (typeof navigator === "undefined") {
-    return { market: "US", locale: "en-US" };
-  }
+export const SKYSCANNER_MARKET = "US";
+export const SKYSCANNER_LOCALE = "en-US";
+export const SKYSCANNER_CURRENCY = "USD";
 
-  const tag = navigator.language || "en-US";
-  const [lang, region] = tag.split("-");
-  const language = (lang || "en").toLowerCase();
-  const market = region?.toUpperCase() && /^[A-Z]{2}$/.test(region.toUpperCase())
-    ? region.toUpperCase()
-    : "US";
-
-  return {
-    market,
-    locale: `${language}-${market}`,
-  };
-};
+/** Fixed US market + en-US locale for Skyscanner hotels (autosuggest + deeplinks). */
+export const getDeviceSkyscannerContext = () => ({
+  market: SKYSCANNER_MARKET,
+  locale: SKYSCANNER_LOCALE,
+});
 
 /** Same default night as SearchForm: tomorrow → day after, local calendar dates. */
 export const getDefaultHotelStayDateStrings = () => {
@@ -83,7 +74,7 @@ export const buildHotelSearchInputFromSuggestion = (
     children: params.children,
     childrenAges: params.children > 0 ? Array.from({ length: params.children }, () => 8) : [],
     rooms: params.rooms,
-    locale: params.locale,
-    country: params.market,
+    locale: SKYSCANNER_LOCALE,
+    country: SKYSCANNER_MARKET,
   };
 };

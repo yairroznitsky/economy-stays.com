@@ -1,5 +1,9 @@
 import { parseEdgeFunctionInvokeError } from "@/lib/hotelSearchErrors";
 import { hasSupabaseClientConfig, supabase } from "@/lib/supabaseClient";
+import {
+  SKYSCANNER_LOCALE,
+  SKYSCANNER_MARKET,
+} from "@/lib/skyscannerDestinationSearch";
 import { parseNumericEntityId } from "@/lib/skyscannerHotels";
 import type {
   HotelAffiliateRouteResponse,
@@ -30,12 +34,6 @@ interface SkyscannerPlaceSuggestion {
     location?: string | null;
   };
 }
-
-const toSkyscannerLocale = (locale: string | undefined, market: string) => {
-  const trimmed = (locale ?? "en").trim();
-  if (trimmed.includes("-")) return trimmed;
-  return `${trimmed.toLowerCase()}-${market}`;
-};
 
 const mapSkyscannerPlaceToSuggestion = (
   place: SkyscannerPlaceSuggestion
@@ -124,8 +122,8 @@ export const requestHotelRedirectUrl = async (
         children_ages: payload.search.childrenAges,
         click_id: payload.clickId,
         landing_id: payload.landingId,
-        locale: payload.search.locale ?? "en",
-        country: payload.search.country ?? "US",
+        locale: SKYSCANNER_LOCALE,
+        country: SKYSCANNER_MARKET,
       },
     }
   );
@@ -160,8 +158,8 @@ export const requestHotelDestinationAutocomplete = async (
     return [];
   }
 
-  const market = (payload.country ?? "US").trim().toUpperCase();
-  const locale = toSkyscannerLocale(payload.locale, market);
+  const market = SKYSCANNER_MARKET;
+  const locale = SKYSCANNER_LOCALE;
   const cacheKey = `skyscanner:hotels:${query.toLowerCase()}:${market}:${locale}`;
   const cached = autosuggestCache.get(cacheKey);
   if (cached && cached.expiresAt > Date.now()) {

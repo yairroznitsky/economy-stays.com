@@ -1,4 +1,5 @@
 import { requestHotelDestinationAutocomplete } from "@/lib/hotelAffiliateApi";
+import { SKYSCANNER_LOCALE, SKYSCANNER_MARKET } from "@/lib/skyscannerDestinationSearch";
 import type { HotelDestinationSuggestion } from "@/types/hotels";
 
 const findBestSuggestionMatch = (
@@ -35,8 +36,8 @@ export const resolveFirstDestinationSuggestion = async (
 
   const results = await requestHotelDestinationAutocomplete({
     query: trimmed,
-    locale: options?.locale ?? "en",
-    country: options?.country ?? "US",
+    locale: SKYSCANNER_LOCALE,
+    country: SKYSCANNER_MARKET,
   });
 
   return findBestSuggestionMatch(trimmed, results);

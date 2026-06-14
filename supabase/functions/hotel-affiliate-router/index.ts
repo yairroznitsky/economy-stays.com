@@ -64,6 +64,9 @@ const KAYAK_DEEPLINK_BASE = Deno.env.get("KAYAK_DEEPLINK_BASE") ?? "https://www.
 const KAYAK_UTM_MEDIUM = Deno.env.get("KAYAK_UTM_MEDIUM") ?? "affiliate";
 const SKYSCANNER_MEDIA_PARTNER_ID = Deno.env.get("SKYSCANNER_MEDIA_PARTNER_ID") ?? "3495464";
 const SKYSCANNER_UTM_SOURCE = Deno.env.get("SKYSCANNER_UTM_SOURCE") ?? "secret-bookings";
+const SKYSCANNER_MARKET = "US";
+const SKYSCANNER_LOCALE = "en-US";
+const SKYSCANNER_CURRENCY = "USD";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 const ENABLE_TRACKING_LOGS = Deno.env.get("ENABLE_TRACKING_LOGS") === "true";
@@ -172,8 +175,8 @@ export const validateInput = (payload: unknown): ValidatedInput => {
 
   const clickId = input.click_id?.trim() || createRequestId();
   const landingId = input.landing_id?.trim() || "default-landing";
-  const locale = input.locale?.trim() || "en";
-  const country = input.country?.trim() || "US";
+  const locale = SKYSCANNER_LOCALE;
+  const country = SKYSCANNER_MARKET;
   const destinationId =
     input.destination_id?.trim() || query.match(/-c(\d+)/i)?.[1] || "";
   const hotelId = input.hotel_id?.trim() || undefined;
@@ -249,6 +252,9 @@ export const buildSkyscannerHotelDeeplink = (input: ValidatedInput) => {
     checkout: input.checkout,
     adults: String(input.adults),
     rooms: String(input.rooms),
+    market: SKYSCANNER_MARKET,
+    locale: SKYSCANNER_LOCALE,
+    currency: SKYSCANNER_CURRENCY,
   });
 
   if (SKYSCANNER_MEDIA_PARTNER_ID) {
