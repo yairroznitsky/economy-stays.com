@@ -11,6 +11,23 @@ export const SKYSCANNER_MARKET = "US";
 export const SKYSCANNER_LOCALE = "en-US";
 export const SKYSCANNER_CURRENCY = "USD";
 
+/** Force US market, en-US locale, and USD on Skyscanner hotel deeplinks. */
+export const ensureSkyscannerHotelLocalization = (url: string): string => {
+  try {
+    const parsed = new URL(url);
+    if (!parsed.hostname.includes("skyscanner")) {
+      return url;
+    }
+
+    parsed.searchParams.set("market", SKYSCANNER_MARKET);
+    parsed.searchParams.set("locale", SKYSCANNER_LOCALE);
+    parsed.searchParams.set("currency", SKYSCANNER_CURRENCY);
+    return parsed.toString();
+  } catch {
+    return url;
+  }
+};
+
 /** Fixed US market + en-US locale for Skyscanner hotels (autosuggest + deeplinks). */
 export const getDeviceSkyscannerContext = () => ({
   market: SKYSCANNER_MARKET,

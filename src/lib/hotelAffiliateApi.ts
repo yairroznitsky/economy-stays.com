@@ -1,6 +1,7 @@
 import { parseEdgeFunctionInvokeError } from "@/lib/hotelSearchErrors";
 import { hasSupabaseClientConfig, supabase } from "@/lib/supabaseClient";
 import {
+  ensureSkyscannerHotelLocalization,
   SKYSCANNER_LOCALE,
   SKYSCANNER_MARKET,
 } from "@/lib/skyscannerDestinationSearch";
@@ -141,7 +142,7 @@ export const requestHotelRedirectUrl = async (
   }
 
   return {
-    redirectUrl: data.redirect_url,
+    redirectUrl: ensureSkyscannerHotelLocalization(data.redirect_url),
     entityId: resolveRouterEntityId(data.entity_id, requestDestinationId),
     provider: payload.affiliateSource ?? "skyscanner",
     clickId: data.tracking_payload?.click_id ?? payload.clickId,

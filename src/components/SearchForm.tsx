@@ -417,8 +417,10 @@ const SearchForm = () => {
   }, [destination, isDestinationLocked]);
 
   useEffect(() => {
-    if (selectedSuggestion && selectedSuggestion.label !== destination.trim()) {
+    if (!selectedSuggestion) return;
+    if (selectedSuggestion.label !== destination.trim()) {
       setSelectedSuggestion(null);
+      setIsDestinationLocked(false);
     }
   }, [destination, selectedSuggestion]);
 
@@ -762,7 +764,10 @@ const SearchForm = () => {
                   <li key={`${suggestion.type}-${suggestion.id}-${index}`}>
                     <button
                       type="button"
-                      onMouseDown={() => handleSuggestionSelect(suggestion)}
+                      onPointerDown={(event) => {
+                        event.preventDefault();
+                        handleSuggestionSelect(suggestion);
+                      }}
                       className={cn(
                         "flex w-full items-start gap-3 rounded-lg px-3 py-2 text-left transition-smooth",
                         activeSuggestionIndex === index
