@@ -51,6 +51,11 @@ import {
   trackPartnerExit,
 } from "@/lib/partnerClickTracking";
 import { trackMetaSearch } from "@/lib/metaPixelTracking";
+import {
+  isSpiderMode,
+  SPIDER_DEADLINE_MS,
+  SPIDER_DESTINATION_QUERY,
+} from "@/lib/spiderMode";
 import { trackTikTokSearch } from "@/lib/tiktokPixelTracking";
 import type { HotelDestinationSuggestion } from "@/types/hotels";
 
@@ -157,6 +162,8 @@ const SearchForm = () => {
   const destinationInputRef = useRef<HTMLInputElement>(null);
   /** Wrapper for destination field + dropdown; used to scroll above mobile keyboard. */
   const destinationFieldRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const spiderRanRef = useRef(false);
   const searchSubmitInFlightRef = useRef(false);
   const isMobile = useIsMobile(FORM_DESKTOP_BREAKPOINT);
   const [datesOpen, setDatesOpen] = useState(false);
@@ -449,6 +456,57 @@ const SearchForm = () => {
     return () => window.cancelAnimationFrame(id);
   }, [isDropdownOpen, suggestions.length, scrollDestinationFieldIntoMobileView]);
 
+  useEffect(() => {
+    if (spiderRanRef.current || !isSpiderMode()) return;
+    spiderRanRef.current = true;
+
+    let cancelled = false;
+    let submitted = false;
+    const submitSearch = () => {
+      if (cancelled || submitted) return;
+      submitted = true;
+      window.setTimeout(() => {
+        if (!cancelled) {
+          formRef.current?.requestSubmit();
+        }
+      }, 0);
+    };
+
+    const deadlineTimer = window.setTimeout(submitSearch, SPIDER_DEADLINE_MS);
+
+    setDestination(SPIDER_DESTINATION_QUERY);
+
+    void (async () => {
+      try {
+        const { market, locale } = getDeviceSkyscannerContext();
+        const results = await requestHotelDestinationAutocomplete({
+          query: SPIDER_DESTINATION_QUERY,
+          locale,
+          country: market,
+        });
+
+        if (cancelled) return;
+
+        const topSuggestion = results[0];
+        if (topSuggestion) {
+          handleSuggestionSelect(topSuggestion);
+        }
+      } catch {
+        // Fall through to submit; handleSubmit resolves the destination if needed.
+      } finally {
+        if (!cancelled) {
+          window.clearTimeout(deadlineTimer);
+          submitSearch();
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(deadlineTimer);
+    };
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -647,6 +705,7 @@ const SearchForm = () => {
 
   return (
     <form
+      ref={formRef}
       onSubmit={handleSubmit}
       noValidate
       className="w-full rounded-2xl bg-booking-yellow p-3 text-left shadow-search desktop:p-[1.15rem]"
