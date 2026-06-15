@@ -1,4 +1,5 @@
 import { format } from "date-fns";
+import { parseSkyscannerLocation } from "@/lib/bookingHotels";
 import { parseNumericEntityId } from "@/lib/skyscannerHotels";
 import type { HotelDestinationSuggestion, HotelSearchInput } from "@/types/hotels";
 
@@ -76,6 +77,7 @@ export const buildHotelSearchInputFromSuggestion = (
     params.market;
   const isAirport = suggestion.type === "airport";
   const airportCode = isAirport ? readRawString(suggestion.raw, "code") : undefined;
+  const coordinates = parseSkyscannerLocation(suggestion.raw?.location);
 
   return {
     destination: suggestion.label.trim(),
@@ -91,6 +93,8 @@ export const buildHotelSearchInputFromSuggestion = (
     children: params.children,
     childrenAges: params.children > 0 ? Array.from({ length: params.children }, () => 8) : [],
     rooms: params.rooms,
+    latitude: coordinates ? Number(coordinates.lat) : undefined,
+    longitude: coordinates ? Number(coordinates.lng) : undefined,
     locale: SKYSCANNER_LOCALE,
     country: SKYSCANNER_MARKET,
   };

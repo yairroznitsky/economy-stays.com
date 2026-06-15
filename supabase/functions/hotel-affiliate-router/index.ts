@@ -1,4 +1,9 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import {
+  buildBookingAffiliateRedirectUrl,
+  getDefaultBookingAffiliateConfig,
+  type BookingDeeplinkInput,
+} from "./bookingDeeplink.ts";
 
 interface HotelAffiliateRequest {
   query: string;
@@ -20,6 +25,9 @@ interface HotelAffiliateRequest {
   landing_id?: string;
   locale?: string;
   country?: string;
+  affiliate_source?: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 interface ValidatedInput {
@@ -42,6 +50,10 @@ interface ValidatedInput {
   landing_id: string;
   locale: string;
   country: string;
+}
+
+interface ValidatedBookingInput extends BookingDeeplinkInput {
+  landing_id: string;
 }
 
 interface NormalizedDestination {
@@ -128,6 +140,87 @@ const parseChildrenAges = (value: unknown, children: number) => {
     }
     return Math.floor(parsed);
   });
+};
+
+const parseOptionalCoordinate = (value: unknown): number | undefined => {
+  if (value === undefined || value === null || value === "") {
+    return undefined;
+  }
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) {
+    return undefined;
+  }
+  return parsed;
+};
+
+const resolveAffiliateSource = (value: unknown): "skyscanner" | "booking" => {
+  if (typeof value === "string" && value.trim().toLowerCase() === "booking") {
+    return "booking";
+  }
+  return "skyscanner";
+};
+
+export const validateBookingInput = (payload: unknown): ValidatedBookingInput => {
+  if (!payload || typeof payload !== "object") {
+    throw new Error("Request body must be a JSON object.");
+  }
+
+  const input = payload as Partial<HotelAffiliateRequest>;
+  const query = input.query?.trim();
+
+  if (!query) {
+    throw new Error("query is required.");
+  }
+
+  if (!input.checkin || !input.checkout) {
+    throw new Error("checkin and checkout are required.");
+  }
+
+  const checkin = sanitizeDate(input.checkin, "checkin");
+  const checkout = sanitizeDate(input.checkout, "checkout");
+  if (checkin >= checkout) {
+    throw new Error("checkout must be after checkin.");
+  }
+
+  const rooms = parsePositiveInt(input.rooms, 1, "rooms", 1);
+  const adults = parsePositiveInt(input.adults, 2, "adults", 1, 6);
+  const children = parsePositiveInt(input.children, 0, "children", 0, 6);
+  const childrenAges = parseChildrenAges(input.children_ages, children);
+
+  if (rooms > 8) {
+    throw new Error("rooms cannot exceed 8.");
+  }
+  if (adults > 28) {
+    throw new Error("adults cannot exceed 28.");
+  }
+  if (adults < rooms) {
+    throw new Error("Number of adults must be greater than or equal to number of rooms.");
+  }
+  if (adults < children) {
+    throw new Error("At least one adult is required per child.");
+  }
+  if (adults + children > rooms * 4) {
+    throw new Error("Maximum 4 guests (including children) are allowed per room.");
+  }
+
+  const clickId = input.click_id?.trim() || createRequestId();
+  const landingId = input.landing_id?.trim() || "default-landing";
+  const latitude = parseOptionalCoordinate(input.latitude);
+  const longitude = parseOptionalCoordinate(input.longitude);
+
+  return {
+    query,
+    checkin,
+    checkout,
+    rooms,
+    adults,
+    children,
+    children_ages: childrenAges,
+    click_id: clickId,
+    landing_id: landingId,
+    latitude,
+    longitude,
+  };
 };
 
 export const validateInput = (payload: unknown): ValidatedInput => {
@@ -380,6 +473,33 @@ Deno.serve(async (request) => {
 
   try {
     const payload = await request.json();
+    const affiliateSource = resolveAffiliateSource(
+      payload && typeof payload === "object"
+        ? (payload as Partial<HotelAffiliateRequest>).affiliate_source
+        : undefined
+    );
+
+    if (affiliateSource === "booking") {
+      const validated = validateBookingInput(payload);
+      const redirectUrl = buildBookingAffiliateRedirectUrl(
+        validated,
+        getDefaultBookingAffiliateConfig()
+      );
+
+      return jsonResponse(200, {
+        success: true,
+        entity_id: validated.query,
+        redirect_url: redirectUrl,
+        tracking_payload: {
+          request_id: requestId,
+          click_id: validated.click_id,
+          landing_id: validated.landing_id,
+          affiliate_source: "booking",
+          query: validated.query,
+        },
+      });
+    }
+
     const validated = validateInput(payload);
     const normalizedDestination = normalizeDestination(validated);
     const redirectUrl = buildSkyscannerHotelDeeplink(validated);

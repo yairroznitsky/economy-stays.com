@@ -50,6 +50,7 @@ import {
   buildHotelClickSearchParams,
   trackPartnerExit,
 } from "@/lib/partnerClickTracking";
+import { getHotelAffiliateRouting } from "@/lib/bookingMode";
 import { trackMetaSearch } from "@/lib/metaPixelTracking";
 import {
   isSpiderMode,
@@ -600,12 +601,13 @@ const SearchForm = () => {
 
       const clickId = generateClickId();
       const landingId = await LandingTrackingService.getOrCreateLandingId();
+      const { affiliateSource, partner } = getHotelAffiliateRouting();
 
       const response = await requestHotelRedirectUrl({
         search,
         clickId,
         landingId,
-        affiliateSource: "skyscanner",
+        affiliateSource,
         metadata: {
           surface: "search_form",
           destination_type: suggestion.type ?? "free_text",
@@ -621,7 +623,7 @@ const SearchForm = () => {
       }
 
       await trackPartnerExit({
-        partner: "skyscanner-hotels",
+        partner,
         redirectUrl: response.redirectUrl,
         placement: "redirect",
         clickId,

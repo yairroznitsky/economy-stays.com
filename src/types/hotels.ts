@@ -1,4 +1,4 @@
-export type AffiliateSource = "skyscanner" | "kayak" | "fallback";
+export type AffiliateSource = "skyscanner" | "kayak" | "booking" | "fallback";
 
 export interface HotelSearchInput {
   destination: string;
@@ -16,6 +16,8 @@ export interface HotelSearchInput {
   children?: number;
   childrenAges?: number[];
   rooms?: number;
+  latitude?: number;
+  longitude?: number;
   locale?: string;
   country?: string;
 }

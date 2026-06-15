@@ -18,6 +18,7 @@ import {
   buildHotelClickSearchParams,
   trackPartnerExit,
 } from "@/lib/partnerClickTracking";
+import { getHotelAffiliateRouting } from "@/lib/bookingMode";
 import { trackMetaSearch } from "@/lib/metaPixelTracking";
 import {
   DESTINATION_PICK_LIST_TOAST,
@@ -194,12 +195,13 @@ const Index = () => {
 
       const clickId = generateClickId();
       const landingId = await LandingTrackingService.getOrCreateLandingId();
+      const { affiliateSource, partner } = getHotelAffiliateRouting();
 
       const response = await requestHotelRedirectUrl({
         search,
         clickId,
         landingId,
-        affiliateSource: "skyscanner",
+        affiliateSource,
         metadata: {
           surface: "trending_destinations",
           source_destination: d.title,
@@ -214,7 +216,7 @@ const Index = () => {
       }
 
       await trackPartnerExit({
-        partner: "skyscanner-hotels",
+        partner,
         redirectUrl: response.redirectUrl,
         placement: "redirect",
         clickId,

@@ -100,7 +100,11 @@ export const requestHotelRedirectUrl = async (
   payload: HotelRedirectRequest
 ): Promise<HotelAffiliateRouteResponse> => {
   assertSupabaseConfigured();
-  const requestDestinationId = assertValidDestinationId(payload.search.destinationId);
+  const affiliateSource = payload.affiliateSource ?? "skyscanner";
+  const requestDestinationId =
+    affiliateSource === "booking"
+      ? payload.search.destinationId
+      : assertValidDestinationId(payload.search.destinationId);
 
   const { data, error } = await supabase.functions.invoke<HotelAffiliateRouterResponse>(
     AFFILIATE_EDGE_FUNCTION_NAME,
@@ -123,6 +127,9 @@ export const requestHotelRedirectUrl = async (
         children_ages: payload.search.childrenAges,
         click_id: payload.clickId,
         landing_id: payload.landingId,
+        affiliate_source: affiliateSource,
+        latitude: payload.search.latitude,
+        longitude: payload.search.longitude,
         locale: SKYSCANNER_LOCALE,
         country: SKYSCANNER_MARKET,
       },
@@ -143,8 +150,11 @@ export const requestHotelRedirectUrl = async (
 
   return {
     redirectUrl: ensureSkyscannerHotelLocalization(data.redirect_url),
-    entityId: resolveRouterEntityId(data.entity_id, requestDestinationId),
-    provider: payload.affiliateSource ?? "skyscanner",
+    entityId:
+      affiliateSource === "booking"
+        ? String(data.entity_id ?? payload.search.destination)
+        : resolveRouterEntityId(data.entity_id, requestDestinationId ?? ""),
+    provider: affiliateSource,
     clickId: data.tracking_payload?.click_id ?? payload.clickId,
   };
 };

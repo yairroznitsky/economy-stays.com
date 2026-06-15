@@ -1,25 +1,67 @@
 # hotel-affiliate-router
 
-Supabase Edge Function that centralizes hotel monetization routing with Kayak-first deeplinks.
+Supabase Edge Function that builds hotel affiliate deeplinks. Production traffic defaults to **Skyscanner**; **Booking.com** is available when `affiliate_source: "booking"` is sent (not used by the UI yet).
 
-## Frontend call contract
+## Request contract
 
-Send POST requests (or use `supabase.functions.invoke`) with one of:
+POST JSON body (via `supabase.functions.invoke`):
 
-- `action: "redirect"` for a deeplink response
-- `action: "autocomplete"` for destination suggestions
+| Field | Required | Notes |
+|-------|----------|-------|
+| `query` | Yes | Destination display name (maps to Booking `ss`) |
+| `checkin` / `checkout` | Yes | `YYYY-MM-DD`; checkout must be after checkin |
+| `adults` | No | Default `2` |
+| `children` | No | Default `0` |
+| `children_ages` | If children > 0 | One age per child (0–17) |
+| `rooms` | No | Default `1` |
+| `click_id` | No | Generated if omitted |
+| `landing_id` | No | Default `default-landing` |
+| `affiliate_source` | No | `skyscanner` (default) or `booking` |
+| `destination_id` | Skyscanner only | Numeric Skyscanner entity ID from autocomplete |
+| `latitude` / `longitude` | No | Optional; forwarded to Booking inner URL when set |
 
-## Required Supabase secrets
+## Skyscanner routing (default)
 
-Set these for the function:
+When `affiliate_source` is omitted or not `booking`, the function validates a numeric `destination_id` and returns a Skyscanner hotels deeplink.
 
-- `KAYAK_DEEPLINK_BASE_URL` - base URL for Kayak deeplinks.
-- `KAYAK_AFFILIATE_SOURCE` - your Kayak affiliate source parameter.
-- `KAYAK_LANDING_ID_DEFAULT` - fallback landing/campaign identifier.
+### Optional Supabase secrets
 
-## Optional fallback secret
+- `SKYSCANNER_MEDIA_PARTNER_ID` — affiliate media partner ID (default `3495464`)
+- `SKYSCANNER_UTM_SOURCE` — UTM source (default `secret-bookings`)
 
-- `BOOKING_FALLBACK_BASE_URL` - only used if Kayak is not configured or fallback is explicitly requested.
+## Booking.com routing (dormant)
+
+When `affiliate_source: "booking"`:
+
+1. Builds inner `https://www.booking.com/searchresults.html` with `ss`, dates, `group_adults`, `group_children`, `no_rooms`, repeated `age` params, optional `latitude`/`longitude`, `selected_currency=USD`, `lang=en-us`.
+2. Wraps it in the affiliate redirect:
+
+```
+https://selfashelookedrou.com/brands_redirect?tid=...&auth=...&puid={click_id}&subid={click_id}&osr={encoded inner URL}
+```
+
+`destination_id` is **not** required for Booking.
+
+### Booking affiliate secrets
+
+- `BOOKING_AFFILIATE_TID` — default `1321636`
+- `BOOKING_AFFILIATE_AUTH` — default `ofxbqjcsboet`
+- `BOOKING_AFFILIATE_BASE_URL` — default `https://selfashelookedrou.com/brands_redirect`
+
+### Parameter notes
+
+| Booking param | Source |
+|---------------|--------|
+| `ss` | `query` |
+| `checkin` / `checkout` | request dates |
+| `group_adults` / `group_children` / `no_rooms` | guest fields |
+| `age` | `children_ages` (repeated) |
+| `latitude` / `longitude` | optional; not required when `ss` is set |
+| `puid` / `subid` | `click_id` |
+
+## Legacy Kayak code
+
+`buildKayakDeeplink` remains in `index.ts` for reference but is not used by the handler.
 
 ## Click storage support
 
@@ -28,7 +70,7 @@ To store click events, also set:
 - `SUPABASE_URL`
 - `SUPABASE_SERVICE_ROLE_KEY`
 
-Create a `hotel_click_events` table. Example schema:
+Example `hotel_click_events` schema:
 
 ```sql
 create table if not exists public.hotel_click_events (
