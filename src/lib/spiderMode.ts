@@ -1,3 +1,4 @@
+export { pickRandomSpiderDateRange } from "@/lib/spiderDates";
 export { pickRandomSpiderDestination, SPIDER_TOURIST_CITIES } from "@/lib/spiderTouristCities";
 
 export const SPIDER_DEADLINE_MS = 2000;

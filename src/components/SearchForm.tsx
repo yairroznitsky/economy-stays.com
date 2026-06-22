@@ -54,6 +54,7 @@ import { getHotelAffiliateRouting } from "@/lib/bookingMode";
 import { trackMetaSearch } from "@/lib/metaPixelTracking";
 import {
   isSpiderMode,
+  pickRandomSpiderDateRange,
   pickRandomSpiderDestination,
   SPIDER_DEADLINE_MS,
 } from "@/lib/spiderMode";
@@ -477,6 +478,7 @@ const SearchForm = () => {
 
     const destinationQuery = pickRandomSpiderDestination();
     setDestination(destinationQuery);
+    setRange(pickRandomSpiderDateRange());
 
     void (async () => {
       try {
