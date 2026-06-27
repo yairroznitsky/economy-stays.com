@@ -36,6 +36,62 @@ interface SkyscannerPlaceSuggestion {
   };
 }
 
+interface SkyscannerWebsitePlace {
+  entity_id?: string;
+  entity_name?: string;
+  hierarchy?: string;
+  location?: string;
+  class?: string;
+  type?: string;
+}
+
+const extractIataCode = (entityName: string): string => {
+  const match = entityName.match(/\(([A-Z]{3})\)\s*$/);
+  return match?.[1] ?? "";
+};
+
+const mapWebsitePlaceType = (skyscannerClass: string, type: string): string => {
+  const normalized = `${skyscannerClass} ${type}`.toLowerCase();
+  if (normalized.includes("hotel")) return "hotel";
+  if (normalized.includes("airport")) return "airport";
+  if (normalized.includes("city")) return "city";
+  return "location";
+};
+
+const transformWebsitePlace = (item: SkyscannerWebsitePlace): SkyscannerPlaceSuggestion | null => {
+  const entityId = parseNumericEntityId(item.entity_id);
+  if (!entityId) return null;
+
+  const entityName = String(item.entity_name ?? `Entity ${entityId}`);
+  const hierarchy = String(item.hierarchy ?? "");
+  const parts = hierarchy.split("|").filter(Boolean);
+  const skyscannerClass = String(item.class ?? item.type ?? "");
+  const iataCode = extractIataCode(entityName);
+
+  return {
+    id: entityId,
+    name: entityName.replace(/\s*\([A-Z]{3}\)\s*$/, "").trim() || entityName,
+    displayName: hierarchy ? parts.join(", ") : entityName,
+    city: parts[0] ?? "",
+    country: parts[parts.length - 1] ?? "",
+    code: iataCode || entityId,
+    type: mapWebsitePlaceType(skyscannerClass, String(item.type ?? "")),
+    partnerMetadata: {
+      entityId,
+      entityName,
+      skyscannerClass,
+      location: item.location ?? null,
+    },
+  };
+};
+
+const normalizeSkyscannerPlaces = (data: unknown): SkyscannerPlaceSuggestion[] => {
+  if (!Array.isArray(data)) return [];
+  return data
+    .map((item) => transformWebsitePlace(item as SkyscannerWebsitePlace))
+    .filter((place): place is SkyscannerPlaceSuggestion => place !== null);
+};
+
 const mapSkyscannerPlaceToSuggestion = (
   place: SkyscannerPlaceSuggestion
 ): HotelDestinationSuggestion | null => {
@@ -65,6 +121,41 @@ const mapSkyscannerPlaceToSuggestion = (
       location: place.partnerMetadata?.location ?? null,
     },
   };
+};
+
+const toDestinationSuggestions = (places: SkyscannerPlaceSuggestion[]): HotelDestinationSuggestion[] =>
+  places
+    .map(mapSkyscannerPlaceToSuggestion)
+    .filter((suggestion): suggestion is HotelDestinationSuggestion => suggestion !== null)
+    .slice(0, 10);
+
+const fetchSkyscannerHotelsAutosuggestFromBrowser = async (
+  query: string,
+  market: string,
+  locale: string
+): Promise<SkyscannerPlaceSuggestion[]> => {
+  if (typeof window === "undefined") {
+    return [];
+  }
+
+  const url =
+    `https://www.skyscanner.net/g/autosuggest-search/api/v1/search-hotel/` +
+    `${market}/${locale}/${encodeURIComponent(query)}`;
+
+  const response = await fetch(url, {
+    headers: {
+      accept: "application/json",
+      referer: "https://www.skyscanner.net/hotels",
+      "skyscanner-client-name": "hotel-search-controls",
+    },
+  });
+
+  if (!response.ok) {
+    return [];
+  }
+
+  const data: unknown = await response.json().catch(() => null);
+  return normalizeSkyscannerPlaces(data);
 };
 
 const assertSupabaseConfigured = () => {
@@ -195,25 +286,25 @@ export const requestHotelDestinationAutocomplete = async (
 
   const data: unknown = await response.json().catch(() => null);
 
-  if (!response.ok) {
-    const message =
-      data &&
-      typeof data === "object" &&
-      "error" in data &&
-      typeof (data as { error?: unknown }).error === "string"
-        ? (data as { error: string }).error
-        : "Unable to fetch destination suggestions.";
-    throw new Error(message);
+  let places: SkyscannerPlaceSuggestion[] = Array.isArray(data) ? data : [];
+
+  if (!response.ok || places.length === 0) {
+    const browserPlaces = await fetchSkyscannerHotelsAutosuggestFromBrowser(query, market, locale);
+    if (browserPlaces.length > 0) {
+      places = browserPlaces;
+    } else if (!response.ok) {
+      const message =
+        data &&
+        typeof data === "object" &&
+        "error" in data &&
+        typeof (data as { error?: unknown }).error === "string"
+          ? (data as { error: string }).error
+          : "Unable to fetch destination suggestions.";
+      throw new Error(message);
+    }
   }
 
-  if (!Array.isArray(data)) {
-    return [];
-  }
-
-  const results = (data as SkyscannerPlaceSuggestion[])
-    .map(mapSkyscannerPlaceToSuggestion)
-    .filter((suggestion): suggestion is HotelDestinationSuggestion => suggestion !== null)
-    .slice(0, 10);
+  const results = toDestinationSuggestions(places);
 
   autosuggestCache.set(cacheKey, {
     results,
