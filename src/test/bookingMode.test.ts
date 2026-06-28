@@ -1,27 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { getHotelAffiliateRouting, isBookingMode } from "@/lib/bookingMode";
+import { getHotelAffiliateRouting } from "@/lib/bookingMode";
 
 describe("bookingMode", () => {
-  it("detects booking=1 in the query string", () => {
-    window.history.replaceState({}, "", "/?booking=1");
-    expect(isBookingMode()).toBe(true);
+  it("routes all clickouts to booking.com", () => {
     expect(getHotelAffiliateRouting()).toEqual({
       affiliateSource: "booking",
       partner: "booking-hotels",
     });
-  });
-
-  it("defaults to kayak when booking param is absent", () => {
-    window.history.replaceState({}, "", "/");
-    expect(isBookingMode()).toBe(false);
-    expect(getHotelAffiliateRouting()).toEqual({
-      affiliateSource: "kayak",
-      partner: "kayak-hotels",
-    });
-  });
-
-  it("ignores other booking query values", () => {
-    window.history.replaceState({}, "", "/?booking=0");
-    expect(isBookingMode()).toBe(false);
   });
 });

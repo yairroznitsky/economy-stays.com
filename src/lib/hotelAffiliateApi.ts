@@ -1,4 +1,4 @@
-import { parseEdgeFunctionInvokeError } from "@/lib/hotelSearchErrors";
+import { buildBookingSearchResultsUrl } from "@/lib/bookingHotels";
 import { getDeviceKayakAutocompleteContext } from "@/lib/kayakDestinationSearch";
 import {
   assertEdgeFunctionsAvailable,
@@ -60,15 +60,48 @@ const filterKayakSuggestions = (
     })
     .slice(0, 10);
 
+const buildBookingRedirect = (
+  payload: HotelRedirectRequest
+): HotelAffiliateRouteResponse => {
+  const search = payload.search;
+  const destination = search.destination?.trim();
+  if (!destination) {
+    throw new Error("Destination is required.");
+  }
+  if (!search.checkIn || !search.checkOut) {
+    throw new Error("Check-in and check-out dates are required.");
+  }
+
+  return {
+    redirectUrl: buildBookingSearchResultsUrl({
+      query: destination,
+      checkin: search.checkIn,
+      checkout: search.checkOut,
+      rooms: search.rooms ?? 1,
+      adults: search.adults ?? 2,
+      children: search.children ?? 0,
+      children_ages: search.childrenAges ?? [],
+      click_id: payload.clickId,
+      latitude: search.latitude,
+      longitude: search.longitude,
+    }),
+    entityId: destination,
+    provider: "booking",
+    clickId: payload.clickId,
+  };
+};
+
 export const requestHotelRedirectUrl = async (
   payload: HotelRedirectRequest
 ): Promise<HotelAffiliateRouteResponse> => {
+  const affiliateSource = payload.affiliateSource ?? "booking";
+
+  if (affiliateSource === "booking") {
+    return buildBookingRedirect(payload);
+  }
+
   assertEdgeFunctionsAvailable();
-  const affiliateSource = payload.affiliateSource ?? "kayak";
-  const requestDestinationId =
-    affiliateSource === "booking"
-      ? payload.search.destinationId
-      : assertValidDestinationId(payload.search.destinationId);
+  const requestDestinationId = assertValidDestinationId(payload.search.destinationId);
 
   const { locale, marketCountry } = getDeviceKayakAutocompleteContext();
 
@@ -110,10 +143,7 @@ export const requestHotelRedirectUrl = async (
 
   return {
     redirectUrl: data.redirect_url,
-    entityId:
-      affiliateSource === "booking"
-        ? String(data.entity_id ?? payload.search.destination)
-        : resolveRouterEntityId(data.entity_id, requestDestinationId ?? ""),
+    entityId: resolveRouterEntityId(data.entity_id, requestDestinationId ?? ""),
     provider: affiliateSource,
     clickId: data.tracking_payload?.click_id ?? payload.clickId,
   };

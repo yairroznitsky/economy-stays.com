@@ -71,9 +71,7 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-const KAYAK_AFFILIATE_ID = Deno.env.get("KAYAK_AFFILIATE_ID")?.trim() ?? "";
-const KAYAK_DEEPLINK_BASE = Deno.env.get("KAYAK_DEEPLINK_BASE") ?? "https://www.kayak.com/in";
-const KAYAK_UTM_MEDIUM = Deno.env.get("KAYAK_UTM_MEDIUM") ?? "affiliate";
+const KAYAK_SITE_BASE = Deno.env.get("KAYAK_DEEPLINK_BASE") ?? "https://www.kayak.com";
 const SKYSCANNER_MEDIA_PARTNER_ID = Deno.env.get("SKYSCANNER_MEDIA_PARTNER_ID") ?? "3495464";
 const SKYSCANNER_UTM_SOURCE =
   Deno.env.get("SKYSCANNER_UTM_SOURCE")?.trim() ??
@@ -423,27 +421,10 @@ export const buildKayakDeeplink = (
   const roomsSegment = `${input.rooms}rooms`;
   const kayakPath = `/hotels/${locationSlug}${destinationCode}${hotelCode}${airportCode}/${input.checkin}/${input.checkout}/${adultsSegment}${childrenSegment}/${roomsSegment}`;
 
-  if (!KAYAK_AFFILIATE_ID) {
-    throw new Error("Kayak affiliate configuration is missing.");
-  }
-
-  const params = new URLSearchParams({
-    a: KAYAK_AFFILIATE_ID,
-    enc_cid: input.click_id,
-    enc_lid: "hotels",
-    enc_pid: "deeplinks",
-    encoder: "27_1",
-    url: kayakPath,
-    utm_medium: KAYAK_UTM_MEDIUM,
-  });
-
-  const baseUrl = new URL(KAYAK_DEEPLINK_BASE);
-  if (!baseUrl.pathname || baseUrl.pathname === "/") {
-    baseUrl.pathname = "/in";
-  }
+  const baseUrl = new URL(KAYAK_SITE_BASE);
+  baseUrl.pathname = kayakPath;
   baseUrl.search = "";
   baseUrl.hash = "";
-  baseUrl.search = params.toString();
 
   return baseUrl.toString();
 };
