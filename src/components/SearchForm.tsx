@@ -42,8 +42,8 @@ import {
 import { resolveFirstDestinationSuggestion } from "@/lib/hotelSearchDestination";
 import {
   buildHotelSearchInputFromSuggestion,
-  getDeviceSkyscannerContext,
-} from "@/lib/skyscannerDestinationSearch";
+  getDeviceKayakAutocompleteContext,
+} from "@/lib/kayakDestinationSearch";
 import { validateHotelSearch } from "@/lib/skyscannerHotels";
 import { generateClickId, LandingTrackingService } from "@/lib/landingTrackingService";
 import {
@@ -385,7 +385,7 @@ const SearchForm = () => {
     }
 
     const query = destination.trim();
-    if (query.length < 2) {
+    if (query.length < 3) {
       setSuggestions([]);
       setIsDropdownOpen(false);
       setIsAutocompleteLoading(false);
@@ -397,11 +397,11 @@ const SearchForm = () => {
     const timeoutId = window.setTimeout(async () => {
       setIsAutocompleteLoading(true);
       try {
-        const { market, locale } = getDeviceSkyscannerContext();
+        const { locale, marketCountry } = getDeviceKayakAutocompleteContext();
         const results = await requestHotelDestinationAutocomplete({
           query,
           locale,
-          country: market,
+          country: marketCountry,
         });
 
         if (isCancelled) return;
@@ -482,11 +482,11 @@ const SearchForm = () => {
 
     void (async () => {
       try {
-        const { market, locale } = getDeviceSkyscannerContext();
+        const { locale, marketCountry } = getDeviceKayakAutocompleteContext();
         const results = await requestHotelDestinationAutocomplete({
           query: destinationQuery,
           locale,
-          country: market,
+          country: marketCountry,
         });
 
         if (cancelled) return;
@@ -537,10 +537,10 @@ const SearchForm = () => {
 
     const trimmedDestination = destination.trim();
 
-    if (trimmedDestination.length < 2) {
+    if (trimmedDestination.length < 3) {
       setDestinationError(true);
       toast.error("Destination too short", {
-        description: "Type at least 2 letters, then select a city or hotel from the suggestions.",
+        description: "Type at least 3 letters, then select a city or hotel from the suggestions.",
       });
       if (isDestinationLocked) {
         setIsDestinationLocked(false);
@@ -555,13 +555,13 @@ const SearchForm = () => {
     searchSubmitInFlightRef.current = true;
     setIsLoading(true);
     try {
-      const { market, locale } = getDeviceSkyscannerContext();
+      const { locale, marketCountry } = getDeviceKayakAutocompleteContext();
       let suggestion = selectedSuggestion;
       if (!suggestion) {
         suggestion = await resolveFirstDestinationSuggestion(
           trimmedDestination,
           suggestions,
-          { locale, country: market }
+          { locale, country: marketCountry }
         );
       }
 
@@ -598,7 +598,7 @@ const SearchForm = () => {
         children,
         rooms,
         locale,
-        market,
+        marketCountry,
       });
 
       const clickId = generateClickId();

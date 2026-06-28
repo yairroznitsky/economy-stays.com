@@ -1,6 +1,8 @@
 import { requestHotelDestinationAutocomplete } from "@/lib/hotelAffiliateApi";
-import { SKYSCANNER_LOCALE, SKYSCANNER_MARKET } from "@/lib/skyscannerDestinationSearch";
+import { getDeviceKayakAutocompleteContext } from "@/lib/kayakDestinationSearch";
 import type { HotelDestinationSuggestion } from "@/types/hotels";
+
+const KAYAK_AUTOCOMPLETE_MIN_QUERY_LENGTH = 3;
 
 const findBestSuggestionMatch = (
   query: string,
@@ -29,15 +31,19 @@ export const resolveFirstDestinationSuggestion = async (
   options?: { locale?: string; country?: string }
 ): Promise<HotelDestinationSuggestion | null> => {
   const trimmed = query.trim();
-  if (trimmed.length < 2) return null;
+  if (trimmed.length < KAYAK_AUTOCOMPLETE_MIN_QUERY_LENGTH) return null;
+
+  const device = getDeviceKayakAutocompleteContext();
+  const locale = options?.locale?.trim() || device.locale;
+  const country = options?.country?.trim().toUpperCase() || device.marketCountry;
 
   const cachedMatch = findBestSuggestionMatch(trimmed, cachedSuggestions);
   if (cachedMatch) return cachedMatch;
 
   const results = await requestHotelDestinationAutocomplete({
     query: trimmed,
-    locale: SKYSCANNER_LOCALE,
-    country: SKYSCANNER_MARKET,
+    locale,
+    country,
   });
 
   return findBestSuggestionMatch(trimmed, results);

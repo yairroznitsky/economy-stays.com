@@ -11,4 +11,4 @@ export const getHotelAffiliateRouting = (): {
 } =>
   isBookingMode()
     ? { affiliateSource: "booking", partner: "booking-hotels" }
-    : { affiliateSource: "skyscanner", partner: "skyscanner-hotels" };
+    : { affiliateSource: "kayak", partner: "kayak-hotels" };

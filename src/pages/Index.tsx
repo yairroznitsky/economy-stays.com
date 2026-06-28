@@ -18,8 +18,8 @@ import {
 import {
   buildHotelSearchInputFromSuggestion,
   getDefaultHotelStayDateStrings,
-  getDeviceSkyscannerContext,
-} from "@/lib/skyscannerDestinationSearch";
+  getDeviceKayakAutocompleteContext,
+} from "@/lib/kayakDestinationSearch";
 import { generateClickId, LandingTrackingService } from "@/lib/landingTrackingService";
 import {
   buildHotelClickSearchParams,
@@ -154,14 +154,14 @@ const Index = () => {
 
     trendingSearchInFlightRef.current = true;
     setOpeningDestination(d.title);
-    const { locale, market } = getDeviceSkyscannerContext();
+    const { locale, marketCountry } = getDeviceKayakAutocompleteContext();
     const { checkIn, checkOut } = getDefaultHotelStayDateStrings();
 
     try {
       const suggestions = await requestHotelDestinationAutocomplete({
         query: trendingAutocompleteQuery(d),
         locale,
-        country: market,
+        country: marketCountry,
       });
       const suggestion = suggestions[0];
       if (!suggestion) {
@@ -176,7 +176,7 @@ const Index = () => {
         children: 0,
         rooms: 1,
         locale,
-        market,
+        marketCountry,
         fallbackCountryName: d.country,
       });
 

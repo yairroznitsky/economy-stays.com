@@ -71,7 +71,7 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-const KAYAK_AFFILIATE_ID = Deno.env.get("KAYAK_AFFILIATE_ID") ?? "YOUR_KAYAK_AFFILIATE_ID";
+const KAYAK_AFFILIATE_ID = Deno.env.get("KAYAK_AFFILIATE_ID")?.trim() ?? "";
 const KAYAK_DEEPLINK_BASE = Deno.env.get("KAYAK_DEEPLINK_BASE") ?? "https://www.kayak.com/in";
 const KAYAK_UTM_MEDIUM = Deno.env.get("KAYAK_UTM_MEDIUM") ?? "affiliate";
 const SKYSCANNER_MEDIA_PARTNER_ID = Deno.env.get("SKYSCANNER_MEDIA_PARTNER_ID") ?? "3495464";
@@ -153,11 +153,14 @@ const parseOptionalCoordinate = (value: unknown): number | undefined => {
   return parsed;
 };
 
-const resolveAffiliateSource = (value: unknown): "skyscanner" | "booking" => {
-  if (typeof value === "string" && value.trim().toLowerCase() === "booking") {
-    return "booking";
+const resolveAffiliateSource = (value: unknown): "kayak" | "skyscanner" | "booking" => {
+  if (typeof value === "string") {
+    const normalized = value.trim().toLowerCase();
+    if (normalized === "booking") return "booking";
+    if (normalized === "skyscanner") return "skyscanner";
+    if (normalized === "kayak") return "kayak";
   }
-  return "skyscanner";
+  return "kayak";
 };
 
 export const validateBookingInput = (payload: unknown): ValidatedBookingInput => {
@@ -268,8 +271,8 @@ export const validateInput = (payload: unknown): ValidatedInput => {
 
   const clickId = input.click_id?.trim() || createRequestId();
   const landingId = input.landing_id?.trim() || "default-landing";
-  const locale = SKYSCANNER_LOCALE;
-  const country = SKYSCANNER_MARKET;
+  const locale = input.locale?.trim() || "en";
+  const country = input.country?.trim().toUpperCase() || "US";
   const destinationId =
     input.destination_id?.trim() || query.match(/-c(\d+)/i)?.[1] || "";
   const hotelId = input.hotel_id?.trim() || undefined;
@@ -288,7 +291,7 @@ export const validateInput = (payload: unknown): ValidatedInput => {
 
   if (!/^\d+$/.test(destinationId)) {
     throw new Error(
-      "destination_id must be a numeric Skyscanner entity ID. Select a destination from the list."
+      "destination_id must be a numeric destination ID. Select a destination from the list."
     );
   }
 
@@ -417,6 +420,10 @@ export const buildKayakDeeplink = (
   const roomsSegment = `${input.rooms}rooms`;
   const kayakPath = `/hotels/${locationSlug}${destinationCode}${hotelCode}${airportCode}/${input.checkin}/${input.checkout}/${adultsSegment}${childrenSegment}/${roomsSegment}`;
 
+  if (!KAYAK_AFFILIATE_ID) {
+    throw new Error("Kayak affiliate configuration is missing.");
+  }
+
   const params = new URLSearchParams({
     a: KAYAK_AFFILIATE_ID,
     enc_cid: input.click_id,
@@ -502,7 +509,10 @@ Deno.serve(async (request) => {
 
     const validated = validateInput(payload);
     const normalizedDestination = normalizeDestination(validated);
-    const redirectUrl = buildSkyscannerHotelDeeplink(validated);
+    const redirectUrl =
+      affiliateSource === "skyscanner"
+        ? buildSkyscannerHotelDeeplink(validated)
+        : buildKayakDeeplink(validated, normalizedDestination);
 
     await logTrackingEvent({
       input: validated,
@@ -520,7 +530,7 @@ Deno.serve(async (request) => {
         request_id: requestId,
         click_id: validated.click_id,
         landing_id: validated.landing_id,
-        affiliate_source: "skyscanner",
+        affiliate_source: affiliateSource === "skyscanner" ? "skyscanner" : "kayak",
         locale: validated.locale,
         country: validated.country,
         query: validated.query,

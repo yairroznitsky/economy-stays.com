@@ -11,12 +11,12 @@ describe("bookingMode", () => {
     });
   });
 
-  it("defaults to skyscanner when booking param is absent", () => {
+  it("defaults to kayak when booking param is absent", () => {
     window.history.replaceState({}, "", "/");
     expect(isBookingMode()).toBe(false);
     expect(getHotelAffiliateRouting()).toEqual({
-      affiliateSource: "skyscanner",
-      partner: "skyscanner-hotels",
+      affiliateSource: "kayak",
+      partner: "kayak-hotels",
     });
   });
 

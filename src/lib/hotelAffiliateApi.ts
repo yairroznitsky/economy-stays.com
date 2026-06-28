@@ -1,162 +1,22 @@
 import { parseEdgeFunctionInvokeError } from "@/lib/hotelSearchErrors";
+import { getDeviceKayakAutocompleteContext } from "@/lib/kayakDestinationSearch";
 import { hasSupabaseClientConfig, supabase } from "@/lib/supabaseClient";
-import {
-  ensureSkyscannerHotelLocalization,
-  SKYSCANNER_LOCALE,
-  SKYSCANNER_MARKET,
-} from "@/lib/skyscannerDestinationSearch";
 import { parseNumericEntityId } from "@/lib/skyscannerHotels";
 import type {
   HotelAffiliateRouteResponse,
   HotelAffiliateRouterResponse,
   HotelAutocompleteRequest,
+  HotelAutocompleteResponse,
   HotelDestinationSuggestion,
   HotelRedirectRequest,
 } from "@/types/hotels";
 
 const AFFILIATE_EDGE_FUNCTION_NAME = "hotel-affiliate-router";
-const SKYSCANNER_PLACES_FUNCTION_NAME = "skyscanner-places";
+const KAYAK_AUTOCOMPLETE_FUNCTION_NAME = "kayak-autocomplete";
 const AUTOSUGGEST_CACHE_TTL_MS = 10 * 60 * 1000;
+const KAYAK_AUTOCOMPLETE_MIN_QUERY_LENGTH = 3;
 
 const autosuggestCache = new Map<string, { expiresAt: number; results: HotelDestinationSuggestion[] }>();
-
-interface SkyscannerPlaceSuggestion {
-  id: string;
-  name: string;
-  displayName: string;
-  city: string;
-  country: string;
-  code: string;
-  type: string;
-  partnerMetadata?: {
-    entityId?: string;
-    entityName?: string;
-    skyscannerClass?: string;
-    location?: string | null;
-  };
-}
-
-interface SkyscannerWebsitePlace {
-  entity_id?: string;
-  entity_name?: string;
-  hierarchy?: string;
-  location?: string;
-  class?: string;
-  type?: string;
-}
-
-const extractIataCode = (entityName: string): string => {
-  const match = entityName.match(/\(([A-Z]{3})\)\s*$/);
-  return match?.[1] ?? "";
-};
-
-const mapWebsitePlaceType = (skyscannerClass: string, type: string): string => {
-  const normalized = `${skyscannerClass} ${type}`.toLowerCase();
-  if (normalized.includes("hotel")) return "hotel";
-  if (normalized.includes("airport")) return "airport";
-  if (normalized.includes("city")) return "city";
-  return "location";
-};
-
-const transformWebsitePlace = (item: SkyscannerWebsitePlace): SkyscannerPlaceSuggestion | null => {
-  const entityId = parseNumericEntityId(item.entity_id);
-  if (!entityId) return null;
-
-  const entityName = String(item.entity_name ?? `Entity ${entityId}`);
-  const hierarchy = String(item.hierarchy ?? "");
-  const parts = hierarchy.split("|").filter(Boolean);
-  const skyscannerClass = String(item.class ?? item.type ?? "");
-  const iataCode = extractIataCode(entityName);
-
-  return {
-    id: entityId,
-    name: entityName.replace(/\s*\([A-Z]{3}\)\s*$/, "").trim() || entityName,
-    displayName: hierarchy ? parts.join(", ") : entityName,
-    city: parts[0] ?? "",
-    country: parts[parts.length - 1] ?? "",
-    code: iataCode || entityId,
-    type: mapWebsitePlaceType(skyscannerClass, String(item.type ?? "")),
-    partnerMetadata: {
-      entityId,
-      entityName,
-      skyscannerClass,
-      location: item.location ?? null,
-    },
-  };
-};
-
-const normalizeSkyscannerPlaces = (data: unknown): SkyscannerPlaceSuggestion[] => {
-  if (!Array.isArray(data)) return [];
-  return data
-    .map((item) => transformWebsitePlace(item as SkyscannerWebsitePlace))
-    .filter((place): place is SkyscannerPlaceSuggestion => place !== null);
-};
-
-const mapSkyscannerPlaceToSuggestion = (
-  place: SkyscannerPlaceSuggestion
-): HotelDestinationSuggestion | null => {
-  const entityId = parseNumericEntityId(
-    place.partnerMetadata?.entityId,
-    place.id
-  );
-  if (!entityId) {
-    return null;
-  }
-
-  const skyscannerClass = place.partnerMetadata?.skyscannerClass?.toLowerCase() ?? "";
-  const type = skyscannerClass === "hotel" ? "hotel" : place.type;
-
-  return {
-    id: entityId,
-    label: place.name,
-    type,
-    subtitle:
-      place.displayName && place.displayName !== place.name ? place.displayName : undefined,
-    raw: {
-      entity_id: entityId,
-      city: place.city,
-      country: place.country,
-      code: place.code,
-      skyscanner_class: place.partnerMetadata?.skyscannerClass ?? null,
-      location: place.partnerMetadata?.location ?? null,
-    },
-  };
-};
-
-const toDestinationSuggestions = (places: SkyscannerPlaceSuggestion[]): HotelDestinationSuggestion[] =>
-  places
-    .map(mapSkyscannerPlaceToSuggestion)
-    .filter((suggestion): suggestion is HotelDestinationSuggestion => suggestion !== null)
-    .slice(0, 10);
-
-const fetchSkyscannerHotelsAutosuggestFromBrowser = async (
-  query: string,
-  market: string,
-  locale: string
-): Promise<SkyscannerPlaceSuggestion[]> => {
-  if (typeof window === "undefined") {
-    return [];
-  }
-
-  const url =
-    `https://www.skyscanner.net/g/autosuggest-search/api/v1/search-hotel/` +
-    `${market}/${locale}/${encodeURIComponent(query)}`;
-
-  const response = await fetch(url, {
-    headers: {
-      accept: "application/json",
-      referer: "https://www.skyscanner.net/hotels",
-      "skyscanner-client-name": "hotel-search-controls",
-    },
-  });
-
-  if (!response.ok) {
-    return [];
-  }
-
-  const data: unknown = await response.json().catch(() => null);
-  return normalizeSkyscannerPlaces(data);
-};
 
 const assertSupabaseConfigured = () => {
   if (!hasSupabaseClientConfig) {
@@ -187,15 +47,35 @@ const resolveRouterEntityId = (
   return entityId;
 };
 
+const resolveAutocompleteContext = (payload: HotelAutocompleteRequest) => {
+  const device = getDeviceKayakAutocompleteContext();
+  return {
+    locale: payload.locale?.trim() || device.locale,
+    country: payload.country?.trim().toUpperCase() || device.marketCountry,
+  };
+};
+
+const filterKayakSuggestions = (
+  suggestions: HotelDestinationSuggestion[]
+): HotelDestinationSuggestion[] =>
+  suggestions
+    .filter((suggestion) => {
+      const type = suggestion.type.toLowerCase();
+      return type.includes("city") || type.includes("hotel") || type.includes("region");
+    })
+    .slice(0, 10);
+
 export const requestHotelRedirectUrl = async (
   payload: HotelRedirectRequest
 ): Promise<HotelAffiliateRouteResponse> => {
   assertSupabaseConfigured();
-  const affiliateSource = payload.affiliateSource ?? "skyscanner";
+  const affiliateSource = payload.affiliateSource ?? "kayak";
   const requestDestinationId =
     affiliateSource === "booking"
       ? payload.search.destinationId
       : assertValidDestinationId(payload.search.destinationId);
+
+  const { locale, marketCountry } = getDeviceKayakAutocompleteContext();
 
   const { data, error } = await supabase.functions.invoke<HotelAffiliateRouterResponse>(
     AFFILIATE_EDGE_FUNCTION_NAME,
@@ -221,8 +101,8 @@ export const requestHotelRedirectUrl = async (
         affiliate_source: affiliateSource,
         latitude: payload.search.latitude,
         longitude: payload.search.longitude,
-        locale: SKYSCANNER_LOCALE,
-        country: SKYSCANNER_MARKET,
+        locale: payload.search.locale ?? locale,
+        country: payload.search.country ?? marketCountry,
       },
     }
   );
@@ -240,7 +120,7 @@ export const requestHotelRedirectUrl = async (
   }
 
   return {
-    redirectUrl: ensureSkyscannerHotelLocalization(data.redirect_url),
+    redirectUrl: data.redirect_url,
     entityId:
       affiliateSource === "booking"
         ? String(data.entity_id ?? payload.search.destination)
@@ -256,55 +136,33 @@ export const requestHotelDestinationAutocomplete = async (
   assertSupabaseConfigured();
 
   const query = payload.query.trim();
-  if (query.length < 2) {
+  if (query.length < KAYAK_AUTOCOMPLETE_MIN_QUERY_LENGTH) {
     return [];
   }
 
-  const market = SKYSCANNER_MARKET;
-  const locale = SKYSCANNER_LOCALE;
-  const cacheKey = `skyscanner:hotels:${query.toLowerCase()}:${market}:${locale}`;
+  const { locale, country } = resolveAutocompleteContext(payload);
+  const cacheKey = `kayak:${query.toLowerCase()}:${country}:${locale}`;
   const cached = autosuggestCache.get(cacheKey);
   if (cached && cached.expiresAt > Date.now()) {
     return cached.results;
   }
 
-  const params = new URLSearchParams({
-    q: query,
-    market,
-    locale,
-    product: "hotels",
-  });
-
-  const response = await fetch(
-    `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/${SKYSCANNER_PLACES_FUNCTION_NAME}?${params}`,
+  const { data, error } = await supabase.functions.invoke<HotelAutocompleteResponse>(
+    KAYAK_AUTOCOMPLETE_FUNCTION_NAME,
     {
-      headers: {
-        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+      body: {
+        query,
+        locale,
+        country,
       },
     }
   );
 
-  const data: unknown = await response.json().catch(() => null);
-
-  let places: SkyscannerPlaceSuggestion[] = Array.isArray(data) ? data : [];
-
-  if (!response.ok || places.length === 0) {
-    const browserPlaces = await fetchSkyscannerHotelsAutosuggestFromBrowser(query, market, locale);
-    if (browserPlaces.length > 0) {
-      places = browserPlaces;
-    } else if (!response.ok) {
-      const message =
-        data &&
-        typeof data === "object" &&
-        "error" in data &&
-        typeof (data as { error?: unknown }).error === "string"
-          ? (data as { error: string }).error
-          : "Unable to fetch destination suggestions.";
-      throw new Error(message);
-    }
+  if (error) {
+    throw new Error(await parseEdgeFunctionInvokeError(error));
   }
 
-  const results = toDestinationSuggestions(places);
+  const results = filterKayakSuggestions(data?.suggestions ?? []);
 
   autosuggestCache.set(cacheKey, {
     results,
