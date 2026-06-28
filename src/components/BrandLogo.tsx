@@ -20,22 +20,19 @@ const BrandLogo = ({
   compact = false,
 }: BrandLogoProps) => {
   const wordmarkClass =
-    "font-brand whitespace-nowrap text-[1.05em] font-extrabold leading-none tracking-[-0.02em] text-booking-yellow";
+    "font-brand whitespace-nowrap text-[1.05em] font-extrabold leading-none tracking-[-0.02em] text-[#FFCE17]";
 
   return (
     <span
       aria-label="Cheap Stays"
       className={cn(
         "inline-flex max-w-full items-center justify-center leading-none",
-        !compact && ["gap-0.5", fluidWordmarkSize, "md:gap-1", textClassName],
+        !compact && ["gap-[0.0875rem]", fluidWordmarkSize, "md:gap-[0.175rem]", textClassName],
         className
       )}
     >
       {!compact ? (
         <>
-          <span className={wordmarkClass} aria-hidden>
-            Cheap
-          </span>
           <img
             src="/logo-icon.png"
             width={180}
@@ -43,12 +40,12 @@ const BrandLogo = ({
             alt=""
             aria-hidden
             className={cn(
-              "h-[1.3em] w-[1.3em] shrink-0 self-center bg-transparent object-contain",
+              "-ml-1 h-[1.94em] w-[1.94em] shrink-0 self-center bg-transparent object-contain md:-ml-1.5",
               iconClassName
             )}
           />
           <span className={wordmarkClass} aria-hidden>
-            Stays
+            Cheap-Stays
           </span>
         </>
       ) : (
@@ -60,7 +57,7 @@ const BrandLogo = ({
           role="img"
           aria-label="Cheap Stays"
           className={cn(
-            "h-[1.3em] w-[1.3em] shrink-0 self-center bg-transparent object-contain",
+            "h-[1.94em] w-[1.94em] shrink-0 self-center bg-transparent object-contain",
             iconClassName
           )}
         />
