@@ -190,7 +190,7 @@ const SearchForm = () => {
   );
 
   const formatDateRangeLabel = (value: DateRange | undefined) => {
-    if (!value?.from) return "Add dates";
+    if (!value?.from) return "Pick dates";
     if (!value.to) return format(value.from, "MMM d, yyyy");
     return `${format(value.from, "MMM d")} — ${format(value.to, "MMM d, yyyy")}`;
   };
@@ -528,8 +528,8 @@ const SearchForm = () => {
     }
 
     if (!range?.from || !range?.to) {
-      toast.error("Add your travel dates", {
-        description: "Choose check-in and check-out so we can find the right stays.",
+      toast.error("Dates required", {
+        description: "Select both check-in and check-out to compare available stays.",
       });
       openDatePicker();
       return;
@@ -539,8 +539,8 @@ const SearchForm = () => {
 
     if (trimmedDestination.length < 2) {
       setDestinationError(true);
-      toast.error("Keep typing your destination", {
-        description: "Enter at least 2 characters, then choose a match from the list.",
+      toast.error("Destination too short", {
+        description: "Type at least 2 letters, then select a city or hotel from the suggestions.",
       });
       if (isDestinationLocked) {
         setIsDestinationLocked(false);
@@ -642,14 +642,14 @@ const SearchForm = () => {
       });
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : "Could not open hotel results.";
+        error instanceof Error ? error.message : "We couldn't load results right now.";
       if (isDestinationPickRequiredMessage(message)) {
         promptPickFromList();
       } else if (isSearchValidationMessage(message)) {
-        toast.error("Check your search details", { description: message });
+        toast.error("Review your search", { description: message });
       } else {
-        toast.error("Could not open hotel results", {
-          description: message || "Please try again or pick a destination from the list.",
+        toast.error("Couldn't compare rates", {
+          description: message || "Please try again or select a destination from the suggestions.",
         });
       }
     } finally {
@@ -715,7 +715,7 @@ const SearchForm = () => {
       noValidate
       className="w-full rounded-2xl bg-booking-yellow p-3 text-left shadow-search desktop:p-[1.15rem]"
     >
-      <div className="grid grid-cols-1 gap-2 desktop:grid-cols-[1.5fr_1.5fr_1fr_auto] desktop:gap-[0.575rem]">
+      <div className="grid grid-cols-1 gap-2 desktop:grid-cols-[1.5fr_1.5fr_1.35fr_auto] desktop:gap-[0.575rem]">
         {/* Destination */}
         <div
           ref={destinationFieldRef}
@@ -794,7 +794,7 @@ const SearchForm = () => {
                   setActiveSuggestionIndex(-1);
                 }
               }}
-              placeholder="City, stay, or destination"
+              placeholder="Where are you headed?"
               autoComplete="off"
               aria-invalid={destinationError}
               aria-describedby={destinationError ? "search-destination-error" : undefined}
@@ -812,11 +812,11 @@ const SearchForm = () => {
               className="mt-2 text-xs font-medium text-destructive"
               role="alert"
             >
-              Add a destination to continue
+              Choose where you're staying
             </p>
           )}
           {isAutocompleteLoading && (
-            <p className="mt-2 text-xs text-muted-foreground">Finding destinations...</p>
+            <p className="mt-2 text-xs text-muted-foreground">Loading suggestions...</p>
           )}
           {isDropdownOpen && destination.trim().length >= 2 && suggestions.length > 0 && (
             <div className="absolute top-full left-0 z-50 mt-2 w-full rounded-xl border border-border bg-popover p-1 shadow-elevated">
@@ -910,12 +910,12 @@ const SearchForm = () => {
               className="max-h-[92dvh] gap-0 rounded-t-2xl px-0 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-3"
             >
               <SheetHeader className="space-y-3 px-4 text-left">
-                <SheetTitle className="text-lg">Select dates</SheetTitle>
+                <SheetTitle className="text-lg">Pick your dates</SheetTitle>
                 <DateRangeStepHeader value={draftRange} phase={datePickerPhase} />
                 <p className="text-sm text-muted-foreground">
                   {datePickerPhase === "check-in"
-                    ? "Tap your check-in date"
-                    : "Tap your check-out date"}
+                    ? "Choose your arrival date"
+                    : "Choose your departure date"}
                 </p>
               </SheetHeader>
               <div className="flex justify-center overflow-x-auto px-2 py-2">
@@ -961,8 +961,8 @@ const SearchForm = () => {
                 <DateRangeStepHeader value={draftRange} phase={datePickerPhase} />
                 <p className="mt-2 text-center text-xs text-muted-foreground">
                   {datePickerPhase === "check-in"
-                    ? "Select check-in, then check-out"
-                    : "Select check-out to finish"}
+                    ? "Pick check-in first, then check-out"
+                    : "Now choose your check-out"}
                 </p>
               </div>
               {dateRangeCalendar}
@@ -990,7 +990,7 @@ const SearchForm = () => {
               </Label>
               <div className="mt-1 flex items-center justify-start gap-2 text-left">
                 <Users className={cn("h-4 w-4 shrink-0 text-primary", desktopFieldIcon)} />
-                <span className={cn("text-left text-base", desktopFieldText)}>{guestSummary}</span>
+                <span className={cn("whitespace-nowrap text-left text-base", desktopFieldText)}>{guestSummary}</span>
               </div>
             </button>
           </PopoverTrigger>
@@ -1026,7 +1026,7 @@ const SearchForm = () => {
           disabled={isLoading}
           className="h-12 rounded-xl bg-gradient-primary px-8 text-xl font-semibold shadow-elevated transition-smooth hover:opacity-95 active:scale-[0.99] desktop:h-auto desktop:px-[2.3rem] desktop:py-4 desktop:text-[1.725rem]"
         >
-          {isLoading ? "Searching..." : "Search"}
+          {isLoading ? "Comparing rates..." : "Compare prices"}
         </Button>
       </div>
     </form>

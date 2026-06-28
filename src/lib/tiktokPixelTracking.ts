@@ -11,9 +11,9 @@ export const buildTikTokSearchParams = (
   search: HotelSearchInput
 ): Record<string, unknown> => {
   const params: Record<string, unknown> = {
-    brand: "secret_bookings",
+    brand: "cheap_stays",
     vertical: "hotels",
-    source_site: "secret-bookings",
+    source_site: "cheap-stays",
     funnel_step: "search",
     traffic_type: inferTrafficType(),
   };

@@ -126,7 +126,7 @@ export class LandingTrackingService {
       referrer: document.referrer,
       timestamp: new Date().toISOString(),
       ip: ipInfo.ip ?? "",
-      source_app: "secret-bookings",
+      source_app: "cheap-stays",
     };
 
     if (partnerData) {

@@ -1,6 +1,6 @@
 export const DESTINATION_PICK_LIST_TOAST = {
-  title: "Pick a destination from the list",
-  description: "Start typing, then choose a city or hotel from the suggestions.",
+  title: "Select from the suggestions",
+  description: "Type a city or property name, then choose a match from the dropdown.",
 } as const;
 
 const PICK_FROM_LIST_PATTERNS = [
@@ -55,5 +55,5 @@ export const parseEdgeFunctionInvokeError = async (
     return error.message.trim();
   }
 
-  return "Unable to open hotel results.";
+  return "We couldn't load results right now.";
 };

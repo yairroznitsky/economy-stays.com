@@ -24,7 +24,7 @@ const BrandLogo = ({
 
   return (
     <span
-      aria-label="Secret Bookings"
+      aria-label="Cheap Stays"
       className={cn(
         "inline-flex max-w-full items-center justify-center leading-none",
         !compact && ["gap-0.5", fluidWordmarkSize, "md:gap-1", textClassName],
@@ -34,7 +34,7 @@ const BrandLogo = ({
       {!compact ? (
         <>
           <span className={wordmarkClass} aria-hidden>
-            Secret
+            Cheap
           </span>
           <img
             src="/logo-icon.png"
@@ -48,7 +48,7 @@ const BrandLogo = ({
             )}
           />
           <span className={wordmarkClass} aria-hidden>
-            Bookings
+            Stays
           </span>
         </>
       ) : (
@@ -58,7 +58,7 @@ const BrandLogo = ({
           height={180}
           alt=""
           role="img"
-          aria-label="Secret Bookings"
+          aria-label="Cheap Stays"
           className={cn(
             "h-[1.3em] w-[1.3em] shrink-0 self-center bg-transparent object-contain",
             iconClassName

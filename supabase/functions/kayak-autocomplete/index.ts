@@ -224,7 +224,7 @@ const fetchKayakSuggestions = async (params: {
     method: "GET",
     headers: {
       Accept: "application/json, text/plain, */*",
-      "User-Agent": `Mozilla/5.0 (compatible; SecretBookingsBot/1.0; +${SUPABASE_URL || "https://secret-bookings.com"})`,
+      "User-Agent": `Mozilla/5.0 (compatible; CheapStaysBot/1.0; +${SUPABASE_URL || "https://cheap-stays.com"})`,
     },
   });
 

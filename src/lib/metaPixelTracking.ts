@@ -10,9 +10,9 @@ export const buildMetaSearchParams = (
   search: HotelSearchInput
 ): Record<string, string | number> => {
   const params: Record<string, string | number> = {
-    brand: "secret_bookings",
+    brand: "cheap_stays",
     vertical: "hotels",
-    source_site: "secret-bookings",
+    source_site: "cheap-stays",
     funnel_step: "search",
     traffic_type: inferTrafficType(),
   };

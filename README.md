@@ -1,6 +1,8 @@
-# Secret Bookings
+# Cheap Stays
 
 Kayak-first hotel monetization flow with Supabase Edge Function routing.
+
+Cheap Stays is operated by Media Smarter.
 
 ## Local setup
 

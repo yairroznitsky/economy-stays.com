@@ -1,7 +1,7 @@
 {
-  "name": "Secret Bookings",
-  "short_name": "SecretBookings",
-  "description": "Find hotel and stay deals worldwide.",
+  "name": "Cheap Stays",
+  "short_name": "CheapStays",
+  "description": "Compare hotel and rental prices worldwide.",
   "icons": [
     {
       "src": "/android-chrome-512x512.png",
