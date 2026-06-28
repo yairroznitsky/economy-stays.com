@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { siteConfig } from "@/lib/siteConfig";
 
 interface BrandLogoProps {
   className?: string;
@@ -24,7 +25,7 @@ const BrandLogo = ({
 
   return (
     <span
-      aria-label="Cheap Stays"
+      aria-label={siteConfig.name}
       className={cn(
         "inline-flex max-w-full items-center justify-center leading-none",
         !compact && ["gap-[0.0875rem]", fluidWordmarkSize, "md:gap-[0.175rem]", textClassName],
@@ -45,7 +46,7 @@ const BrandLogo = ({
             )}
           />
           <span className={wordmarkClass} aria-hidden>
-            Cheap-Stays
+            {siteConfig.wordmark}
           </span>
         </>
       ) : (
@@ -55,7 +56,7 @@ const BrandLogo = ({
           height={180}
           alt=""
           role="img"
-          aria-label="Cheap Stays"
+          aria-label={siteConfig.name}
           className={cn(
             "h-[1.94em] w-[1.94em] shrink-0 self-center bg-transparent object-contain",
             iconClassName

@@ -1,6 +1,7 @@
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { appendLandingIdQuery } from "@/lib/landingTrackingService";
+import { siteConfig } from "@/lib/siteConfig";
 
 const NotFound = () => {
   const location = useLocation();
@@ -18,7 +19,7 @@ const NotFound = () => {
           href={appendLandingIdQuery("/")}
           className="text-primary underline hover:text-primary/90"
         >
-          Back to Cheap Stays
+          Back to {siteConfig.name}
         </a>
       </div>
     </div>

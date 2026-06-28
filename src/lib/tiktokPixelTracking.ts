@@ -1,3 +1,4 @@
+import { siteConfig } from "@/lib/siteConfig";
 import type { HotelSearchInput } from "@/types/hotels";
 
 const inferTrafficType = (): "tiktok" | "unknown" => {
@@ -11,9 +12,9 @@ export const buildTikTokSearchParams = (
   search: HotelSearchInput
 ): Record<string, unknown> => {
   const params: Record<string, unknown> = {
-    brand: "cheap_stays",
+    brand: siteConfig.trackingBrand,
     vertical: "hotels",
-    source_site: "cheap-stays",
+    source_site: siteConfig.slug,
     funnel_step: "search",
     traffic_type: inferTrafficType(),
   };

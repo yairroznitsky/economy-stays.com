@@ -75,7 +75,10 @@ const KAYAK_AFFILIATE_ID = Deno.env.get("KAYAK_AFFILIATE_ID")?.trim() ?? "";
 const KAYAK_DEEPLINK_BASE = Deno.env.get("KAYAK_DEEPLINK_BASE") ?? "https://www.kayak.com/in";
 const KAYAK_UTM_MEDIUM = Deno.env.get("KAYAK_UTM_MEDIUM") ?? "affiliate";
 const SKYSCANNER_MEDIA_PARTNER_ID = Deno.env.get("SKYSCANNER_MEDIA_PARTNER_ID") ?? "3495464";
-const SKYSCANNER_UTM_SOURCE = Deno.env.get("SKYSCANNER_UTM_SOURCE") ?? "cheap-stays";
+const SKYSCANNER_UTM_SOURCE =
+  Deno.env.get("SKYSCANNER_UTM_SOURCE")?.trim() ??
+  Deno.env.get("SITE_SLUG")?.trim() ??
+  "affiliate";
 const SKYSCANNER_MARKET = "US";
 const SKYSCANNER_LOCALE = "en-US";
 const SKYSCANNER_CURRENCY = "USD";

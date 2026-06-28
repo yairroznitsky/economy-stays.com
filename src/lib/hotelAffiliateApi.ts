@@ -1,6 +1,9 @@
 import { parseEdgeFunctionInvokeError } from "@/lib/hotelSearchErrors";
 import { getDeviceKayakAutocompleteContext } from "@/lib/kayakDestinationSearch";
-import { hasSupabaseClientConfig, supabase } from "@/lib/supabaseClient";
+import {
+  assertEdgeFunctionsAvailable,
+  invokeEdgeFunction,
+} from "@/lib/edgeFunctionClient";
 import { parseNumericEntityId } from "@/lib/skyscannerHotels";
 import type {
   HotelAffiliateRouteResponse,
@@ -17,14 +20,6 @@ const AUTOSUGGEST_CACHE_TTL_MS = 10 * 60 * 1000;
 const KAYAK_AUTOCOMPLETE_MIN_QUERY_LENGTH = 3;
 
 const autosuggestCache = new Map<string, { expiresAt: number; results: HotelDestinationSuggestion[] }>();
-
-const assertSupabaseConfigured = () => {
-  if (!hasSupabaseClientConfig) {
-    throw new Error(
-      "Supabase client configuration missing. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY."
-    );
-  }
-};
 
 const assertValidDestinationId = (destinationId: string | undefined): string => {
   const entityId = parseNumericEntityId(destinationId);
@@ -68,7 +63,7 @@ const filterKayakSuggestions = (
 export const requestHotelRedirectUrl = async (
   payload: HotelRedirectRequest
 ): Promise<HotelAffiliateRouteResponse> => {
-  assertSupabaseConfigured();
+  assertEdgeFunctionsAvailable();
   const affiliateSource = payload.affiliateSource ?? "kayak";
   const requestDestinationId =
     affiliateSource === "booking"
@@ -77,39 +72,33 @@ export const requestHotelRedirectUrl = async (
 
   const { locale, marketCountry } = getDeviceKayakAutocompleteContext();
 
-  const { data, error } = await supabase.functions.invoke<HotelAffiliateRouterResponse>(
+  const data = await invokeEdgeFunction<HotelAffiliateRouterResponse>(
     AFFILIATE_EDGE_FUNCTION_NAME,
     {
-      body: {
-        query: payload.search.destination,
-        destination_id: requestDestinationId,
-        hotel_id: payload.search.hotelId,
-        airport_place_id: payload.search.airportPlaceId,
-        airport_code: payload.search.airportCode,
-        airport_name: payload.search.airportName,
-        city_name: payload.search.cityName,
-        state_name: payload.search.stateName,
-        country_name: payload.search.countryName,
-        checkin: payload.search.checkIn,
-        checkout: payload.search.checkOut,
-        rooms: payload.search.rooms,
-        adults: payload.search.adults,
-        children: payload.search.children,
-        children_ages: payload.search.childrenAges,
-        click_id: payload.clickId,
-        landing_id: payload.landingId,
-        affiliate_source: affiliateSource,
-        latitude: payload.search.latitude,
-        longitude: payload.search.longitude,
-        locale: payload.search.locale ?? locale,
-        country: payload.search.country ?? marketCountry,
-      },
+      query: payload.search.destination,
+      destination_id: requestDestinationId,
+      hotel_id: payload.search.hotelId,
+      airport_place_id: payload.search.airportPlaceId,
+      airport_code: payload.search.airportCode,
+      airport_name: payload.search.airportName,
+      city_name: payload.search.cityName,
+      state_name: payload.search.stateName,
+      country_name: payload.search.countryName,
+      checkin: payload.search.checkIn,
+      checkout: payload.search.checkOut,
+      rooms: payload.search.rooms,
+      adults: payload.search.adults,
+      children: payload.search.children,
+      children_ages: payload.search.childrenAges,
+      click_id: payload.clickId,
+      landing_id: payload.landingId,
+      affiliate_source: affiliateSource,
+      latitude: payload.search.latitude,
+      longitude: payload.search.longitude,
+      locale: payload.search.locale ?? locale,
+      country: payload.search.country ?? marketCountry,
     }
   );
-
-  if (error) {
-    throw new Error(await parseEdgeFunctionInvokeError(error));
-  }
 
   if (!data?.success || !data.redirect_url) {
     const message =
@@ -133,7 +122,7 @@ export const requestHotelRedirectUrl = async (
 export const requestHotelDestinationAutocomplete = async (
   payload: HotelAutocompleteRequest
 ): Promise<HotelDestinationSuggestion[]> => {
-  assertSupabaseConfigured();
+  assertEdgeFunctionsAvailable();
 
   const query = payload.query.trim();
   if (query.length < KAYAK_AUTOCOMPLETE_MIN_QUERY_LENGTH) {
@@ -147,20 +136,14 @@ export const requestHotelDestinationAutocomplete = async (
     return cached.results;
   }
 
-  const { data, error } = await supabase.functions.invoke<HotelAutocompleteResponse>(
+  const data = await invokeEdgeFunction<HotelAutocompleteResponse>(
     KAYAK_AUTOCOMPLETE_FUNCTION_NAME,
     {
-      body: {
-        query,
-        locale,
-        country,
-      },
+      query,
+      locale,
+      country,
     }
   );
-
-  if (error) {
-    throw new Error(await parseEdgeFunctionInvokeError(error));
-  }
 
   const results = filterKayakSuggestions(data?.suggestions ?? []);
 

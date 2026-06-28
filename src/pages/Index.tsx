@@ -27,6 +27,7 @@ import {
 } from "@/lib/partnerClickTracking";
 import { getHotelAffiliateRouting } from "@/lib/bookingMode";
 import { trackMetaSearch } from "@/lib/metaPixelTracking";
+import { siteConfig } from "@/lib/siteConfig";
 import {
   DESTINATION_PICK_LIST_TOAST,
   isDestinationPickRequiredMessage,
@@ -339,7 +340,7 @@ const Index = () => {
         <div className="container">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="font-display text-3xl font-bold text-foreground md:text-4xl">
-              Why book with Cheap Stays
+              Why book with {siteConfig.name}
             </h2>
             <p className="mt-3 text-muted-foreground">
               One search pulls rates from trusted partners so you can book with confidence.
@@ -380,10 +381,10 @@ const Index = () => {
       <footer className="border-t border-border bg-background py-10">
         <div className="container flex flex-col items-center gap-2 text-center text-sm text-muted-foreground">
           <p>
-            © {new Date().getFullYear()} Media Smarter. All rights reserved. Cheap Stays is operated by Media Smarter.
+            © {new Date().getFullYear()} {siteConfig.operator}. All rights reserved. {siteConfig.name} is operated by {siteConfig.operator}.
           </p>
           <p className="max-w-2xl">
-            Cheap Stays may receive a commission when you book through partner links.
+            {siteConfig.name} may receive a commission when you book through partner links.
           </p>
         </div>
       </footer>

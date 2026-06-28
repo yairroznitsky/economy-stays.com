@@ -27,7 +27,7 @@ When `affiliate_source` is omitted or not `booking`, the function validates a nu
 ### Optional Supabase secrets
 
 - `SKYSCANNER_MEDIA_PARTNER_ID` — affiliate media partner ID (default `3495464`)
-- `SKYSCANNER_UTM_SOURCE` — UTM source (default `cheap-stays`)
+- `SKYSCANNER_UTM_SOURCE` — UTM source (defaults to `SITE_SLUG`, then `affiliate`)
 
 ## Booking.com routing (dormant)
 

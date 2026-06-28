@@ -24,6 +24,15 @@ const KAYAK_AUTOCOMPLETE_BASE_URL =
 const KAYAK_AUTOCOMPLETE_SIZE = Number(Deno.env.get("KAYAK_AUTOCOMPLETE_SIZE") ?? "50");
 const MAX_SUGGESTIONS = 10;
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
+const BOT_NAME = Deno.env.get("BOT_NAME")?.trim() ?? "AffiliateBot";
+const SITE_DOMAIN = Deno.env.get("SITE_DOMAIN")?.trim() ?? "";
+
+const buildBotUserAgent = (): string => {
+  const ref = SITE_DOMAIN ? `https://${SITE_DOMAIN}` : SUPABASE_URL;
+  return ref
+    ? `Mozilla/5.0 (compatible; ${BOT_NAME}/1.0; +${ref})`
+    : `Mozilla/5.0 (compatible; ${BOT_NAME}/1.0)`;
+};
 
 const jsonResponse = (status: number, body: Record<string, unknown>) =>
   new Response(JSON.stringify(body), {
@@ -224,7 +233,7 @@ const fetchKayakSuggestions = async (params: {
     method: "GET",
     headers: {
       Accept: "application/json, text/plain, */*",
-      "User-Agent": `Mozilla/5.0 (compatible; CheapStaysBot/1.0; +${SUPABASE_URL || "https://cheap-stays.com"})`,
+      "User-Agent": buildBotUserAgent(),
     },
   });
 

@@ -1,4 +1,5 @@
 import { generateClickId } from "@/lib/landingTrackingService";
+import { siteConfig } from "@/lib/siteConfig";
 import type { HotelSearchInput } from "@/types/hotels";
 
 const inferTrafficType = (): "facebook" | "unknown" => {
@@ -10,9 +11,9 @@ export const buildMetaSearchParams = (
   search: HotelSearchInput
 ): Record<string, string | number> => {
   const params: Record<string, string | number> = {
-    brand: "cheap_stays",
+    brand: siteConfig.trackingBrand,
     vertical: "hotels",
-    source_site: "cheap-stays",
+    source_site: siteConfig.slug,
     funnel_step: "search",
     traffic_type: inferTrafficType(),
   };
