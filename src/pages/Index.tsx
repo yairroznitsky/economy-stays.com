@@ -131,18 +131,18 @@ const trendingAutocompleteQuery = (d: TrendingDestination) =>
 const features = [
   {
     icon: Tag,
-    title: "Lower rates, less hassle",
-    desc: "Compare hotels, apartments, and rentals side by side to spot the best price for your dates.",
+    title: "Clear price comparison",
+    desc: "See hotels, apartments, and rentals side by side so you can pick the best option for your dates.",
   },
   {
     icon: Globe2,
-    title: "Millions of places to stay",
-    desc: "Weekend getaways, beach breaks, or long-stay rentals — options across cities and coastlines worldwide.",
+    title: "Worldwide coverage",
+    desc: "Weekend escapes, beach breaks, or longer stays — options across cities and coastlines worldwide.",
   },
   {
     icon: ShieldCheck,
-    title: "Trusted booking partners",
-    desc: "Flexible policies on many listings, backed by established travel partners you already know.",
+    title: "Established partners",
+    desc: "Flexible policies on many listings, backed by travel partners you already know.",
   },
 ];
 
@@ -242,7 +242,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero */}
-      <section className="relative min-h-[100svh] w-full md:min-h-[760px]">
+      <section className="relative min-h-[85svh] w-full md:min-h-[680px]">
         <img
           src={heroImage}
           alt="Clifftop resort with infinity pool overlooking the ocean at sunset"
@@ -251,15 +251,21 @@ const Index = () => {
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-hero" />
-        <div className="absolute inset-0 bg-gradient-to-b from-foreground/30 via-foreground/10 to-foreground/50" />
+        <div className="absolute inset-0 bg-gradient-to-b from-foreground/35 via-foreground/15 to-foreground/55" />
 
         <Header />
 
-        <div className="container relative z-10 flex min-h-[100svh] flex-col items-center justify-start pt-28 pb-10 text-center md:min-h-[760px] md:justify-center md:pt-20 md:pb-32">
-          <h1 className="mt-4 max-w-3xl font-display text-2xl font-bold leading-[1.1] text-primary-foreground drop-shadow-lg md:mt-[15vh] md:max-w-3xl md:text-5xl md:leading-[1.08]">
-            Same stays. Just cheaper.
+        <div className="container relative z-10 flex min-h-[85svh] flex-col items-center justify-start pt-24 pb-10 text-center md:min-h-[680px] md:justify-center md:pt-16 md:pb-24">
+          <p className="mt-2 text-sm font-medium uppercase tracking-widest text-primary-foreground/80 md:mt-0">
+            Independent stay search
+          </p>
+          <h1 className="mt-3 max-w-3xl font-display text-2xl font-bold leading-[1.15] text-primary-foreground drop-shadow-md md:max-w-3xl md:text-5xl md:leading-[1.1]">
+            A calmer way to compare stays
           </h1>
-          <div className="mt-7 w-full max-w-5xl desktop:mt-12 desktop:max-w-[73.6rem]">
+          <p className="mt-4 max-w-xl text-base text-primary-foreground/85 md:text-lg">
+            Search hotels, apartments, and rentals in one place — then book through partners you trust.
+          </p>
+          <div className="mt-7 w-full max-w-5xl desktop:mt-10 desktop:max-w-[73.6rem]">
             <SearchForm />
           </div>
         </div>
@@ -270,10 +276,10 @@ const Index = () => {
         <div className="container">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="font-display text-3xl font-bold text-foreground md:text-4xl">
-              Why book with {siteConfig.name}
+              Why travelers use {siteConfig.name}
             </h2>
             <p className="mt-3 text-muted-foreground">
-              One search pulls rates from trusted partners so you can book with confidence.
+              One search surfaces rates from trusted partners so you can choose with confidence.
             </p>
           </div>
           <div className="mt-12 grid gap-6 md:grid-cols-3">
@@ -282,7 +288,7 @@ const Index = () => {
                 key={f.title}
                 className="rounded-2xl border border-border bg-card p-7 shadow-soft"
               >
-                <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-primary text-primary-foreground">
+                <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground">
                   <f.icon className="h-6 w-6" />
                 </div>
                 <h3 className="text-lg font-semibold text-foreground">
@@ -300,10 +306,10 @@ const Index = () => {
         <div className="container">
           <div className="text-center">
             <h2 className="font-display text-3xl font-bold text-foreground md:text-4xl">
-              Where people are booking now
+              Popular destinations
             </h2>
             <p className="mt-2 text-muted-foreground">
-              Popular cities around the world with strong rates this week.
+              Explore cities travelers are searching this week.
             </p>
           </div>
 
@@ -340,7 +346,7 @@ const Index = () => {
                     </p>
                     <p className="mt-0.5 text-sm text-muted-foreground">{d.subtitle}</p>
                   </div>
-                  <span className="inline-flex w-full items-center justify-center gap-1 whitespace-nowrap rounded-lg bg-gradient-primary px-2.5 py-2 text-[11px] font-semibold leading-none text-primary-foreground shadow-sm transition-opacity group-hover:opacity-95 sm:gap-1.5 sm:rounded-xl sm:px-3 sm:py-2.5 sm:text-sm">
+                  <span className="inline-flex w-full items-center justify-center gap-1 whitespace-nowrap rounded-lg bg-primary px-2.5 py-2 text-[11px] font-semibold leading-none text-primary-foreground shadow-sm transition-opacity group-hover:opacity-90 sm:gap-1.5 sm:rounded-xl sm:px-3 sm:py-2.5 sm:text-sm">
                     {openingDestination === d.title ? (
                       "Checking rates…"
                     ) : (
@@ -358,13 +364,13 @@ const Index = () => {
       </section>
 
       {/* CTA strip */}
-      <section id="deals" className="relative overflow-hidden bg-gradient-primary py-16">
+      <section id="deals" className="relative overflow-hidden bg-primary py-16">
         <div className="container text-center">
           <h2 className="font-display text-4xl font-bold text-primary-foreground md:text-5xl">
-            Your next trip starts here
+            Ready to plan your trip?
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-base text-primary-foreground/90 md:text-lg">
-            Head back to the search bar above — compare stays and jump to the best rate in a click.
+            Use the search above to compare stays and continue to your preferred booking partner.
           </p>
         </div>
       </section>

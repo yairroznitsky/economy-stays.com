@@ -20,8 +20,10 @@ const BrandLogo = ({
   variant = "dark",
   compact = false,
 }: BrandLogoProps) => {
-  const wordmarkClass =
-    "font-brand whitespace-nowrap text-[1.05em] font-extrabold leading-none tracking-[-0.02em] text-[#FFCE17]";
+  const wordmarkClass = cn(
+    "font-brand whitespace-nowrap text-[1.05em] font-extrabold leading-none tracking-[-0.02em]",
+    variant === "light" ? "text-primary-foreground" : "text-primary"
+  );
 
   return (
     <span

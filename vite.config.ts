@@ -46,8 +46,8 @@ const webManifestPlugin = (env: Record<string, string>): Plugin => {
         purpose: "any",
       },
     ],
-    theme_color: "#2563EB",
-    background_color: "#ffffff",
+    theme_color: "#244A3D",
+    background_color: "#F9F7F4",
     display: "standalone",
   });
 

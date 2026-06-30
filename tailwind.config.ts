@@ -53,10 +53,6 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        booking: {
-          blue: "#2563EB",
-          yellow: "#CFF5FF",
-        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
@@ -84,7 +80,7 @@ export default {
         search: "var(--shadow-search)",
       },
       fontFamily: {
-        display: ["'Playfair Display'", "serif"],
+        display: ['"Plus Jakarta Sans"', "Inter", "system-ui", "sans-serif"],
         brand: ['"Sora"', "Inter", "system-ui", "sans-serif"],
         sans: ["Inter", "system-ui", "sans-serif"],
       },
