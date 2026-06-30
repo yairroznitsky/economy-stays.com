@@ -22,6 +22,7 @@ export const siteConfig = {
   shortName: readEnv(import.meta.env.VITE_SITE_SHORT_NAME, name.replace(/\s+/g, "")),
   domain: readEnv(import.meta.env.VITE_SITE_DOMAIN, "localhost"),
   operator: readEnv(import.meta.env.VITE_SITE_OPERATOR, ""),
+  supportEmail: readEnv(import.meta.env.VITE_SITE_SUPPORT_EMAIL, "support@cheap-stays.com"),
   trackingBrand: readEnv(import.meta.env.VITE_TRACKING_BRAND, slug.replace(/-/g, "_")),
   landingIdPrefix: readEnv(import.meta.env.VITE_LANDING_ID_PREFIX, "LD-"),
   metaPixelId: readEnv(import.meta.env.VITE_META_PIXEL_ID, ""),

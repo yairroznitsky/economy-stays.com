@@ -10,6 +10,7 @@ import dubaiImg from "@/assets/destinations/dubai.jpg";
 import sydneyImg from "@/assets/destinations/sydney.jpg";
 import bangkokImg from "@/assets/destinations/bangkok.jpg";
 import Header from "@/components/Header";
+import SiteFooter from "@/components/SiteFooter";
 import SearchForm from "@/components/SearchForm";
 import {
   requestHotelDestinationAutocomplete,
@@ -375,17 +376,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-border bg-background py-10">
-        <div className="container flex flex-col items-center gap-2 text-center text-sm text-muted-foreground">
-          <p>
-            © {new Date().getFullYear()} {siteConfig.operator}. All rights reserved. {siteConfig.name} is operated by {siteConfig.operator}.
-          </p>
-          <p className="max-w-2xl">
-            {siteConfig.name} may receive a commission when you book through partner links.
-          </p>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 };
