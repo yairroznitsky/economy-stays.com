@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { ExternalLink, ShieldCheck, Tag, Globe2, Sparkles } from "lucide-react";
+import { ExternalLink, ShieldCheck, Tag, Globe2 } from "lucide-react";
 import heroImage from "@/assets/hero-hotel.jpg";
 import parisImg from "@/assets/destinations/paris.jpg";
 import londonImg from "@/assets/destinations/london.jpg";
@@ -256,19 +256,41 @@ const Index = () => {
         <Header />
 
         <div className="container relative z-10 flex min-h-[100svh] flex-col items-center justify-start pt-28 pb-10 text-center md:min-h-[760px] md:justify-center md:pt-20 md:pb-32">
-          <span className="mb-4 hidden items-center gap-2 rounded-full border border-primary-foreground/30 bg-primary-foreground/10 px-4 py-1.5 text-xs font-medium text-primary-foreground backdrop-blur-md sm:inline-flex md:mb-5">
-            <Sparkles className="h-3.5 w-3.5" />
-            Smart rates on every stay
-          </span>
-          <h1 className="mt-4 max-w-3xl font-display text-2xl font-bold leading-[1.1] text-primary-foreground drop-shadow-lg md:mt-0 md:max-w-3xl md:text-5xl md:leading-[1.08]">
-            Great stays. Better prices.
+          <h1 className="mt-4 max-w-3xl font-display text-2xl font-bold leading-[1.1] text-primary-foreground drop-shadow-lg md:mt-[15vh] md:max-w-3xl md:text-5xl md:leading-[1.08]">
+            Same stays. Just cheaper.
           </h1>
-          <p className="mt-4 hidden max-w-xl text-base text-primary-foreground/90 md:mt-5 md:block md:max-w-xl md:text-lg">
-            Compare hotels, apartments, and vacation rentals in seconds.
-          </p>
-
           <div className="mt-7 w-full max-w-5xl desktop:mt-12 desktop:max-w-[73.6rem]">
             <SearchForm />
+          </div>
+        </div>
+      </section>
+
+      {/* Features */}
+      <section id="how" className="border-b border-border bg-background py-20">
+        <div className="container">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="font-display text-3xl font-bold text-foreground md:text-4xl">
+              Why book with {siteConfig.name}
+            </h2>
+            <p className="mt-3 text-muted-foreground">
+              One search pulls rates from trusted partners so you can book with confidence.
+            </p>
+          </div>
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
+            {features.map((f) => (
+              <div
+                key={f.title}
+                className="rounded-2xl border border-border bg-card p-7 shadow-soft"
+              >
+                <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-primary text-primary-foreground">
+                  <f.icon className="h-6 w-6" />
+                </div>
+                <h3 className="text-lg font-semibold text-foreground">
+                  {f.title}
+                </h3>
+                <p className="mt-2 text-muted-foreground">{f.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -330,36 +352,6 @@ const Index = () => {
                   </span>
                 </div>
               </button>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Features */}
-      <section id="how" className="border-b border-border bg-background py-20">
-        <div className="container">
-          <div className="mx-auto max-w-2xl text-center">
-            <h2 className="font-display text-3xl font-bold text-foreground md:text-4xl">
-              Why book with {siteConfig.name}
-            </h2>
-            <p className="mt-3 text-muted-foreground">
-              One search pulls rates from trusted partners so you can book with confidence.
-            </p>
-          </div>
-          <div className="mt-12 grid gap-6 md:grid-cols-3">
-            {features.map((f) => (
-              <div
-                key={f.title}
-                className="rounded-2xl border border-border bg-card p-7 shadow-soft"
-              >
-                <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-primary text-primary-foreground">
-                  <f.icon className="h-6 w-6" />
-                </div>
-                <h3 className="text-lg font-semibold text-foreground">
-                  {f.title}
-                </h3>
-                <p className="mt-2 text-muted-foreground">{f.desc}</p>
-              </div>
             ))}
           </div>
         </div>

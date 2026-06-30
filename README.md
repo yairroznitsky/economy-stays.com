@@ -1,5 +1,7 @@
 # Cheap Stays
 
+Same stays. Just cheaper.
+
 Kayak-first hotel monetization flow with Supabase Edge Function routing.
 
 Cheap Stays is operated by Media Smarter.

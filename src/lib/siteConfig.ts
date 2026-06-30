@@ -36,5 +36,5 @@ export const siteConfig = {
     return `${protocol}://${domain}/`;
   },
   description:
-    "Compare hotels, apartments, and vacation rentals in one search. Find lower rates from trusted booking partners.",
+    "Same stays, just cheaper. Compare hotels, apartments, and vacation rentals in one search and book the exact same stay for less from trusted booking partners.",
 } as const;
