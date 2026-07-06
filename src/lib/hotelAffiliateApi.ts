@@ -50,13 +50,40 @@ const resolveAutocompleteContext = (payload: HotelAutocompleteRequest) => {
   };
 };
 
+const normalizeKayakSuggestionType = (type: string): string => {
+  const normalized = type.trim().toLowerCase();
+  if (normalized === "ct" || normalized.includes("city")) return "city";
+  if (normalized.includes("hotel") || normalized.includes("hostel")) return "hotel";
+  if (normalized === "ap" || normalized.includes("airport")) return "airport";
+  if (normalized === "reg" || normalized.includes("region") || normalized.includes("state")) {
+    return "region";
+  }
+  return normalized || "unknown";
+};
+
+const mapKayakAutocompleteSuggestion = (
+  suggestion: HotelDestinationSuggestion
+): HotelDestinationSuggestion => ({
+  id: suggestion.id,
+  label: suggestion.label,
+  type: normalizeKayakSuggestionType(suggestion.type),
+  subtitle: suggestion.subtitle,
+  raw: suggestion.raw,
+});
+
 const filterKayakSuggestions = (
   suggestions: HotelDestinationSuggestion[]
 ): HotelDestinationSuggestion[] =>
   suggestions
+    .map(mapKayakAutocompleteSuggestion)
     .filter((suggestion) => {
       const type = suggestion.type.toLowerCase();
-      return type.includes("city") || type.includes("hotel") || type.includes("region");
+      return (
+        type.includes("city") ||
+        type.includes("hotel") ||
+        type.includes("region") ||
+        type.includes("airport")
+      );
     })
     .slice(0, 10);
 
@@ -94,7 +121,7 @@ const buildBookingRedirect = (
 export const requestHotelRedirectUrl = async (
   payload: HotelRedirectRequest
 ): Promise<HotelAffiliateRouteResponse> => {
-  const affiliateSource = payload.affiliateSource ?? "booking";
+  const affiliateSource = payload.affiliateSource ?? "kayak";
 
   if (affiliateSource === "booking") {
     return buildBookingRedirect(payload);
@@ -160,7 +187,7 @@ export const requestHotelDestinationAutocomplete = async (
   }
 
   const { locale, country } = resolveAutocompleteContext(payload);
-  const cacheKey = `kayak:${query.toLowerCase()}:${country}:${locale}`;
+  const cacheKey = `kayak:hotels:${query.toLowerCase()}:${country}:${locale}`;
   const cached = autosuggestCache.get(cacheKey);
   if (cached && cached.expiresAt > Date.now()) {
     return cached.results;

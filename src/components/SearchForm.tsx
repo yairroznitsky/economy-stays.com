@@ -372,7 +372,7 @@ const SearchForm = () => {
     });
     destinationInputRef.current?.focus();
     scrollDestinationFieldIntoMobileView();
-    if (destination.trim().length >= 2 && suggestions.length > 0) {
+    if (destination.trim().length >= 3 && suggestions.length > 0) {
       setIsDropdownOpen(true);
     }
   }, [destination, suggestions.length, scrollDestinationFieldIntoMobileView]);
@@ -759,7 +759,7 @@ const SearchForm = () => {
               onFocus={() => {
                 if (isDestinationLocked) return;
                 scrollDestinationFieldIntoMobileView();
-                if (destination.trim().length >= 2 && suggestions.length > 0) {
+                if (destination.trim().length >= 3 && suggestions.length > 0) {
                   setIsDropdownOpen(true);
                 }
               }}
@@ -818,7 +818,7 @@ const SearchForm = () => {
           {isAutocompleteLoading && (
             <p className="mt-2 text-xs text-muted-foreground">Loading suggestions...</p>
           )}
-          {isDropdownOpen && destination.trim().length >= 2 && suggestions.length > 0 && (
+          {isDropdownOpen && destination.trim().length >= 3 && suggestions.length > 0 && (
             <div className="absolute top-full left-0 z-50 mt-2 w-full rounded-xl border border-border bg-popover p-1 shadow-elevated">
               <ul
                 role="listbox"

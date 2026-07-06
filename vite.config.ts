@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { writeFileSync } from "fs";
 import { componentTagger } from "lovable-tagger";
+import { localEdgePlugin } from "./server/edge/vitePlugin";
 
 const htmlEnvPlugin = (env: Record<string, string>): Plugin => ({
   name: "html-env-transform",
@@ -75,7 +76,9 @@ const webManifestPlugin = (env: Record<string, string>): Plugin => {
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
-  const useApiProxy = env.VITE_USE_API_PROXY === "true";
+  const useLocalEdge = mode === "development" && env.VITE_LOCAL_EDGE !== "false";
+  const useApiProxy = env.VITE_USE_API_PROXY === "true" && !useLocalEdge;
+  const useEdgeProxyClient = useApiProxy || useLocalEdge;
   const supabaseUrl = env.SUPABASE_URL || env.VITE_SUPABASE_URL;
   const anonKey = env.SUPABASE_ANON_KEY || env.VITE_SUPABASE_ANON_KEY;
 
@@ -111,11 +114,12 @@ export default defineConfig(({ mode }) => {
       react(),
       htmlEnvPlugin(env),
       webManifestPlugin(env),
+      useLocalEdge && localEdgePlugin(),
       mode === "development" && componentTagger(),
     ].filter(Boolean),
     resolve: {
       alias: [
-        ...(useApiProxy
+        ...(useEdgeProxyClient
           ? [
               {
                 find: "@/lib/edgeFunctionClient",

@@ -1,13 +1,9 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import {
-  buildBookingAffiliateRedirectUrl,
-  getDefaultBookingAffiliateConfig,
-  type BookingDeeplinkInput,
-} from "./bookingDeeplink.ts";
+import { buildBookingAffiliateRedirectUrl } from "../../supabase/functions/hotel-affiliate-router/bookingDeeplink";
 import {
   buildKayakDeeplink,
   resolveAffiliateSource,
-} from "./kayakDeeplink.ts";
+} from "../../supabase/functions/hotel-affiliate-router/kayakDeeplink";
+import { getBookingAffiliateConfig, getKayakAffiliateConfig, readEnv } from "./env";
 
 interface HotelAffiliateRequest {
   query: string;
@@ -56,10 +52,6 @@ interface ValidatedInput {
   country: string;
 }
 
-interface ValidatedBookingInput extends BookingDeeplinkInput {
-  landing_id: string;
-}
-
 interface NormalizedDestination {
   original_query: string;
   normalized_query: string;
@@ -69,28 +61,15 @@ interface NormalizedDestination {
   country: string;
 }
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
-
-const SKYSCANNER_MEDIA_PARTNER_ID = Deno.env.get("SKYSCANNER_MEDIA_PARTNER_ID") ?? "3495464";
+const SKYSCANNER_MEDIA_PARTNER_ID = readEnv("SKYSCANNER_MEDIA_PARTNER_ID") ?? "3495464";
 const SKYSCANNER_UTM_SOURCE =
-  Deno.env.get("SKYSCANNER_UTM_SOURCE")?.trim() ??
-  Deno.env.get("SITE_SLUG")?.trim() ??
+  readEnv("SKYSCANNER_UTM_SOURCE")?.trim() ??
+  readEnv("SITE_SLUG")?.trim() ??
+  readEnv("VITE_SITE_SLUG")?.trim() ??
   "affiliate";
 const SKYSCANNER_MARKET = "US";
 const SKYSCANNER_LOCALE = "en-US";
 const SKYSCANNER_CURRENCY = "USD";
-const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
-const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
-const ENABLE_TRACKING_LOGS = Deno.env.get("ENABLE_TRACKING_LOGS") === "true";
-
-const supabase =
-  SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY
-    ? createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
-    : null;
 
 const createRequestId = () => {
   if (typeof crypto?.randomUUID === "function") {
@@ -157,7 +136,7 @@ const parseOptionalCoordinate = (value: unknown): number | undefined => {
   return parsed;
 };
 
-export const validateBookingInput = (payload: unknown): ValidatedBookingInput => {
+const validateBookingInput = (payload: unknown) => {
   if (!payload || typeof payload !== "object") {
     throw new Error("Request body must be a JSON object.");
   }
@@ -184,12 +163,8 @@ export const validateBookingInput = (payload: unknown): ValidatedBookingInput =>
   const children = parsePositiveInt(input.children, 0, "children", 0, 6);
   const childrenAges = parseChildrenAges(input.children_ages, children);
 
-  if (rooms > 8) {
-    throw new Error("rooms cannot exceed 8.");
-  }
-  if (adults > 28) {
-    throw new Error("adults cannot exceed 28.");
-  }
+  if (rooms > 8) throw new Error("rooms cannot exceed 8.");
+  if (adults > 28) throw new Error("adults cannot exceed 28.");
   if (adults < rooms) {
     throw new Error("Number of adults must be greater than or equal to number of rooms.");
   }
@@ -199,11 +174,6 @@ export const validateBookingInput = (payload: unknown): ValidatedBookingInput =>
   if (adults + children > rooms * 4) {
     throw new Error("Maximum 4 guests (including children) are allowed per room.");
   }
-
-  const clickId = input.click_id?.trim() || createRequestId();
-  const landingId = input.landing_id?.trim() || "default-landing";
-  const latitude = parseOptionalCoordinate(input.latitude);
-  const longitude = parseOptionalCoordinate(input.longitude);
 
   return {
     query,
@@ -213,14 +183,14 @@ export const validateBookingInput = (payload: unknown): ValidatedBookingInput =>
     adults,
     children,
     children_ages: childrenAges,
-    click_id: clickId,
-    landing_id: landingId,
-    latitude,
-    longitude,
+    click_id: input.click_id?.trim() || createRequestId(),
+    landing_id: input.landing_id?.trim() || "default-landing",
+    latitude: parseOptionalCoordinate(input.latitude),
+    longitude: parseOptionalCoordinate(input.longitude),
   };
 };
 
-export const validateInput = (payload: unknown): ValidatedInput => {
+const validateInput = (payload: unknown): ValidatedInput => {
   if (!payload || typeof payload !== "object") {
     throw new Error("Request body must be a JSON object.");
   }
@@ -247,12 +217,8 @@ export const validateInput = (payload: unknown): ValidatedInput => {
   const children = parsePositiveInt(input.children, 0, "children", 0, 6);
   const childrenAges = parseChildrenAges(input.children_ages, children);
 
-  if (rooms > 8) {
-    throw new Error("rooms cannot exceed 8.");
-  }
-  if (adults > 28) {
-    throw new Error("adults cannot exceed 28.");
-  }
+  if (rooms > 8) throw new Error("rooms cannot exceed 8.");
+  if (adults > 28) throw new Error("adults cannot exceed 28.");
   if (adults < rooms) {
     throw new Error("Number of adults must be greater than or equal to number of rooms.");
   }
@@ -263,19 +229,8 @@ export const validateInput = (payload: unknown): ValidatedInput => {
     throw new Error("Maximum 4 guests (including children) are allowed per room.");
   }
 
-  const clickId = input.click_id?.trim() || createRequestId();
-  const landingId = input.landing_id?.trim() || "default-landing";
-  const locale = input.locale?.trim() || "en";
-  const country = input.country?.trim().toUpperCase() || "US";
   const destinationId =
     input.destination_id?.trim() || query.match(/-c(\d+)/i)?.[1] || "";
-  const hotelId = input.hotel_id?.trim() || undefined;
-  const airportPlaceId = input.airport_place_id?.trim() || undefined;
-  const airportCode = input.airport_code?.trim() || undefined;
-  const airportName = input.airport_name?.trim() || undefined;
-  const cityName = input.city_name?.trim() || undefined;
-  const stateName = input.state_name?.trim() || undefined;
-  const countryName = input.country_name?.trim() || undefined;
 
   if (!destinationId) {
     throw new Error(
@@ -292,52 +247,38 @@ export const validateInput = (payload: unknown): ValidatedInput => {
   return {
     query,
     destination_id: destinationId,
-    hotel_id: hotelId,
-    airport_place_id: airportPlaceId,
-    airport_code: airportCode,
-    airport_name: airportName,
-    city_name: cityName,
-    state_name: stateName,
-    country_name: countryName,
+    hotel_id: input.hotel_id?.trim() || undefined,
+    airport_place_id: input.airport_place_id?.trim() || undefined,
+    airport_code: input.airport_code?.trim() || undefined,
+    airport_name: input.airport_name?.trim() || undefined,
+    city_name: input.city_name?.trim() || undefined,
+    state_name: input.state_name?.trim() || undefined,
+    country_name: input.country_name?.trim() || undefined,
     checkin,
     checkout,
     rooms,
     adults,
     children,
     children_ages: childrenAges,
-    click_id: clickId,
-    landing_id: landingId,
-    locale,
-    country,
+    click_id: input.click_id?.trim() || createRequestId(),
+    landing_id: input.landing_id?.trim() || "default-landing",
+    locale: input.locale?.trim() || "en",
+    country: input.country?.trim().toUpperCase() || "US",
   };
 };
 
-export const normalizeDestination = (input: ValidatedInput): NormalizedDestination => {
-  const normalizedQuery = input.query.toLowerCase().replace(/\s+/g, " ").trim();
+const normalizeDestination = (input: ValidatedInput): NormalizedDestination => ({
+  original_query: input.query,
+  normalized_query: input.query.toLowerCase().replace(/\s+/g, " ").trim(),
+  destination_id: input.destination_id,
+  destination_type: "city_or_region",
+  locale: input.locale,
+  country: input.country,
+});
 
-  return {
-    original_query: input.query,
-    normalized_query: normalizedQuery,
-    destination_id: input.destination_id,
-    destination_type: "city_or_region",
-    locale: input.locale,
-    country: input.country,
-  };
-};
-
-const resolveSkyscannerEntityId = (destinationId: string): string | null => {
-  if (/^\d+$/.test(destinationId)) return destinationId;
-  return null;
-};
-
-export const buildSkyscannerHotelDeeplink = (input: ValidatedInput) => {
-  const entityId = resolveSkyscannerEntityId(input.destination_id);
-  if (!entityId) {
-    throw new Error("Could not resolve destination. Please select a different result.");
-  }
-
+const buildSkyscannerHotelDeeplink = (input: ValidatedInput) => {
   const qs = new URLSearchParams({
-    entity_id: entityId,
+    entity_id: input.destination_id,
     checkin: input.checkin,
     checkout: input.checkout,
     adults: String(input.adults),
@@ -358,41 +299,13 @@ export const buildSkyscannerHotelDeeplink = (input: ValidatedInput) => {
   return `https://www.skyscanner.net/hotels/search?${qs.toString()}`;
 };
 
-export const logTrackingEvent = async (_params: {
-  input: ValidatedInput;
-  destination: NormalizedDestination;
-  redirectUrl: string;
-  requestId: string;
-}) => {
-  // Logging disabled by request: keep routing fast and stateless.
-  return;
-};
-
-const jsonResponse = (status: number, body: Record<string, unknown>) =>
-  new Response(JSON.stringify(body), {
-    status,
-    headers: {
-      ...corsHeaders,
-      "Content-Type": "application/json",
-    },
-  });
-
-Deno.serve(async (request) => {
-  if (request.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
-
-  if (request.method !== "POST") {
-    return jsonResponse(405, {
-      success: false,
-      error: "Method not allowed. Use POST.",
-    });
-  }
-
+export const handleHotelAffiliateRouter = async (
+  payload: unknown
+): Promise<{ status: number; body: Record<string, unknown> }> => {
   const requestId = createRequestId();
+  const kayakConfig = getKayakAffiliateConfig();
 
   try {
-    const payload = await request.json();
     const affiliateSource = resolveAffiliateSource(
       payload && typeof payload === "object"
         ? (payload as Partial<HotelAffiliateRequest>).affiliate_source
@@ -403,36 +316,62 @@ Deno.serve(async (request) => {
       const validated = validateBookingInput(payload);
       const redirectUrl = buildBookingAffiliateRedirectUrl(
         validated,
-        getDefaultBookingAffiliateConfig()
+        getBookingAffiliateConfig()
       );
 
-      return jsonResponse(200, {
-        success: true,
-        entity_id: validated.query,
-        redirect_url: redirectUrl,
-        tracking_payload: {
-          request_id: requestId,
-          click_id: validated.click_id,
-          landing_id: validated.landing_id,
-          affiliate_source: "booking",
-          query: validated.query,
+      return {
+        status: 200,
+        body: {
+          success: true,
+          entity_id: validated.query,
+          redirect_url: redirectUrl,
+          tracking_payload: {
+            request_id: requestId,
+            click_id: validated.click_id,
+            landing_id: validated.landing_id,
+            affiliate_source: "booking",
+            query: validated.query,
+          },
         },
-      });
+      };
     }
 
     if (affiliateSource === "kayak") {
       const validated = validateInput(payload);
       const normalizedDestination = normalizeDestination(validated);
-      const redirectUrl = buildKayakDeeplink(validated, normalizedDestination);
+      const redirectUrl = buildKayakDeeplink(
+        validated,
+        normalizedDestination,
+        kayakConfig
+      );
 
-      await logTrackingEvent({
-        input: validated,
-        destination: normalizedDestination,
-        redirectUrl,
-        requestId,
-      });
+      return {
+        status: 200,
+        body: {
+          success: true,
+          entity_id: validated.destination_id,
+          normalized_destination: normalizedDestination,
+          redirect_url: redirectUrl,
+          tracking_payload: {
+            request_id: requestId,
+            click_id: validated.click_id,
+            landing_id: validated.landing_id,
+            affiliate_source: "kayak",
+            locale: validated.locale,
+            country: validated.country,
+            query: validated.query,
+          },
+        },
+      };
+    }
 
-      return jsonResponse(200, {
+    const validated = validateInput(payload);
+    const normalizedDestination = normalizeDestination(validated);
+    const redirectUrl = buildSkyscannerHotelDeeplink(validated);
+
+    return {
+      status: 200,
+      body: {
         success: true,
         entity_id: validated.destination_id,
         normalized_destination: normalizedDestination,
@@ -441,46 +380,18 @@ Deno.serve(async (request) => {
           request_id: requestId,
           click_id: validated.click_id,
           landing_id: validated.landing_id,
-          affiliate_source: "kayak",
+          affiliate_source: "skyscanner",
           locale: validated.locale,
           country: validated.country,
           query: validated.query,
         },
-      });
-    }
-
-    const validated = validateInput(payload);
-    const normalizedDestination = normalizeDestination(validated);
-    const redirectUrl = buildSkyscannerHotelDeeplink(validated);
-
-    await logTrackingEvent({
-      input: validated,
-      destination: normalizedDestination,
-      redirectUrl,
-      requestId,
-    });
-
-    return jsonResponse(200, {
-      success: true,
-      entity_id: validated.destination_id,
-      normalized_destination: normalizedDestination,
-      redirect_url: redirectUrl,
-      tracking_payload: {
-        request_id: requestId,
-        click_id: validated.click_id,
-        landing_id: validated.landing_id,
-        affiliate_source: "skyscanner",
-        locale: validated.locale,
-        country: validated.country,
-        query: validated.query,
       },
-    });
+    };
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unexpected server error.";
-    return jsonResponse(400, {
-      success: false,
-      error: message,
-      request_id: requestId,
-    });
+    return {
+      status: 400,
+      body: { success: false, error: message, request_id: requestId },
+    };
   }
-});
+};

@@ -20,6 +20,7 @@ import {
   buildHotelSearchInputFromSuggestion,
   getDefaultHotelStayDateStrings,
   getDeviceKayakAutocompleteContext,
+  withTrendingDeeplinkPlace,
 } from "@/lib/kayakDestinationSearch";
 import { generateClickId, LandingTrackingService } from "@/lib/landingTrackingService";
 import {
@@ -171,16 +172,23 @@ const Index = () => {
         return;
       }
 
-      const search = buildHotelSearchInputFromSuggestion(suggestion, {
-        checkIn,
-        checkOut,
-        adults: 2,
-        children: 0,
-        rooms: 1,
-        locale,
-        marketCountry,
-        fallbackCountryName: d.country,
-      });
+      const search = withTrendingDeeplinkPlace(
+        buildHotelSearchInputFromSuggestion(suggestion, {
+          checkIn,
+          checkOut,
+          adults: 2,
+          children: 0,
+          rooms: 1,
+          locale,
+          marketCountry,
+          fallbackCountryName: d.country,
+        }),
+        {
+          city: d.city,
+          state: d.state ?? "",
+          country: d.country,
+        }
+      );
 
       const clickId = generateClickId();
       const landingId = await LandingTrackingService.getOrCreateLandingId();
