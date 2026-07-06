@@ -1,4 +1,5 @@
 import { buildBookingSearchResultsUrl } from "@/lib/bookingHotels";
+import { buildKayakDeeplink } from "@/lib/kayakDeeplink";
 import { getDeviceKayakAutocompleteContext } from "@/lib/kayakDestinationSearch";
 import {
   assertEdgeFunctionsAvailable,
@@ -87,6 +88,52 @@ const filterKayakSuggestions = (
     })
     .slice(0, 10);
 
+const buildKayakRedirect = (
+  payload: HotelRedirectRequest
+): HotelAffiliateRouteResponse => {
+  const search = payload.search;
+  const destination = search.destination?.trim();
+  if (!destination) {
+    throw new Error("Destination is required.");
+  }
+  if (!search.checkIn || !search.checkOut) {
+    throw new Error("Check-in and check-out dates are required.");
+  }
+
+  const destinationId = assertValidDestinationId(search.destinationId);
+  const { marketCountry } = getDeviceKayakAutocompleteContext();
+
+  const redirectUrl = buildKayakDeeplink(
+    {
+      query: destination,
+      destination_id: destinationId,
+      hotel_id: search.hotelId,
+      airport_place_id: search.airportPlaceId,
+      airport_code: search.airportCode,
+      airport_name: search.airportName,
+      city_name: search.cityName,
+      state_name: search.stateName,
+      country_name: search.countryName,
+      checkin: search.checkIn,
+      checkout: search.checkOut,
+      rooms: search.rooms ?? 1,
+      adults: search.adults ?? 2,
+      children: search.children ?? 0,
+      children_ages: search.childrenAges ?? [],
+      click_id: payload.clickId,
+      country: search.country ?? marketCountry,
+    },
+    { destination_id: destinationId }
+  );
+
+  return {
+    redirectUrl,
+    entityId: destinationId,
+    provider: "kayak",
+    clickId: payload.clickId,
+  };
+};
+
 const buildBookingRedirect = (
   payload: HotelRedirectRequest
 ): HotelAffiliateRouteResponse => {
@@ -125,6 +172,10 @@ export const requestHotelRedirectUrl = async (
 
   if (affiliateSource === "booking") {
     return buildBookingRedirect(payload);
+  }
+
+  if (affiliateSource === "kayak") {
+    return buildKayakRedirect(payload);
   }
 
   assertEdgeFunctionsAvailable();

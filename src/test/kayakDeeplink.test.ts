@@ -2,9 +2,8 @@ import { describe, expect, it } from "vitest";
 import {
   buildKayakDeeplink,
   buildKayakHotelPath,
-  resolveAffiliateSource,
   type KayakAffiliateConfig,
-} from "../../supabase/functions/hotel-affiliate-router/kayakDeeplink";
+} from "@/lib/kayakDeeplink";
 
 const KAYAK_CONFIG: KayakAffiliateConfig = {
   affiliateId: "kan_317716_594040",
@@ -27,19 +26,6 @@ const baseInput = {
   state_name: "New York",
   country_name: "United States",
 };
-
-describe("resolveAffiliateSource", () => {
-  it("defaults to kayak when affiliate_source is omitted", () => {
-    expect(resolveAffiliateSource(undefined)).toBe("kayak");
-    expect(resolveAffiliateSource("")).toBe("kayak");
-  });
-
-  it("returns booking or skyscanner when explicitly set", () => {
-    expect(resolveAffiliateSource("booking")).toBe("booking");
-    expect(resolveAffiliateSource("skyscanner")).toBe("skyscanner");
-    expect(resolveAffiliateSource("kayak")).toBe("kayak");
-  });
-});
 
 describe("buildKayakDeeplink", () => {
   const destination = { destination_id: "12345" };

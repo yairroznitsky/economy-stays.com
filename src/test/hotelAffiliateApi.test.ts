@@ -1,11 +1,48 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { requestHotelDestinationAutocomplete } from "@/lib/hotelAffiliateApi";
+import {
+  requestHotelDestinationAutocomplete,
+  requestHotelRedirectUrl,
+} from "@/lib/hotelAffiliateApi";
 import * as edgeFunctionClient from "@/lib/edgeFunctionClient";
 
 vi.mock("@/lib/edgeFunctionClient", () => ({
   assertEdgeFunctionsAvailable: vi.fn(),
   invokeEdgeFunction: vi.fn(),
 }));
+
+describe("requestHotelRedirectUrl", () => {
+  it("builds Kayak deeplinks client-side without calling edge functions", async () => {
+    const response = await requestHotelRedirectUrl({
+      search: {
+        destination: "New York, New York, United States",
+        destinationId: "12345",
+        cityName: "New York",
+        stateName: "New York",
+        countryName: "United States",
+        checkIn: "2026-07-10",
+        checkOut: "2026-07-12",
+        rooms: 1,
+        adults: 2,
+        children: 0,
+        country: "US",
+      },
+      clickId: "test-click-abc",
+      affiliateSource: "kayak",
+    });
+
+    expect(edgeFunctionClient.invokeEdgeFunction).not.toHaveBeenCalled();
+    expect(edgeFunctionClient.assertEdgeFunctionsAvailable).not.toHaveBeenCalled();
+
+    const parsed = new URL(response.redirectUrl);
+    expect(parsed.origin + parsed.pathname).toBe("https://www.kayak.com/in");
+    expect(parsed.searchParams.get("enc_cid")).toBe("test-click-abc");
+    expect(parsed.searchParams.get("url")).toBe(
+      "/hotels/New-York,New-York,United-States-c12345/2026-07-10/2026-07-12/2adults/1rooms"
+    );
+    expect(response.entityId).toBe("12345");
+    expect(response.provider).toBe("kayak");
+  });
+});
 
 describe("requestHotelDestinationAutocomplete", () => {
   beforeEach(() => {
