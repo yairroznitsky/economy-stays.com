@@ -12,7 +12,7 @@ const SitePageLayout = ({ title, children }: SitePageLayoutProps) => {
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <header className="border-b border-border bg-background">
-        <div className="container py-4 md:py-5">
+        <div className="container flex justify-center py-4 md:py-5">
           <Link to={appendLandingIdQuery("/")} className="inline-block">
             <BrandLogo variant="dark" compact={false} textClassName="text-2xl md:text-3xl" />
           </Link>
