@@ -15,11 +15,15 @@ export const initAnalytics = (): void => {
       t.src=v;s=b.getElementsByTagName(e)[0];
       s.parentNode.insertBefore(t,s)}(window, document,'script',
       'https://connect.facebook.net/en_US/fbevents.js');
-      fbq('set', 'autoConfig', false, '${metaPixelId}');
       fbq('init', '${metaPixelId}');
       fbq('track', 'PageView');
     `;
     document.head.appendChild(metaScript);
+
+    const noscript = document.createElement("noscript");
+    noscript.innerHTML = `<img height="1" width="1" style="display:none"
+      src="https://www.facebook.com/tr?id=${metaPixelId}&ev=PageView&noscript=1" />`;
+    document.body.appendChild(noscript);
   }
 
   if (tiktokPixelId) {
