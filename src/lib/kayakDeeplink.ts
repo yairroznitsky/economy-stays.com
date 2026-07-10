@@ -28,8 +28,10 @@ export interface KayakAffiliateConfig {
   utmMedium: string;
 }
 
+const DEFAULT_KAYAK_AFFILIATE_ID = "kan_317716_594040";
+
 const DEFAULT_KAYAK_AFFILIATE_CONFIG: KayakAffiliateConfig = {
-  affiliateId: import.meta.env.VITE_KAYAK_AFFILIATE_ID?.trim() ?? "",
+  affiliateId: import.meta.env.VITE_KAYAK_AFFILIATE_ID?.trim() || DEFAULT_KAYAK_AFFILIATE_ID,
   deeplinkBase:
     import.meta.env.VITE_KAYAK_DEEPLINK_BASE?.trim() ?? "https://www.kayak.com/in",
   utmMedium: import.meta.env.VITE_KAYAK_UTM_MEDIUM?.trim() ?? "affiliate",

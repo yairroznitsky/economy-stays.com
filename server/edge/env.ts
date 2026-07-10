@@ -3,8 +3,10 @@ export const readEnv = (key: string): string | undefined => {
   return typeof value === "string" && value.length > 0 ? value : undefined;
 };
 
+const DEFAULT_KAYAK_AFFILIATE_ID = "kan_317716_594040";
+
 export const getKayakAffiliateConfig = () => ({
-  affiliateId: readEnv("KAYAK_AFFILIATE_ID") ?? "",
+  affiliateId: readEnv("KAYAK_AFFILIATE_ID") ?? DEFAULT_KAYAK_AFFILIATE_ID,
   deeplinkBase: readEnv("KAYAK_DEEPLINK_BASE") ?? "https://www.kayak.com/in",
   utmMedium: readEnv("KAYAK_UTM_MEDIUM") ?? "affiliate",
 });
