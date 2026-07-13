@@ -11,8 +11,8 @@ const readFlag = (value: string | undefined, fallback: boolean): boolean => {
   return fallback;
 };
 
-const name = readEnv(import.meta.env.VITE_SITE_NAME, "Hotel Search");
-const slug = readEnv(import.meta.env.VITE_SITE_SLUG, "site");
+const name = readEnv(import.meta.env.VITE_SITE_NAME, "Cheap Stays");
+const slug = readEnv(import.meta.env.VITE_SITE_SLUG, "cheap-stays");
 const useApiProxy = readFlag(import.meta.env.VITE_USE_API_PROXY, false);
 
 export const siteConfig = {
@@ -20,11 +20,11 @@ export const siteConfig = {
   wordmark: readEnv(import.meta.env.VITE_SITE_WORDMARK, name.replace(/\s+/g, "-")),
   slug,
   shortName: readEnv(import.meta.env.VITE_SITE_SHORT_NAME, name.replace(/\s+/g, "")),
-  domain: readEnv(import.meta.env.VITE_SITE_DOMAIN, "localhost"),
-  operator: readEnv(import.meta.env.VITE_SITE_OPERATOR, ""),
+  domain: readEnv(import.meta.env.VITE_SITE_DOMAIN, "cheap-stays.com"),
+  operator: readEnv(import.meta.env.VITE_SITE_OPERATOR, "Media Smarter"),
   supportEmail: readEnv(import.meta.env.VITE_SITE_SUPPORT_EMAIL, "support@cheap-stays.com"),
   trackingBrand: readEnv(import.meta.env.VITE_TRACKING_BRAND, slug.replace(/-/g, "_")),
-  landingIdPrefix: readEnv(import.meta.env.VITE_LANDING_ID_PREFIX, "LD-"),
+  landingIdPrefix: readEnv(import.meta.env.VITE_LANDING_ID_PREFIX, "CS-"),
   metaPixelId: readEnv(import.meta.env.VITE_META_PIXEL_ID, ""),
   tiktokPixelId: readEnv(import.meta.env.VITE_TIKTOK_PIXEL_ID, ""),
   useApiProxy,

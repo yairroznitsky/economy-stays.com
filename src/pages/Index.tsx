@@ -260,18 +260,18 @@ const Index = () => {
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-hero" />
-        <div className="absolute inset-0 bg-gradient-to-b from-foreground/35 via-foreground/15 to-foreground/55" />
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/40 via-primary/15 to-primary/70" />
 
         <Header />
 
         <div className="container relative z-10 flex min-h-[85svh] flex-col items-center justify-start pt-24 pb-10 text-center md:min-h-[680px] md:justify-center md:pt-16 md:pb-24">
-          <p className="mt-2 text-sm font-medium uppercase tracking-widest text-primary-foreground/80 md:mt-0">
+          <p className="mt-2 text-sm font-medium uppercase tracking-widest text-accent md:mt-0">
             Independent stay search
           </p>
-          <h1 className="mt-3 max-w-3xl font-display text-2xl font-bold leading-[1.15] text-primary-foreground drop-shadow-md md:max-w-3xl md:text-5xl md:leading-[1.1]">
+          <h1 className="mt-3 max-w-3xl font-display text-2xl font-bold leading-[1.15] text-white drop-shadow-md md:max-w-3xl md:text-5xl md:leading-[1.1]">
             A calmer way to compare stays
           </h1>
-          <p className="mt-4 max-w-xl text-base text-primary-foreground/85 md:text-lg">
+          <p className="mt-4 max-w-xl text-base text-white/85 md:text-lg">
             Search hotels, apartments, and rentals in one place — then book through partners you trust.
           </p>
           <div className="mt-7 w-full max-w-5xl desktop:mt-10 desktop:max-w-[73.6rem]">

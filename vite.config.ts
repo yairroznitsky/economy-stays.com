@@ -9,9 +9,9 @@ const htmlEnvPlugin = (env: Record<string, string>): Plugin => ({
   name: "html-env-transform",
   transformIndexHtml(html) {
     const values = {
-      VITE_SITE_NAME: env.VITE_SITE_NAME || "Hotel Search",
-      VITE_SITE_OPERATOR: env.VITE_SITE_OPERATOR || "",
-      VITE_SITE_DOMAIN: env.VITE_SITE_DOMAIN || "localhost",
+      VITE_SITE_NAME: env.VITE_SITE_NAME || "Cheap Stays",
+      VITE_SITE_OPERATOR: env.VITE_SITE_OPERATOR || "Media Smarter",
+      VITE_SITE_DOMAIN: env.VITE_SITE_DOMAIN || "cheap-stays.com",
     };
 
     return Object.entries(values).reduce(
@@ -24,8 +24,8 @@ const htmlEnvPlugin = (env: Record<string, string>): Plugin => ({
 
 const webManifestPlugin = (env: Record<string, string>): Plugin => {
   const buildManifest = () => ({
-    name: env.VITE_SITE_NAME || "Hotel Search",
-    short_name: env.VITE_SITE_SHORT_NAME || "HotelSearch",
+    name: env.VITE_SITE_NAME || "Cheap Stays",
+    short_name: env.VITE_SITE_SHORT_NAME || "CheapStays",
     description: "Compare hotel and rental prices worldwide.",
     icons: [
       {
@@ -47,7 +47,7 @@ const webManifestPlugin = (env: Record<string, string>): Plugin => {
         purpose: "any",
       },
     ],
-    theme_color: "#244A3D",
+    theme_color: "#003580",
     background_color: "#F9F7F4",
     display: "standalone",
   });
