@@ -1,5 +1,5 @@
 import { generateClickId, LandingTrackingService } from "@/lib/landingTrackingService";
-import { supabase } from "@/lib/supabaseClient";
+import { postTrackingJson } from "@/lib/trackingApi";
 import type { HotelSearchInput } from "@/types/hotels";
 
 export type PartnerPlacement = "redirect" | "new_tab";
@@ -75,7 +75,7 @@ const insertRentalClick = async (options: {
   searchParams: Record<string, string>;
   autoParams: boolean;
 }): Promise<void> => {
-  const { error } = await supabase.from("rental_clicks").insert({
+  await postTrackingJson("/search", {
     click_id: options.clickId,
     landing_id: options.landingId,
     partner: options.partner,
@@ -91,8 +91,6 @@ const insertRentalClick = async (options: {
     search_params: options.searchParams,
     auto_params: options.autoParams,
   });
-
-  if (error) throw error;
 };
 
 export const trackPartnerExit = async (

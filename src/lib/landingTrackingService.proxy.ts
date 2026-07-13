@@ -3,7 +3,6 @@ import { siteConfig } from "@/lib/siteConfig";
 const LANDING_COOKIE = "landing_id";
 const COOKIE_MAX_AGE_SEC = 5 * 60;
 const LANDING_ID_PREFIX = siteConfig.landingIdPrefix;
-const LANDING_ID_LENGTH = 10;
 const ID_CHARS =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
@@ -18,6 +17,12 @@ const randomChars = (length: number): string => {
   const bytes = new Uint8Array(length);
   crypto.getRandomValues(bytes);
   return Array.from(bytes, (b) => ID_CHARS[b % ID_CHARS.length]).join("");
+};
+
+const randomHex = (byteLength: number): string => {
+  const bytes = new Uint8Array(byteLength);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
 };
 
 export const generateClickId = (): string => randomChars(10);
@@ -35,7 +40,10 @@ const writeCookie = (value: string) => {
 
 export class LandingTrackingService {
   static generateLandingId(): string {
-    return `${LANDING_ID_PREFIX}${randomChars(LANDING_ID_LENGTH)}`;
+    if (LANDING_ID_PREFIX === "CS-") {
+      return `CS-${randomHex(6)}`;
+    }
+    return `${LANDING_ID_PREFIX}${randomChars(10)}`;
   }
 
   static getCurrentLandingId(): string | null {

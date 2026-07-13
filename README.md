@@ -13,8 +13,22 @@ Cheap Stays is operated by Media Smarter.
 2. Create env file:
    - copy `.env.example` to `.env`
    - set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`
+   - set server-only `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` for landings / rental_clicks writes
 3. Run app:
    - `npm run dev`
+
+## Shared Supabase tracking
+
+Browser never inserts into `landings` / `rental_clicks` directly. The app server does:
+
+| Route | Table | When |
+|-------|--------|------|
+| `POST /api/landings` | `public.landings` | New session (no cookie / no `?landing_id=`) |
+| `POST /api/search` | `public.rental_clicks` | Partner click-out (≤500ms race, then redirect) |
+
+Uses `SUPABASE_SERVICE_ROLE_KEY`. Continuity is the `landing_id` query param + `landing_id` cookie (max-age 300, SameSite=Lax). Cheap-stays IDs are `CS-` + 12 hex (`metadata.source_app` = `cheap-stays`).
+
+Same-origin paths work on `cheap-stays.com`. For `api.cheap-stays.com/landings` and `/search`, set `VITE_TRACKING_API_BASE=https://api.cheap-stays.com` (Vercel rewrites bare paths to `/api/*`).
 
 ## Affiliate architecture
 
@@ -49,7 +63,7 @@ For an alternate domain on the **same Supabase project** without exposing it in 
 3. Add server-only `SUPABASE_URL` and `SUPABASE_ANON_KEY` in your Vercel project (not `VITE_` prefixed).
 4. Build with `vite build --mode secret-booking` and deploy to a separate Vercel project.
 5. Edge Function calls go through `/api/edge/*` on your domain — the Supabase project ID never appears in the JS bundle.
-6. Client-side DB tracking (`landings`, `rental_clicks`) is automatically disabled in proxy mode.
+6. Client-side DB tracking (`landings`, `rental_clicks`) is automatically disabled in proxy mode (no-op stubs). Cheap-stays uses server `POST /api/landings` and `POST /api/search` instead of browser→Supabase inserts.
 
 For lowest exposure also use separate pixels (or leave blank), unique favicon/logo assets, and matching Edge Function secrets (`SITE_SLUG`, `BOT_NAME`, `SITE_DOMAIN`).
 

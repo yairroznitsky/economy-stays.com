@@ -15,6 +15,7 @@ interface ImportMetaEnv {
   readonly VITE_TIKTOK_PIXEL_ID?: string;
   readonly VITE_USE_API_PROXY?: string;
   readonly VITE_ENABLE_DB_TRACKING?: string;
+  readonly VITE_TRACKING_API_BASE?: string;
   readonly VITE_KAYAK_AFFILIATE_ID?: string;
   readonly VITE_KAYAK_DEEPLINK_BASE?: string;
   readonly VITE_KAYAK_UTM_MEDIUM?: string;

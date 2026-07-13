@@ -3,7 +3,7 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { writeFileSync } from "fs";
 import { componentTagger } from "lovable-tagger";
-import { localEdgePlugin } from "./server/edge/vitePlugin";
+import { localEdgePlugin, localTrackingPlugin } from "./server/edge/vitePlugin";
 
 const htmlEnvPlugin = (env: Record<string, string>): Plugin => ({
   name: "html-env-transform",
@@ -114,6 +114,7 @@ export default defineConfig(({ mode }) => {
       react(),
       htmlEnvPlugin(env),
       webManifestPlugin(env),
+      mode === "development" && localTrackingPlugin(),
       useLocalEdge && localEdgePlugin(),
       mode === "development" && componentTagger(),
     ].filter(Boolean),
@@ -128,6 +129,12 @@ export default defineConfig(({ mode }) => {
                   "./src/lib/edgeFunctionClient.proxy.ts"
                 ),
               },
+            ]
+          : []),
+        // Alternate brands (VITE_USE_API_PROXY): skip DB writes. Local edge keeps
+        // landings/search tracking via /api/landings and /api/search.
+        ...(useApiProxy
+          ? [
               {
                 find: "@/lib/landingTrackingService",
                 replacement: path.resolve(

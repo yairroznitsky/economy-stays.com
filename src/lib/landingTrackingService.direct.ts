@@ -1,22 +1,13 @@
 import { siteConfig } from "@/lib/siteConfig";
-import { supabase } from "@/lib/supabaseClient";
+import { postTrackingJson } from "@/lib/trackingApi";
 
 const LANDING_COOKIE = "landing_id";
 const COOKIE_MAX_AGE_SEC = 5 * 60;
 const LANDING_ID_PREFIX = siteConfig.landingIdPrefix;
-const LANDING_ID_LENGTH = 10;
 const ID_CHARS =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
 type DeviceType = "mobile" | "tablet" | "desktop";
-
-interface IpInfo {
-  ip?: string;
-  city?: string;
-  region?: string;
-  country?: string;
-  loc?: string;
-}
 
 export interface PartnerLandingData {
   partner: string;
@@ -29,6 +20,12 @@ const randomChars = (length: number): string => {
   const bytes = new Uint8Array(length);
   crypto.getRandomValues(bytes);
   return Array.from(bytes, (b) => ID_CHARS[b % ID_CHARS.length]).join("");
+};
+
+const randomHex = (byteLength: number): string => {
+  const bytes = new Uint8Array(byteLength);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
 };
 
 export const generateClickId = (): string => randomChars(10);
@@ -57,30 +54,13 @@ const clearLandingCookie = () => {
   document.cookie = `${LANDING_COOKIE}=; max-age=0; path=/; SameSite=Lax`;
 };
 
-const fetchIpInfo = async (): Promise<IpInfo> => {
-  try {
-    const response = await fetch("https://ipinfo.io/json");
-    if (!response.ok) return {};
-    return (await response.json()) as IpInfo;
-  } catch {
-    return {};
-  }
-};
-
-const buildLocationFromIp = (ipInfo: IpInfo) => {
-  const [lat, lng] = ipInfo.loc?.split(",") ?? [];
-  return {
-    city: ipInfo.city,
-    region: ipInfo.region,
-    country: ipInfo.country,
-    lat: lat || undefined,
-    lng: lng || undefined,
-  };
-};
-
 export class LandingTrackingService {
+  /** Cheap-stays: CS- + 12 hex. Other brands (e.g. SB-): prefix + 10 alphanumeric. */
   static generateLandingId(): string {
-    return `${LANDING_ID_PREFIX}${randomChars(LANDING_ID_LENGTH)}`;
+    if (LANDING_ID_PREFIX === "CS-") {
+      return `CS-${randomHex(6)}`;
+    }
+    return `${LANDING_ID_PREFIX}${randomChars(10)}`;
   }
 
   static getCurrentLandingId(): string | null {
@@ -121,18 +101,11 @@ export class LandingTrackingService {
     landingId: string,
     partnerData?: PartnerLandingData
   ): Promise<void> {
-    const ipInfo = await fetchIpInfo();
-
     const metadata: Record<string, unknown> = {
-      user_agent: navigator.userAgent,
       referrer: document.referrer,
-      timestamp: new Date().toISOString(),
-      ip: ipInfo.ip ?? "",
-      source_app: siteConfig.slug,
     };
 
     if (partnerData) {
-      metadata.location = buildLocationFromIp(ipInfo);
       metadata.device = getDeviceType();
       metadata.partner = partnerData.partner;
       metadata.deeplink = partnerData.deeplink;
@@ -140,13 +113,11 @@ export class LandingTrackingService {
       metadata.method = partnerData.method;
     }
 
-    const { error } = await supabase.from("landings").insert({
+    await postTrackingJson("/landings", {
       landing_id: landingId,
-      metadata,
       url_params: window.location.search || "",
+      metadata,
     });
-
-    if (error) throw error;
   }
 
   static async logPartnerLanding(
@@ -166,43 +137,11 @@ export class LandingTrackingService {
   }
 
   static updateLandingLocation(
-    city: string,
-    region: string,
-    country: string
+    _city: string,
+    _region: string,
+    _country: string
   ): void {
-    const landingId = this.getCurrentLandingId();
-    if (!landingId) return;
-
-    void (async () => {
-      try {
-        const { data, error } = await supabase
-          .from("landings")
-          .select("metadata")
-          .eq("landing_id", landingId)
-          .maybeSingle();
-
-        if (error || !data?.metadata) return;
-
-        const metadata = {
-          ...(data.metadata as Record<string, unknown>),
-          location: {
-            ...(((data.metadata as Record<string, unknown>).location as
-              | Record<string, unknown>
-              | undefined) ?? {}),
-            city,
-            region,
-            country,
-          },
-        };
-
-        await supabase
-          .from("landings")
-          .update({ metadata })
-          .eq("landing_id", landingId);
-      } catch {
-        // fire-and-forget
-      }
-    })();
+    // Location enrichment is server-side via landings metadata on insert only.
   }
 }
 

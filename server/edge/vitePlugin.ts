@@ -2,6 +2,7 @@ import type { Plugin } from "vite";
 import { loadEnv } from "vite";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { handleLocalEdgeRequest } from "./index";
+import { handleTrackingRequest } from "../tracking/http";
 
 const matchEdgePath = (url: string | undefined): string | null => {
   if (!url) return null;
@@ -19,6 +20,25 @@ const hydrateProcessEnv = (mode: string, envDir: string) => {
   }
 };
 
+/** Serves POST /api/landings and /api/search in Vite dev (always). */
+export const localTrackingPlugin = (): Plugin => ({
+  name: "local-tracking-api",
+  configureServer(server) {
+    hydrateProcessEnv(server.config.mode, server.config.envDir);
+
+    server.middlewares.use(
+      (req: IncomingMessage, res: ServerResponse, next: (err?: Error) => void) => {
+        void handleTrackingRequest(req, res)
+          .then((handled) => {
+            if (!handled) next();
+          })
+          .catch(next);
+      }
+    );
+  },
+});
+
+/** Serves local hotel-affiliate-router + kayak-autocomplete at /api/edge/*. */
 export const localEdgePlugin = (): Plugin => ({
   name: "local-edge-functions",
   configureServer(server) {
