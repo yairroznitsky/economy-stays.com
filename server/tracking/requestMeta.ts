@@ -1,11 +1,15 @@
 type HeaderBag = Record<string, string | string[] | undefined>;
 
 export interface RequestLike {
-  headers: HeaderBag;
+  headers?: HeaderBag;
   socket?: { remoteAddress?: string | null };
 }
 
-const headerValue = (headers: HeaderBag, name: string): string => {
+const headerValue = (
+  headers: HeaderBag | undefined,
+  name: string
+): string => {
+  if (!headers) return "";
   const raw = headers[name] ?? headers[name.toLowerCase()];
   if (Array.isArray(raw)) return raw[0]?.trim() ?? "";
   return typeof raw === "string" ? raw.trim() : "";

@@ -50,10 +50,6 @@ const writeCookie = (value: string) => {
   document.cookie = `${LANDING_COOKIE}=${encodeURIComponent(value)}; max-age=${COOKIE_MAX_AGE_SEC}; path=/; SameSite=Lax`;
 };
 
-const clearLandingCookie = () => {
-  document.cookie = `${LANDING_COOKIE}=; max-age=0; path=/; SameSite=Lax`;
-};
-
 export class LandingTrackingService {
   /** Cheap-stays: CS- + 12 hex. Other brands (e.g. SB-): prefix + 10 alphanumeric. */
   static generateLandingId(): string {
@@ -87,14 +83,9 @@ export class LandingTrackingService {
 
     const landingId = this.generateLandingId();
     this.setExistingLandingId(landingId);
-
-    try {
-      await this.logLanding(landingId);
-      return landingId;
-    } catch (error) {
-      clearLandingCookie();
-      throw error;
-    }
+    // DB insert is best-effort — never block search / autocomplete / redirects.
+    void this.logLanding(landingId);
+    return landingId;
   }
 
   static async logLanding(
@@ -113,11 +104,15 @@ export class LandingTrackingService {
       metadata.method = partnerData.method;
     }
 
-    await postTrackingJson("/landings", {
-      landing_id: landingId,
-      url_params: window.location.search || "",
-      metadata,
-    });
+    try {
+      await postTrackingJson("/landings", {
+        landing_id: landingId,
+        url_params: window.location.search || "",
+        metadata,
+      });
+    } catch (error) {
+      console.warn("[tracking] landings insert failed", error);
+    }
   }
 
   static async logPartnerLanding(

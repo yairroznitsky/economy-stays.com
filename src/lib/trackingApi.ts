@@ -27,12 +27,18 @@ export const postTrackingJson = async (
   });
 
   if (!response.ok) {
-    let detail = response.statusText;
+    let detail = response.statusText || `HTTP ${response.status}`;
     try {
-      const payload = (await response.json()) as { error?: string };
-      if (payload.error) detail = payload.error;
+      const text = await response.text();
+      try {
+        const payload = JSON.parse(text) as { error?: string };
+        if (payload.error) detail = payload.error;
+        else if (text.trim()) detail = text.trim().slice(0, 300);
+      } catch {
+        if (text.trim()) detail = text.trim().slice(0, 300);
+      }
     } catch {
-      // ignore parse errors
+      // ignore body read errors
     }
     throw new Error(`Tracking ${path} failed: ${detail}`);
   }

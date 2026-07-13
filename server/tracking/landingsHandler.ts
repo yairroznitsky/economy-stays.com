@@ -32,16 +32,16 @@ export const handleLandingsInsert = async (
   const clientReferrer =
     typeof clientMeta.referrer === "string" ? clientMeta.referrer : "";
 
-  const metadata: Record<string, unknown> = {
-    ...clientMeta,
-    user_agent: getUserAgent(req),
-    referrer: clientReferrer || getReferrer(req),
-    timestamp: new Date().toISOString(),
-    ip: getClientIp(req),
-    source_app: getSourceApp(),
-  };
-
   try {
+    const metadata: Record<string, unknown> = {
+      ...clientMeta,
+      user_agent: getUserAgent(req),
+      referrer: clientReferrer || getReferrer(req),
+      timestamp: new Date().toISOString(),
+      ip: getClientIp(req),
+      source_app: getSourceApp(),
+    };
+
     const supabase = getSupabaseAdmin();
     const { error } = await supabase.from("landings").insert({
       landing_id: landingId,

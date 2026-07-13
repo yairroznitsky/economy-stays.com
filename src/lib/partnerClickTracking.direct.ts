@@ -75,22 +75,26 @@ const insertRentalClick = async (options: {
   searchParams: Record<string, string>;
   autoParams: boolean;
 }): Promise<void> => {
-  await postTrackingJson("/search", {
-    click_id: options.clickId,
-    landing_id: options.landingId,
-    partner: options.partner,
-    iata_code: options.iataCode,
-    location_id: options.locationId,
-    pickup_date_new: options.pickupDateNew,
-    pickup_time_new: options.pickupTimeNew,
-    dropoff_date_new: options.dropoffDateNew,
-    dropoff_time_new: options.dropoffTimeNew,
-    timestamp: new Date().toISOString(),
-    placement: options.placement,
-    redirect_url: options.redirectUrl,
-    search_params: options.searchParams,
-    auto_params: options.autoParams,
-  });
+  try {
+    await postTrackingJson("/search", {
+      click_id: options.clickId,
+      landing_id: options.landingId,
+      partner: options.partner,
+      iata_code: options.iataCode,
+      location_id: options.locationId,
+      pickup_date_new: options.pickupDateNew,
+      pickup_time_new: options.pickupTimeNew,
+      dropoff_date_new: options.dropoffDateNew,
+      dropoff_time_new: options.dropoffTimeNew,
+      timestamp: new Date().toISOString(),
+      placement: options.placement,
+      redirect_url: options.redirectUrl,
+      search_params: options.searchParams,
+      auto_params: options.autoParams,
+    });
+  } catch (error) {
+    console.warn("[tracking] rental_clicks insert failed", error);
+  }
 };
 
 export const trackPartnerExit = async (

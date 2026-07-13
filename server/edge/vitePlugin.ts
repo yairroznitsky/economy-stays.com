@@ -32,7 +32,18 @@ export const localTrackingPlugin = (): Plugin => ({
           .then((handled) => {
             if (!handled) next();
           })
-          .catch(next);
+          .catch((error: unknown) => {
+            // Keep failures scoped to tracking — never break /api/edge or the SPA.
+            if (!res.headersSent) {
+              res.statusCode = 500;
+              res.setHeader("Content-Type", "application/json");
+              const message =
+                error instanceof Error ? error.message : "Tracking handler failed";
+              res.end(JSON.stringify({ error: message }));
+              return;
+            }
+            next(error instanceof Error ? error : new Error(String(error)));
+          });
       }
     );
   },
@@ -52,9 +63,21 @@ export const localEdgePlugin = (): Plugin => ({
           return;
         }
 
-        void handleLocalEdgeRequest(functionName, req, res).then((handled) => {
-          if (!handled) next();
-        });
+        void handleLocalEdgeRequest(functionName, req, res)
+          .then((handled) => {
+            if (!handled) next();
+          })
+          .catch((error: unknown) => {
+            if (!res.headersSent) {
+              res.statusCode = 500;
+              res.setHeader("Content-Type", "application/json");
+              const message =
+                error instanceof Error ? error.message : "Edge handler failed";
+              res.end(JSON.stringify({ error: message }));
+              return;
+            }
+            next(error instanceof Error ? error : new Error(String(error)));
+          });
       }
     );
   },
