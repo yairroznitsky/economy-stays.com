@@ -61,6 +61,11 @@ import {
 import { trackTikTokSearch } from "@/lib/tiktokPixelTracking";
 import type { HotelDestinationSuggestion } from "@/types/hotels";
 
+const dateStepActive =
+  "border-primary bg-primary/15 ring-2 ring-primary/40 shadow-sm scale-[1.02]";
+const dateStepIdle = "border-border bg-muted/40";
+const dateStepDone = "border-border bg-muted/30";
+
 const DateRangeStepHeader = ({
   value,
   phase,
@@ -73,45 +78,64 @@ const DateRangeStepHeader = ({
   <div className={cn("grid grid-cols-2 gap-2", className)}>
     <div
       className={cn(
-        "rounded-xl border px-3 py-2.5 transition-colors",
-        phase === "check-in"
-          ? "border-primary bg-primary/5 ring-1 ring-primary/25"
-          : value?.from
-            ? "border-primary/50 bg-primary/5"
-            : "border-border bg-muted/40"
+        "rounded-xl border px-3 py-2.5 transition-all duration-200",
+        phase === "check-in" ? dateStepActive : value?.from ? dateStepDone : dateStepIdle
       )}
     >
-      <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+      <p
+        className={cn(
+          "text-xs font-semibold uppercase tracking-wide",
+          phase === "check-in" ? "text-primary" : "text-muted-foreground"
+        )}
+      >
         Check-in
       </p>
       <p
         className={cn(
           "mt-0.5 text-sm font-semibold",
-          value?.from ? "text-foreground" : "text-muted-foreground"
+          value?.from
+            ? "text-foreground"
+            : phase === "check-in"
+              ? "text-primary"
+              : "text-muted-foreground"
         )}
       >
-        {value?.from ? format(value.from, "MMM d, yyyy") : "Select date"}
+        {value?.from ? format(value.from, "MMM d, yyyy") : "Select check-in"}
       </p>
     </div>
     <div
+      key={phase === "check-out" ? "check-out-active" : "check-out-idle"}
       className={cn(
-        "rounded-xl border px-3 py-2.5 transition-colors",
+        "rounded-xl border px-3 py-2.5 transition-all duration-200",
         phase === "check-out"
-          ? "border-primary bg-primary/5 ring-1 ring-primary/25"
-          : "border-border bg-muted/40",
+          ? cn(dateStepActive, "animate-in zoom-in-95 fade-in-0 duration-300")
+          : dateStepIdle,
         !value?.from && "opacity-60"
       )}
     >
-      <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+      <p
+        className={cn(
+          "text-xs font-semibold uppercase tracking-wide",
+          phase === "check-out" ? "text-primary" : "text-muted-foreground"
+        )}
+      >
         Check-out
       </p>
       <p
         className={cn(
           "mt-0.5 text-sm font-semibold",
-          value?.to ? "text-foreground" : "text-muted-foreground"
+          value?.to
+            ? "text-foreground"
+            : phase === "check-out"
+              ? "text-primary"
+              : "text-muted-foreground"
         )}
       >
-        {value?.to ? format(value.to, "MMM d, yyyy") : "Select date"}
+        {value?.to
+          ? format(value.to, "MMM d, yyyy")
+          : phase === "check-out"
+            ? "Select check-out"
+            : "Select date"}
       </p>
     </div>
   </div>
@@ -912,10 +936,17 @@ const SearchForm = () => {
               <SheetHeader className="space-y-3 px-4 text-left">
                 <SheetTitle className="text-lg">Pick your dates</SheetTitle>
                 <DateRangeStepHeader value={draftRange} phase={datePickerPhase} />
-                <p className="text-sm text-muted-foreground">
+                <p
+                  className={cn(
+                    "text-sm",
+                    datePickerPhase === "check-out"
+                      ? "font-medium text-primary"
+                      : "text-muted-foreground"
+                  )}
+                >
                   {datePickerPhase === "check-in"
                     ? "Choose your arrival date"
-                    : "Choose your departure date"}
+                    : "Now choose your departure date"}
                 </p>
               </SheetHeader>
               <div className="flex justify-center overflow-x-auto px-2 py-2">
@@ -959,7 +990,14 @@ const SearchForm = () => {
             <PopoverContent className="w-auto p-0" align="start">
               <div className="border-b border-border p-3">
                 <DateRangeStepHeader value={draftRange} phase={datePickerPhase} />
-                <p className="mt-2 text-center text-xs text-muted-foreground">
+                <p
+                  className={cn(
+                    "mt-2 text-center text-xs",
+                    datePickerPhase === "check-out"
+                      ? "font-medium text-primary"
+                      : "text-muted-foreground"
+                  )}
+                >
                   {datePickerPhase === "check-in"
                     ? "Pick check-in first, then check-out"
                     : "Now choose your check-out"}
