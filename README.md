@@ -56,6 +56,19 @@ Set these on `kayak-autocomplete`:
 
 Site branding, tracking labels, and analytics are driven by Vite env vars (see [`.env.example`](.env.example)).
 
+### Cheap Stays (production edge proxy)
+
+Production builds default to the same `/api/edge/*` proxy path used in local dev (`VITE_USE_EDGE_PROXY`, on unless set to `false`). The browser does not need `VITE_SUPABASE_*` for autocomplete.
+
+On Vercel, set **runtime** env (Production):
+
+- `SUPABASE_URL` (or `VITE_SUPABASE_URL`)
+- `SUPABASE_ANON_KEY` (or `VITE_SUPABASE_ANON_KEY`)
+
+Then redeploy. `api/edge/[name].ts` forwards `kayak-autocomplete` (and allowed functions) to Supabase.
+
+### Alternate brands (full API proxy)
+
 For an alternate domain on the **same Supabase project** without exposing it in the browser:
 
 1. Copy [`.env.secret-booking.example`](.env.secret-booking.example) to `.env.secret-booking`.

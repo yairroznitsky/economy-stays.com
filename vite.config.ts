@@ -78,7 +78,12 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
   const useLocalEdge = mode === "development" && env.VITE_LOCAL_EDGE !== "false";
   const useApiProxy = env.VITE_USE_API_PROXY === "true" && !useLocalEdge;
-  const useEdgeProxyClient = useApiProxy || useLocalEdge;
+  // Production defaults to /api/edge proxy (same path as local edge) so the browser
+  // does not need VITE_SUPABASE_* baked in. Opt out with VITE_USE_EDGE_PROXY=false.
+  const useEdgeProxy =
+    env.VITE_USE_EDGE_PROXY === "true" ||
+    (mode === "production" && env.VITE_USE_EDGE_PROXY !== "false");
+  const useEdgeProxyClient = useLocalEdge || useApiProxy || useEdgeProxy;
   const supabaseUrl = env.SUPABASE_URL || env.VITE_SUPABASE_URL;
   const anonKey = env.SUPABASE_ANON_KEY || env.VITE_SUPABASE_ANON_KEY;
 

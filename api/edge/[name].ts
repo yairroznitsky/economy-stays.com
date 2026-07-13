@@ -34,8 +34,12 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     return;
   }
 
-  const supabaseUrl = process.env.SUPABASE_URL?.trim();
-  const anonKey = process.env.SUPABASE_ANON_KEY?.trim();
+  // Prefer server-only names; fall back to VITE_* when those are the only vars on Vercel.
+  const supabaseUrl =
+    process.env.SUPABASE_URL?.trim() || process.env.VITE_SUPABASE_URL?.trim();
+  const anonKey =
+    process.env.SUPABASE_ANON_KEY?.trim() ||
+    process.env.VITE_SUPABASE_ANON_KEY?.trim();
 
   if (!supabaseUrl || !anonKey) {
     res.status(500).json({ error: "Server configuration missing" });
