@@ -28,6 +28,23 @@ export interface KayakAffiliateConfig {
   utmMedium: string;
 }
 
+/** Kayak requires at least 1 room per 4 guests (adults + children). */
+const KAYAK_GUESTS_PER_ROOM = 4;
+
+/**
+ * Kayak deeplinks are rejected/ignored if the room count is too low for the
+ * number of guests. Kayak requires at least 1 room per 4 guests, so we bump
+ * the room count up to that minimum while still respecting a higher room
+ * count explicitly chosen by the user.
+ */
+export const getKayakMinimumRooms = (totalGuests: number): number =>
+  Math.max(1, Math.ceil(totalGuests / KAYAK_GUESTS_PER_ROOM));
+
+export const resolveKayakRoomCount = (rooms: number, adults: number, children: number): number => {
+  const minimumRooms = getKayakMinimumRooms(adults + children);
+  return Math.max(rooms, minimumRooms);
+};
+
 const DEFAULT_KAYAK_AFFILIATE_ID = "kan_317716_594040";
 
 const DEFAULT_KAYAK_AFFILIATE_CONFIG: KayakAffiliateConfig = {
@@ -97,7 +114,7 @@ export const buildKayakHotelPath = (
     input.children > 0
       ? `/${input.children}children-${input.children_ages.join("-")}`
       : "";
-  const roomsSegment = `${input.rooms}rooms`;
+  const roomsSegment = `${resolveKayakRoomCount(input.rooms, input.adults, input.children)}rooms`;
 
   return `/hotels/${locationSlug}${destinationCode}${hotelCode}${airportCode}/${input.checkin}/${input.checkout}/${adultsSegment}${childrenSegment}/${roomsSegment}`;
 };

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildKayakDeeplink,
   buildKayakHotelPath,
+  resolveKayakRoomCount,
   type KayakAffiliateConfig,
 } from "@/lib/kayakDeeplink";
 
@@ -119,5 +120,62 @@ describe("buildKayakDeeplink", () => {
     expect(kayakPath).toBe(
       "/hotels/New-York,New-York,United-States-c12345/2026-07-10/2026-07-12/2adults/1children-8/1rooms"
     );
+  });
+});
+
+describe("resolveKayakRoomCount", () => {
+  it("requires at least 1 room for up to 4 guests", () => {
+    expect(resolveKayakRoomCount(1, 4, 0)).toBe(1);
+    expect(resolveKayakRoomCount(1, 2, 2)).toBe(1);
+  });
+
+  it("bumps the minimum to 2 rooms for 6 guests", () => {
+    expect(resolveKayakRoomCount(1, 6, 0)).toBe(2);
+    expect(resolveKayakRoomCount(1, 4, 2)).toBe(2);
+  });
+
+  it("respects a higher room count explicitly chosen by the user", () => {
+    expect(resolveKayakRoomCount(3, 6, 0)).toBe(3);
+  });
+
+  it("requires 3 rooms minimum for 9 guests", () => {
+    expect(resolveKayakRoomCount(1, 9, 0)).toBe(3);
+    expect(resolveKayakRoomCount(2, 9, 0)).toBe(3);
+  });
+
+  it("allows up to 1 room per guest (no upper cap)", () => {
+    expect(resolveKayakRoomCount(6, 6, 0)).toBe(6);
+    expect(resolveKayakRoomCount(9, 9, 0)).toBe(9);
+  });
+});
+
+describe("buildKayakHotelPath room count enforcement", () => {
+  const destination = { destination_id: "12345" };
+
+  it("raises the rooms segment to the Kayak minimum for 6 guests", () => {
+    const kayakPath = buildKayakHotelPath(
+      { ...baseInput, rooms: 1, adults: 6, children: 0 },
+      destination
+    );
+
+    expect(kayakPath).toContain("/6adults/2rooms");
+  });
+
+  it("keeps a user-selected room count of 3 for 6 guests", () => {
+    const kayakPath = buildKayakHotelPath(
+      { ...baseInput, rooms: 3, adults: 6, children: 0 },
+      destination
+    );
+
+    expect(kayakPath).toContain("/6adults/3rooms");
+  });
+
+  it("raises the rooms segment to the Kayak minimum for 9 guests", () => {
+    const kayakPath = buildKayakHotelPath(
+      { ...baseInput, rooms: 1, adults: 9, children: 0 },
+      destination
+    );
+
+    expect(kayakPath).toContain("/9adults/3rooms");
   });
 });
