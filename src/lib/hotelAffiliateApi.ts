@@ -1,4 +1,5 @@
 import { buildBookingSearchResultsUrl } from "@/lib/bookingHotels";
+import { isFacebookAdsTraffic } from "@/lib/facebookTraffic";
 import { buildKayakDeeplink } from "@/lib/kayakDeeplink";
 import {
   getDeviceKayakAutocompleteContext,
@@ -139,6 +140,7 @@ const buildKayakRedirect = (
 
   const destinationId = assertValidKayakDestinationId(search);
   const { marketCountry } = getDeviceKayakAutocompleteContext();
+  const fromFacebookAds = isFacebookAdsTraffic();
 
   const redirectUrl = buildKayakDeeplink(
     {
@@ -159,6 +161,7 @@ const buildKayakRedirect = (
       children_ages: search.childrenAges ?? [],
       click_id: payload.clickId,
       country: search.country ?? marketCountry,
+      from_facebook_ads: fromFacebookAds,
     },
     { destination_id: destinationId }
   );

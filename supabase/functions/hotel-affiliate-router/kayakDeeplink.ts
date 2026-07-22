@@ -16,6 +16,7 @@ export interface KayakDeeplinkInput {
   children_ages: number[];
   click_id: string;
   country: string;
+  from_facebook_ads?: boolean;
 }
 
 export interface KayakNormalizedDestination {
@@ -126,6 +127,9 @@ export const buildKayakDeeplink = (
   wrapper.searchParams.set("encoder", "27_1");
   wrapper.searchParams.set("url", kayakPath);
   wrapper.searchParams.set("utm_medium", config.utmMedium);
+  if (input.from_facebook_ads) {
+    wrapper.searchParams.set("cc", "us");
+  }
 
   return wrapper.toString();
 };

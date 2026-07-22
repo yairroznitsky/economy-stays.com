@@ -1,11 +1,10 @@
 import { generateClickId } from "@/lib/landingTrackingService";
+import { isFacebookAdsTraffic } from "@/lib/facebookTraffic";
 import { siteConfig } from "@/lib/siteConfig";
 import type { HotelSearchInput } from "@/types/hotels";
 
-const inferTrafficType = (): "facebook" | "unknown" => {
-  const params = new URLSearchParams(window.location.search);
-  return params.get("fbclid") ? "facebook" : "unknown";
-};
+const inferTrafficType = (): "facebook" | "unknown" =>
+  isFacebookAdsTraffic() ? "facebook" : "unknown";
 
 export const buildMetaSearchParams = (
   search: HotelSearchInput
