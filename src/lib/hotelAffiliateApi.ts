@@ -1,11 +1,14 @@
 import { buildBookingSearchResultsUrl } from "@/lib/bookingHotels";
 import { buildKayakDeeplink } from "@/lib/kayakDeeplink";
-import { getDeviceKayakAutocompleteContext } from "@/lib/kayakDestinationSearch";
+import {
+  getDeviceKayakAutocompleteContext,
+  pickBestIataSuggestion,
+} from "@/lib/kayakDestinationSearch";
 import {
   assertEdgeFunctionsAvailable,
   invokeEdgeFunction,
 } from "@/lib/edgeFunctionClient";
-import { parseNumericEntityId } from "@/lib/skyscannerHotels";
+import { parseNumericEntityId, parseIataCode, resolveSkyscannerEntityId } from "@/lib/skyscannerHotels";
 import type {
   HotelAffiliateRouteResponse,
   HotelAffiliateRouterResponse,
@@ -22,8 +25,28 @@ const KAYAK_AUTOCOMPLETE_MIN_QUERY_LENGTH = 3;
 
 const autosuggestCache = new Map<string, { expiresAt: number; results: HotelDestinationSuggestion[] }>();
 
-const assertValidDestinationId = (destinationId: string | undefined): string => {
-  const entityId = parseNumericEntityId(destinationId);
+const assertValidKayakDestinationId = (search: HotelRedirectRequest["search"]): string => {
+  const numericId = parseNumericEntityId(search.destinationId);
+  if (numericId) return numericId;
+
+  const hasAirportDeeplink = Boolean(
+    search.airportPlaceId && search.airportCode && search.airportName
+  );
+  if (hasAirportDeeplink && search.destinationId?.trim()) {
+    return search.destinationId.trim();
+  }
+
+  throw new Error(
+    "destination_id is required. Select a destination from autocomplete before searching."
+  );
+};
+
+const assertValidSkyscannerEntityId = (search: HotelRedirectRequest["search"]): string => {
+  const entityId = resolveSkyscannerEntityId({
+    destinationId: search.destinationId,
+    airportCode: search.airportCode,
+    airportName: search.airportName,
+  });
   if (!entityId) {
     throw new Error(
       "destination_id is required. Select a destination from autocomplete before searching."
@@ -36,7 +59,9 @@ const resolveRouterEntityId = (
   responseEntityId: unknown,
   requestDestinationId: string
 ): string => {
-  const entityId = parseNumericEntityId(responseEntityId, requestDestinationId);
+  const entityId =
+    parseNumericEntityId(responseEntityId, requestDestinationId) ??
+    parseIataCode(responseEntityId, requestDestinationId);
   if (!entityId) {
     throw new Error("Invalid redirect response: missing entity_id.");
   }
@@ -72,21 +97,33 @@ const mapKayakAutocompleteSuggestion = (
   raw: suggestion.raw,
 });
 
+const prioritizeIataSuggestions = (
+  query: string,
+  suggestions: HotelDestinationSuggestion[]
+): HotelDestinationSuggestion[] => {
+  const best = pickBestIataSuggestion(query, suggestions);
+  if (!best) return suggestions;
+  return [best, ...suggestions.filter((suggestion) => suggestion.id !== best.id)];
+};
+
 const filterKayakSuggestions = (
+  query: string,
   suggestions: HotelDestinationSuggestion[]
 ): HotelDestinationSuggestion[] =>
-  suggestions
-    .map(mapKayakAutocompleteSuggestion)
-    .filter((suggestion) => {
-      const type = suggestion.type.toLowerCase();
-      return (
-        type.includes("city") ||
-        type.includes("hotel") ||
-        type.includes("region") ||
-        type.includes("airport")
-      );
-    })
-    .slice(0, 10);
+  prioritizeIataSuggestions(
+    query,
+    suggestions
+      .map(mapKayakAutocompleteSuggestion)
+      .filter((suggestion) => {
+        const type = suggestion.type.toLowerCase();
+        return (
+          type.includes("city") ||
+          type.includes("hotel") ||
+          type.includes("region") ||
+          type.includes("airport")
+        );
+      })
+  ).slice(0, 10);
 
 const buildKayakRedirect = (
   payload: HotelRedirectRequest
@@ -100,7 +137,7 @@ const buildKayakRedirect = (
     throw new Error("Check-in and check-out dates are required.");
   }
 
-  const destinationId = assertValidDestinationId(search.destinationId);
+  const destinationId = assertValidKayakDestinationId(search);
   const { marketCountry } = getDeviceKayakAutocompleteContext();
 
   const redirectUrl = buildKayakDeeplink(
@@ -179,7 +216,7 @@ export const requestHotelRedirectUrl = async (
   }
 
   assertEdgeFunctionsAvailable();
-  const requestDestinationId = assertValidDestinationId(payload.search.destinationId);
+  const requestDestinationId = assertValidSkyscannerEntityId(payload.search);
 
   const { locale, marketCountry } = getDeviceKayakAutocompleteContext();
 
@@ -253,7 +290,7 @@ export const requestHotelDestinationAutocomplete = async (
     }
   );
 
-  const results = filterKayakSuggestions(data?.suggestions ?? []);
+  const results = filterKayakSuggestions(query, data?.suggestions ?? []);
 
   autosuggestCache.set(cacheKey, {
     results,

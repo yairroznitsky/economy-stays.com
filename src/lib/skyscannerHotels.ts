@@ -41,6 +41,31 @@ export const parseNumericEntityId = (...candidates: unknown[]): string | null =>
   return null;
 };
 
+export const parseIataCode = (...candidates: unknown[]): string | null => {
+  for (const candidate of candidates) {
+    if (typeof candidate !== "string") continue;
+    const trimmed = candidate.trim().toUpperCase();
+    if (/^[A-Z]{3}$/.test(trimmed)) {
+      return trimmed;
+    }
+  }
+  return null;
+};
+
+/** Skyscanner accepts numeric entity IDs or 3-letter IATA codes as entity_id. */
+export const resolveSkyscannerEntityId = (input: {
+  destinationId?: string;
+  airportCode?: string;
+  airportName?: string;
+}): string | null => {
+  const isAirportSearch = Boolean(input.airportCode?.trim() && input.airportName?.trim());
+  if (isAirportSearch) {
+    const iata = parseIataCode(input.airportCode);
+    if (iata) return iata;
+  }
+  return parseNumericEntityId(input.destinationId);
+};
+
 export const resolveEntityId = (location: SelectedLocation): string | null => {
   return parseNumericEntityId(
     location.partnerMetadata?.entityId,

@@ -1,5 +1,8 @@
 import { requestHotelDestinationAutocomplete } from "@/lib/hotelAffiliateApi";
-import { getDeviceKayakAutocompleteContext } from "@/lib/kayakDestinationSearch";
+import {
+  getDeviceKayakAutocompleteContext,
+  pickBestIataSuggestion,
+} from "@/lib/kayakDestinationSearch";
 import type { HotelDestinationSuggestion } from "@/types/hotels";
 
 const KAYAK_AUTOCOMPLETE_MIN_QUERY_LENGTH = 3;
@@ -10,7 +13,11 @@ const findBestSuggestionMatch = (
 ): HotelDestinationSuggestion | null => {
   if (suggestions.length === 0) return null;
 
+  const iataMatch = pickBestIataSuggestion(query, suggestions);
+  if (iataMatch) return iataMatch;
+
   const normalizedQuery = query.trim().toLowerCase();
+
   const exactLabel = suggestions.find(
     (suggestion) => suggestion.label.trim().toLowerCase() === normalizedQuery
   );

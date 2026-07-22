@@ -1,6 +1,6 @@
 export const DESTINATION_PICK_LIST_TOAST = {
   title: "Select from the suggestions",
-  description: "Type a city or property name, then choose a match from the dropdown.",
+  description: "Type a destination name, then choose a match from the dropdown.",
 } as const;
 
 const PICK_FROM_LIST_PATTERNS = [

@@ -232,13 +232,19 @@ const validateInput = (payload: unknown): ValidatedInput => {
   const destinationId =
     input.destination_id?.trim() || query.match(/-c(\d+)/i)?.[1] || "";
 
-  if (!destinationId) {
+  const airportCode = input.airport_code?.trim().toUpperCase() || undefined;
+  const airportName = input.airport_name?.trim() || undefined;
+  const hasAirportIata = Boolean(
+    airportCode && airportName && /^[A-Z]{3}$/.test(airportCode)
+  );
+
+  if (!destinationId && !hasAirportIata) {
     throw new Error(
       "destination_id is required. Select a destination from autocomplete before searching."
     );
   }
 
-  if (!/^\d+$/.test(destinationId)) {
+  if (destinationId && !/^\d+$/.test(destinationId) && !hasAirportIata) {
     throw new Error(
       "destination_id must be a numeric destination ID. Select a destination from the list."
     );
@@ -246,11 +252,11 @@ const validateInput = (payload: unknown): ValidatedInput => {
 
   return {
     query,
-    destination_id: destinationId,
+    destination_id: destinationId || airportCode || "",
     hotel_id: input.hotel_id?.trim() || undefined,
     airport_place_id: input.airport_place_id?.trim() || undefined,
-    airport_code: input.airport_code?.trim() || undefined,
-    airport_name: input.airport_name?.trim() || undefined,
+    airport_code: airportCode,
+    airport_name: airportName,
     city_name: input.city_name?.trim() || undefined,
     state_name: input.state_name?.trim() || undefined,
     country_name: input.country_name?.trim() || undefined,
@@ -276,9 +282,29 @@ const normalizeDestination = (input: ValidatedInput): NormalizedDestination => (
   country: input.country,
 });
 
+const parseIataCode = (value: string | undefined): string | null => {
+  const trimmed = value?.trim().toUpperCase() ?? "";
+  return /^[A-Z]{3}$/.test(trimmed) ? trimmed : null;
+};
+
+const resolveSkyscannerEntityId = (input: ValidatedInput): string | null => {
+  const isAirportSearch = Boolean(input.airport_code && input.airport_name);
+  if (isAirportSearch) {
+    const iata = parseIataCode(input.airport_code);
+    if (iata) return iata;
+  }
+  if (/^\d+$/.test(input.destination_id)) return input.destination_id;
+  return parseIataCode(input.destination_id);
+};
+
 const buildSkyscannerHotelDeeplink = (input: ValidatedInput) => {
+  const entityId = resolveSkyscannerEntityId(input);
+  if (!entityId) {
+    throw new Error("Could not resolve destination. Please select a different result.");
+  }
+
   const qs = new URLSearchParams({
-    entity_id: input.destination_id,
+    entity_id: entityId,
     checkin: input.checkin,
     checkout: input.checkout,
     adults: String(input.adults),
@@ -368,12 +394,13 @@ export const handleHotelAffiliateRouter = async (
     const validated = validateInput(payload);
     const normalizedDestination = normalizeDestination(validated);
     const redirectUrl = buildSkyscannerHotelDeeplink(validated);
+    const skyscannerEntityId = resolveSkyscannerEntityId(validated) ?? validated.destination_id;
 
     return {
       status: 200,
       body: {
         success: true,
-        entity_id: validated.destination_id,
+        entity_id: skyscannerEntityId,
         normalized_destination: normalizedDestination,
         redirect_url: redirectUrl,
         tracking_payload: {

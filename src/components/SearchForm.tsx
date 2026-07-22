@@ -43,6 +43,9 @@ import { resolveFirstDestinationSuggestion } from "@/lib/hotelSearchDestination"
 import {
   buildHotelSearchInputFromSuggestion,
   getDeviceKayakAutocompleteContext,
+  isIataQuery,
+  pickBestIataSuggestion,
+  readSuggestionAirportCode,
 } from "@/lib/kayakDestinationSearch";
 import { validateHotelSearch } from "@/lib/skyscannerHotels";
 import { generateClickId, LandingTrackingService } from "@/lib/landingTrackingService";
@@ -377,6 +380,19 @@ const SearchForm = () => {
     return normalizedType.charAt(0).toUpperCase() + normalizedType.slice(1);
   };
 
+  const suggestionSubtitle = (suggestion: HotelDestinationSuggestion) => {
+    const typeLabel = suggestionTypeLabel(suggestion.type);
+    const airportCode = readSuggestionAirportCode(suggestion);
+    const parts = [typeLabel];
+    if (airportCode) {
+      parts.push(airportCode);
+    }
+    if (suggestion.subtitle) {
+      parts.push(suggestion.subtitle);
+    }
+    return parts.join(" · ");
+  };
+
   const handleSuggestionSelect = (suggestion: HotelDestinationSuggestion) => {
     setDestination(suggestion.label);
     setSelectedSuggestion(suggestion);
@@ -564,7 +580,7 @@ const SearchForm = () => {
     if (trimmedDestination.length < 3) {
       setDestinationError(true);
       toast.error("Destination too short", {
-        description: "Type at least 3 letters, then select a city or hotel from the suggestions.",
+        description: "Type at least 3 letters — city, hotel, or airport code (e.g. VAR).",
       });
       if (isDestinationLocked) {
         setIsDestinationLocked(false);
@@ -590,7 +606,13 @@ const SearchForm = () => {
       }
 
       if (!suggestion) {
-        promptPickFromList();
+        if (isIataQuery(trimmedDestination)) {
+          toast.error("Airport not found", {
+            description: `No airport matched "${trimmedDestination.toUpperCase()}". Check the code and try again.`,
+          });
+        } else {
+          promptPickFromList();
+        }
         return;
       }
 
@@ -668,7 +690,13 @@ const SearchForm = () => {
       const message =
         error instanceof Error ? error.message : "We couldn't load results right now.";
       if (isDestinationPickRequiredMessage(message)) {
-        promptPickFromList();
+        if (isIataQuery(destination.trim())) {
+          toast.error("Airport not found", {
+            description: `No airport matched "${destination.trim().toUpperCase()}". Check the code and try again.`,
+          });
+        } else {
+          promptPickFromList();
+        }
       } else if (isSearchValidationMessage(message)) {
         toast.error("Review your search", { description: message });
       } else {
@@ -874,18 +902,7 @@ const SearchForm = () => {
                           <HighlightQuery text={suggestion.label} query={destination} />
                         </p>
                         <p className="truncate text-xs text-muted-foreground">
-                          <span className="capitalize">
-                            <HighlightQuery
-                              text={suggestionTypeLabel(suggestion.type)}
-                              query={destination}
-                            />
-                          </span>
-                          {suggestion.subtitle ? (
-                            <>
-                              <span> · </span>
-                              <HighlightQuery text={suggestion.subtitle} query={destination} />
-                            </>
-                          ) : null}
+                          <HighlightQuery text={suggestionSubtitle(suggestion)} query={destination} />
                         </p>
                       </span>
                     </button>

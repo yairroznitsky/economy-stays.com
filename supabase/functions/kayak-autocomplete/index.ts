@@ -97,6 +97,19 @@ const extractString = (
   return fallback;
 };
 
+const extractId = (source: Record<string, unknown>, keys: string[]) => {
+  for (const key of keys) {
+    const value = source[key];
+    if (typeof value === "number" && Number.isFinite(value)) {
+      return String(Math.trunc(value));
+    }
+    if (typeof value === "string" && value.trim()) {
+      return value.trim();
+    }
+  }
+  return null;
+};
+
 const findSuggestionArray = (value: unknown): Record<string, unknown>[] | null => {
   if (Array.isArray(value)) {
     const asRecords = value
@@ -194,6 +207,8 @@ const normalizeKayakSuggestions = (payload: unknown): NormalizedSuggestion[] => 
     if (seen.has(dedupeKey)) continue;
     seen.add(dedupeKey);
 
+    const isAirport = mappedType === "ap" || mappedType.includes("airport");
+
     normalized.push({
       id,
       label,
@@ -203,15 +218,16 @@ const normalizeKayakSuggestions = (payload: unknown): NormalizedSuggestion[] => 
       raw: {
         id: record["id"] ?? record["entityId"] ?? null,
         type: rawType || null,
-        hotel_id: record["hid"] ?? null,
-        city_id: record["ctid"] ?? record["id"] ?? null,
+        hotel_id: extractId(record, ["hid"]),
+        city_id: extractId(record, ["ctid", "id"]),
         city: record["cityonly"] ?? record["cityname"] ?? null,
+        cityonly: record["cityonly"] ?? null,
         state: record["region"] ?? record["rc"] ?? null,
         country: record["country"] ?? null,
         name: record["name"] ?? record["hotelname"] ?? null,
-        place_id: record["placeID"] ?? record["indexId"] ?? null,
-        airport_code: record["apicode"] ?? record["ap"] ?? null,
-        airport_name: record["airportname"] ?? null,
+        place_id: extractId(record, ["placeID", "indexId"]),
+        airport_code: isAirport ? (record["apicode"] ?? record["ap"] ?? null) : null,
+        airport_name: isAirport ? (record["airportname"] ?? record["name"] ?? null) : null,
       },
     });
 
