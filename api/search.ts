@@ -1,3 +1,5 @@
+import { handleSearchInsert } from "../server/tracking/searchHandler";
+
 interface ApiRequest {
   method?: string;
   body: unknown;
@@ -43,10 +45,6 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       typeof req.body === "object" && req.body !== null
         ? (req.body as Record<string, unknown>)
         : {};
-
-    const { handleSearchInsert } = await import(
-      "../server/tracking/searchHandler"
-    );
 
     const result = await handleSearchInsert(body);
     res.status(result.status).json(result.body);

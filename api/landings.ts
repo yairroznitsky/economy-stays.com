@@ -1,3 +1,5 @@
+import { handleLandingsInsert } from "../server/tracking/landingsHandler";
+
 interface ApiRequest {
   method?: string;
   headers?: Record<string, string | string[] | undefined>;
@@ -45,10 +47,6 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       typeof req.body === "object" && req.body !== null
         ? (req.body as Record<string, unknown>)
         : {};
-
-    const { handleLandingsInsert } = await import(
-      "../server/tracking/landingsHandler"
-    );
 
     const result = await handleLandingsInsert(req, body);
     res.status(result.status).json(result.body);
