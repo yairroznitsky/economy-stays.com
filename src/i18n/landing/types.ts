@@ -1,0 +1,78 @@
+export type LandingLocale = "en" | "es" | "pt-BR";
+
+export type LandingTranslations = {
+  heroEyebrow: string;
+  heroTitle: string;
+  heroSubtitle: string;
+  heroImageAlt: string;
+  featuresTitle: (siteName: string) => string;
+  featuresSubtitle: string;
+  features: Array<{ title: string; desc: string }>;
+  destinationsTitle: string;
+  destinationsSubtitle: string;
+  compareRates: string;
+  checkingRates: string;
+  ctaTitle: string;
+  ctaSubtitle: string;
+  destinationNotFound: (city: string) => string;
+  reviewSearch: string;
+  ratesUnavailable: string;
+  ratesUnavailableDesc: string;
+  destinationPickTitle: string;
+  destinationPickDesc: string;
+  footer: {
+    about: string;
+    contact: string;
+    privacy: string;
+    rightsReserved: string;
+    operatedBy: (siteName: string, operator: string) => string;
+    commission: (siteName: string) => string;
+  };
+  search: {
+    where: string;
+    wherePlaceholder: string;
+    whereError: string;
+    loadingSuggestions: string;
+    when: string;
+    pickDates: string;
+    checkIn: string;
+    checkOut: string;
+    selectCheckIn: string;
+    selectCheckOut: string;
+    selectDate: string;
+    pickYourDates: string;
+    chooseArrival: string;
+    chooseDeparture: string;
+    pickCheckInFirst: string;
+    nowChooseCheckOut: string;
+    who: string;
+    guestSummary: (guests: number, rooms: number) => string;
+    adults: string;
+    adultsSub: string;
+    children: string;
+    childrenSub: string;
+    rooms: string;
+    comparePrices: string;
+    comparingRates: string;
+    datesRequired: string;
+    datesRequiredDesc: string;
+    destinationTooShort: string;
+    destinationTooShortDesc: string;
+    airportNotFound: string;
+    airportNotFoundDesc: (code: string) => string;
+    couldNotCompare: string;
+    couldNotCompareDesc: string;
+    suggestionType: {
+      state: string;
+      airport: string;
+      landmark: string;
+      city: string;
+    };
+    validation: {
+      checkoutAfterCheckin: string;
+      adultsGteRooms: string;
+      adultsRoomsMin: string;
+    };
+  };
+  countries: Record<string, string>;
+};

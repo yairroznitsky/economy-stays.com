@@ -18,6 +18,8 @@ const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<Index />} />
+      <Route path="/es" element={<Index locale="es" />} />
+      <Route path="/br" element={<Index locale="pt-BR" />} />
       <Route path="/about" element={<About />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/privacy" element={<Privacy />} />

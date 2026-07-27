@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { format, isBefore, isSameDay, startOfDay } from "date-fns";
+import { enUS, es as esLocale, ptBR as ptBRLocale, type Locale } from "date-fns/locale";
 import {
   CalendarIcon,
   MapPin,
@@ -35,10 +36,10 @@ import {
   requestHotelRedirectUrl,
 } from "@/lib/hotelAffiliateApi";
 import {
-  DESTINATION_PICK_LIST_TOAST,
   isDestinationPickRequiredMessage,
   isSearchValidationMessage,
 } from "@/lib/hotelSearchErrors";
+import { translateValidationMessage, useLandingI18n } from "@/i18n/landing";
 import { resolveFirstDestinationSuggestion } from "@/lib/hotelSearchDestination";
 import {
   buildHotelSearchInputFromSuggestion,
@@ -73,10 +74,20 @@ const DateRangeStepHeader = ({
   value,
   phase,
   className,
+  labels,
+  dateLocale,
 }: {
   value: DateRange | undefined;
   phase: "check-in" | "check-out";
   className?: string;
+  labels: {
+    checkIn: string;
+    checkOut: string;
+    selectCheckIn: string;
+    selectCheckOut: string;
+    selectDate: string;
+  };
+  dateLocale: Locale;
 }) => (
   <div className={cn("grid grid-cols-2 gap-2", className)}>
     <div
@@ -91,7 +102,7 @@ const DateRangeStepHeader = ({
           phase === "check-in" ? "text-primary" : "text-muted-foreground"
         )}
       >
-        Check-in
+        {labels.checkIn}
       </p>
       <p
         className={cn(
@@ -103,7 +114,9 @@ const DateRangeStepHeader = ({
               : "text-muted-foreground"
         )}
       >
-        {value?.from ? format(value.from, "MMM d, yyyy") : "Select check-in"}
+        {value?.from
+          ? format(value.from, "MMM d, yyyy", { locale: dateLocale })
+          : labels.selectCheckIn}
       </p>
     </div>
     <div
@@ -122,7 +135,7 @@ const DateRangeStepHeader = ({
           phase === "check-out" ? "text-primary" : "text-muted-foreground"
         )}
       >
-        Check-out
+        {labels.checkOut}
       </p>
       <p
         className={cn(
@@ -135,10 +148,10 @@ const DateRangeStepHeader = ({
         )}
       >
         {value?.to
-          ? format(value.to, "MMM d, yyyy")
+          ? format(value.to, "MMM d, yyyy", { locale: dateLocale })
           : phase === "check-out"
-            ? "Select check-out"
-            : "Select date"}
+            ? labels.selectCheckOut
+            : labels.selectDate}
       </p>
     </div>
   </div>
@@ -163,8 +176,24 @@ const desktopFieldPad = "desktop:px-[1.15rem] desktop:py-[0.8625rem]";
 const desktopFieldLabel = "desktop:text-[0.8625rem]";
 const desktopFieldText = "desktop:text-[1.15rem]";
 const desktopFieldIcon = "desktop:h-[1.15rem] desktop:w-[1.15rem]";
+const searchFieldShell =
+  "rounded-xl border bg-background px-4 py-3 text-left transition-smooth hover:border-primary/40 desktop:h-[4.5625rem]";
+const searchFieldValueRow = "mt-1 flex min-w-0 items-center justify-start gap-2 text-left";
+const searchFieldValueText =
+  "min-w-0 flex-1 truncate whitespace-nowrap text-left text-base text-foreground";
 
 const SearchForm = () => {
+  const { locale: landingLocale, t } = useLandingI18n();
+  const dateLocale =
+    landingLocale === "es" ? esLocale : landingLocale === "pt-BR" ? ptBRLocale : enUS;
+  const dateLabels = {
+    checkIn: t.search.checkIn,
+    checkOut: t.search.checkOut,
+    selectCheckIn: t.search.selectCheckIn,
+    selectCheckOut: t.search.selectCheckOut,
+    selectDate: t.search.selectDate,
+  };
+
   const today = new Date();
   const tomorrow = new Date();
   tomorrow.setDate(today.getDate() + 1);
@@ -217,9 +246,9 @@ const SearchForm = () => {
   );
 
   const formatDateRangeLabel = (value: DateRange | undefined) => {
-    if (!value?.from) return "Pick dates";
-    if (!value.to) return format(value.from, "MMM d, yyyy");
-    return `${format(value.from, "MMM d")} — ${format(value.to, "MMM d, yyyy")}`;
+    if (!value?.from) return t.search.pickDates;
+    if (!value.to) return format(value.from, "MMM d, yyyy", { locale: dateLocale });
+    return `${format(value.from, "MMM d", { locale: dateLocale })} — ${format(value.to, "MMM d, yyyy", { locale: dateLocale })}`;
   };
 
   const openDatePicker = () => {
@@ -373,10 +402,10 @@ const SearchForm = () => {
 
   const suggestionTypeLabel = (type: string) => {
     const normalizedType = type.toLowerCase();
-    if (normalizedType === "reg") return "State";
-    if (normalizedType === "ap") return "Airport";
-    if (normalizedType === "lm") return "Landmark";
-    if (normalizedType === "ct") return "City";
+    if (normalizedType === "reg") return t.search.suggestionType.state;
+    if (normalizedType === "ap") return t.search.suggestionType.airport;
+    if (normalizedType === "lm") return t.search.suggestionType.landmark;
+    if (normalizedType === "ct") return t.search.suggestionType.city;
     return normalizedType.charAt(0).toUpperCase() + normalizedType.slice(1);
   };
 
@@ -407,15 +436,15 @@ const SearchForm = () => {
     setDestinationError(true);
     setIsDestinationLocked(false);
     setSelectedSuggestion(null);
-    toast.error(DESTINATION_PICK_LIST_TOAST.title, {
-      description: DESTINATION_PICK_LIST_TOAST.description,
+    toast.error(t.destinationPickTitle, {
+      description: t.destinationPickDesc,
     });
     destinationInputRef.current?.focus();
     scrollDestinationFieldIntoMobileView();
     if (destination.trim().length >= 3 && suggestions.length > 0) {
       setIsDropdownOpen(true);
     }
-  }, [destination, suggestions.length, scrollDestinationFieldIntoMobileView]);
+  }, [destination, suggestions.length, scrollDestinationFieldIntoMobileView, t]);
 
   useEffect(() => {
     if (isDestinationLocked) {
@@ -568,8 +597,8 @@ const SearchForm = () => {
     }
 
     if (!range?.from || !range?.to) {
-      toast.error("Dates required", {
-        description: "Select both check-in and check-out to compare available stays.",
+      toast.error(t.search.datesRequired, {
+        description: t.search.datesRequiredDesc,
       });
       openDatePicker();
       return;
@@ -579,8 +608,8 @@ const SearchForm = () => {
 
     if (trimmedDestination.length < 3) {
       setDestinationError(true);
-      toast.error("Destination too short", {
-        description: "Type at least 3 letters — city, hotel, or airport code (e.g. VAR).",
+      toast.error(t.search.destinationTooShort, {
+        description: t.search.destinationTooShortDesc,
       });
       if (isDestinationLocked) {
         setIsDestinationLocked(false);
@@ -607,8 +636,8 @@ const SearchForm = () => {
 
       if (!suggestion) {
         if (isIataQuery(trimmedDestination)) {
-          toast.error("Airport not found", {
-            description: `No airport matched "${trimmedDestination.toUpperCase()}". Check the code and try again.`,
+          toast.error(t.search.airportNotFound, {
+            description: t.search.airportNotFoundDesc(trimmedDestination.toUpperCase()),
           });
         } else {
           promptPickFromList();
@@ -625,7 +654,7 @@ const SearchForm = () => {
         rooms,
       });
       if (validationError) {
-        toast.error(validationError);
+        toast.error(translateValidationMessage(landingLocale, validationError));
         return;
       }
 
@@ -691,17 +720,19 @@ const SearchForm = () => {
         error instanceof Error ? error.message : "We couldn't load results right now.";
       if (isDestinationPickRequiredMessage(message)) {
         if (isIataQuery(destination.trim())) {
-          toast.error("Airport not found", {
-            description: `No airport matched "${destination.trim().toUpperCase()}". Check the code and try again.`,
+          toast.error(t.search.airportNotFound, {
+            description: t.search.airportNotFoundDesc(destination.trim().toUpperCase()),
           });
         } else {
           promptPickFromList();
         }
       } else if (isSearchValidationMessage(message)) {
-        toast.error("Review your search", { description: message });
+        toast.error(t.reviewSearch, {
+          description: translateValidationMessage(landingLocale, message),
+        });
       } else {
-        toast.error("Couldn't compare rates", {
-          description: message || "Please try again or select a destination from the suggestions.",
+        toast.error(t.search.couldNotCompare, {
+          description: message || t.search.couldNotCompareDesc,
         });
       }
     } finally {
@@ -710,9 +741,7 @@ const SearchForm = () => {
     }
   };
 
-  const guestSummary = `${adults + children} guest${
-    adults + children !== 1 ? "s" : ""
-  } · ${rooms} room${rooms !== 1 ? "s" : ""}`;
+  const guestSummary = t.search.guestSummary(adults + children, rooms);
 
   const Stepper = ({
     label,
@@ -767,15 +796,16 @@ const SearchForm = () => {
       noValidate
       className="w-full rounded-2xl border border-border/80 bg-card/95 p-3 text-left shadow-search backdrop-blur-sm desktop:p-[1.15rem]"
     >
-      <div className="grid grid-cols-1 gap-2 desktop:grid-cols-[1.5fr_1.5fr_1.35fr_auto] desktop:gap-[0.575rem]">
+      <div className="grid grid-cols-1 gap-2 desktop:grid-cols-[1.5fr_1.5fr_1.35fr_auto] desktop:gap-[0.575rem] desktop:[&>*]:min-w-0">
         {/* Destination */}
         <div
           ref={destinationFieldRef}
           className={cn(
-            "relative rounded-xl border bg-background px-4 py-3 text-left transition-smooth hover:border-primary/40",
+            "relative",
+            searchFieldShell,
             desktopFieldPad,
             destinationError
-              ? "border-destructive ring-1 ring-destructive/30"
+              ? "border-destructive ring-1 ring-destructive/30 desktop:h-auto"
               : "border-border"
           )}
         >
@@ -786,9 +816,9 @@ const SearchForm = () => {
               desktopFieldLabel
             )}
           >
-            Where
+            {t.search.where}
           </Label>
-          <div className="mt-1 flex min-w-0 items-center justify-start gap-2 text-left">
+          <div className={searchFieldValueRow}>
             <MapPin className={cn("h-4 w-4 shrink-0 text-primary", desktopFieldIcon)} aria-hidden />
             <input
               id="search-destination"
@@ -846,12 +876,12 @@ const SearchForm = () => {
                   setActiveSuggestionIndex(-1);
                 }
               }}
-              placeholder="Where are you headed?"
+              placeholder={t.search.wherePlaceholder}
               autoComplete="off"
               aria-invalid={destinationError}
               aria-describedby={destinationError ? "search-destination-error" : undefined}
               className={cn(
-                "min-w-0 flex-1 border-0 bg-transparent p-0 text-left text-base text-foreground shadow-none outline-none",
+                "min-w-0 flex-1 truncate border-0 bg-transparent p-0 text-left text-base text-foreground shadow-none outline-none",
                 desktopFieldText,
                 "placeholder:text-left placeholder:text-muted-foreground",
                 "focus-visible:ring-0 focus-visible:ring-offset-0"
@@ -864,11 +894,11 @@ const SearchForm = () => {
               className="mt-2 text-xs font-medium text-destructive"
               role="alert"
             >
-              Choose where you're staying
+              {t.search.whereError}
             </p>
           )}
           {isAutocompleteLoading && (
-            <p className="mt-2 text-xs text-muted-foreground">Loading suggestions...</p>
+            <p className="mt-2 text-xs text-muted-foreground">{t.search.loadingSuggestions}</p>
           )}
           {isDropdownOpen && destination.trim().length >= 3 && suggestions.length > 0 && (
             <div className="absolute top-full left-0 z-50 mt-2 w-full rounded-xl border border-border bg-popover p-1 shadow-elevated">
@@ -919,10 +949,7 @@ const SearchForm = () => {
             <button
               type="button"
               onClick={openDatePicker}
-              className={cn(
-                "rounded-xl border border-border bg-background px-4 py-3 text-left transition-smooth hover:border-primary/40",
-                desktopFieldPad
-              )}
+              className={cn(searchFieldShell, "border-border", desktopFieldPad)}
             >
               <Label
                 className={cn(
@@ -930,13 +957,13 @@ const SearchForm = () => {
                   desktopFieldLabel
                 )}
               >
-                When
+                {t.search.when}
               </Label>
-              <div className="mt-1 flex items-center justify-start gap-2 text-left">
+              <div className={searchFieldValueRow}>
                 <CalendarIcon className={cn("h-4 w-4 shrink-0 text-primary", desktopFieldIcon)} />
                 <span
                   className={cn(
-                    "text-left text-base",
+                    searchFieldValueText,
                     desktopFieldText,
                     !range?.from && "text-muted-foreground"
                   )}
@@ -951,8 +978,13 @@ const SearchForm = () => {
               className="max-h-[92dvh] gap-0 rounded-t-2xl px-0 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-3"
             >
               <SheetHeader className="space-y-3 px-4 text-left">
-                <SheetTitle className="text-lg">Pick your dates</SheetTitle>
-                <DateRangeStepHeader value={draftRange} phase={datePickerPhase} />
+                <SheetTitle className="text-lg">{t.search.pickYourDates}</SheetTitle>
+                <DateRangeStepHeader
+                  value={draftRange}
+                  phase={datePickerPhase}
+                  labels={dateLabels}
+                  dateLocale={dateLocale}
+                />
                 <p
                   className={cn(
                     "text-sm",
@@ -962,8 +994,8 @@ const SearchForm = () => {
                   )}
                 >
                   {datePickerPhase === "check-in"
-                    ? "Choose your arrival date"
-                    : "Now choose your departure date"}
+                    ? t.search.chooseArrival
+                    : t.search.chooseDeparture}
                 </p>
               </SheetHeader>
               <div className="flex justify-center overflow-x-auto px-2 py-2">
@@ -977,10 +1009,7 @@ const SearchForm = () => {
             <PopoverTrigger asChild>
               <button
                 type="button"
-                className={cn(
-                "rounded-xl border border-border bg-background px-4 py-3 text-left transition-smooth hover:border-primary/40",
-                desktopFieldPad
-              )}
+                className={cn(searchFieldShell, "border-border", desktopFieldPad)}
               >
                 <Label
                   className={cn(
@@ -988,13 +1017,13 @@ const SearchForm = () => {
                     desktopFieldLabel
                   )}
                 >
-                  When
+                  {t.search.when}
                 </Label>
-                <div className="mt-1 flex items-center justify-start gap-2 text-left">
+                <div className={searchFieldValueRow}>
                   <CalendarIcon className={cn("h-4 w-4 shrink-0 text-primary", desktopFieldIcon)} />
                   <span
                     className={cn(
-                      "text-left text-base",
+                      searchFieldValueText,
                       desktopFieldText,
                       !range?.from && "text-muted-foreground"
                     )}
@@ -1006,7 +1035,12 @@ const SearchForm = () => {
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
               <div className="border-b border-border p-3">
-                <DateRangeStepHeader value={draftRange} phase={datePickerPhase} />
+                <DateRangeStepHeader
+                  value={draftRange}
+                  phase={datePickerPhase}
+                  labels={dateLabels}
+                  dateLocale={dateLocale}
+                />
                 <p
                   className={cn(
                     "mt-2 text-center text-xs",
@@ -1016,8 +1050,8 @@ const SearchForm = () => {
                   )}
                 >
                   {datePickerPhase === "check-in"
-                    ? "Pick check-in first, then check-out"
-                    : "Now choose your check-out"}
+                    ? t.search.pickCheckInFirst
+                    : t.search.nowChooseCheckOut}
                 </p>
               </div>
               {dateRangeCalendar}
@@ -1030,10 +1064,7 @@ const SearchForm = () => {
           <PopoverTrigger asChild>
             <button
               type="button"
-              className={cn(
-                "rounded-xl border border-border bg-background px-4 py-3 text-left transition-smooth hover:border-primary/40",
-                desktopFieldPad
-              )}
+              className={cn(searchFieldShell, "border-border", desktopFieldPad)}
             >
               <Label
                 className={cn(
@@ -1041,32 +1072,32 @@ const SearchForm = () => {
                   desktopFieldLabel
                 )}
               >
-                Who
+                {t.search.who}
               </Label>
-              <div className="mt-1 flex items-center justify-start gap-2 text-left">
+              <div className={searchFieldValueRow}>
                 <Users className={cn("h-4 w-4 shrink-0 text-primary", desktopFieldIcon)} />
-                <span className={cn("whitespace-nowrap text-left text-base", desktopFieldText)}>{guestSummary}</span>
+                <span className={cn(searchFieldValueText, desktopFieldText)}>{guestSummary}</span>
               </div>
             </button>
           </PopoverTrigger>
           <PopoverContent className="w-72 p-4" align="start">
             <Stepper
-              label="Adults"
-              sub="Age 13+"
+              label={t.search.adults}
+              sub={t.search.adultsSub}
               value={adults}
               onChange={setAdults}
               min={1}
               max={6}
             />
             <Stepper
-              label="Children"
-              sub="Age 0–12"
+              label={t.search.children}
+              sub={t.search.childrenSub}
               value={children}
               onChange={setChildren}
               max={6}
             />
             <Stepper
-              label="Rooms"
+              label={t.search.rooms}
               value={rooms}
               onChange={setRooms}
               min={1}
@@ -1079,9 +1110,9 @@ const SearchForm = () => {
           type="submit"
           size="lg"
           disabled={isLoading}
-          className="h-12 rounded-xl bg-primary px-8 text-xl font-semibold shadow-elevated transition-smooth hover:bg-primary/90 active:scale-[0.99] desktop:h-auto desktop:px-[2.3rem] desktop:py-4 desktop:text-[1.725rem]"
+          className="h-12 rounded-xl bg-primary px-8 text-xl font-semibold shadow-elevated transition-smooth hover:bg-primary/90 active:scale-[0.99] desktop:h-[4.5625rem] desktop:w-max desktop:max-w-full desktop:shrink-0 desktop:px-5 desktop:py-0 desktop:text-[1.5rem] desktop:leading-none"
         >
-          {isLoading ? "Comparing rates..." : "Compare prices"}
+          {isLoading ? t.search.comparingRates : t.search.comparePrices}
         </Button>
       </div>
     </form>
