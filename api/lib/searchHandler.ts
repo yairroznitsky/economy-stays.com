@@ -1,5 +1,5 @@
-import { getSupabaseAdmin } from "./supabaseAdmin";
 import type { TrackingHandlerResult } from "./landingsHandler";
+import { insertRow } from "./supabaseRest";
 
 export interface SearchInsertBody {
   click_id?: unknown;
@@ -73,8 +73,7 @@ export const handleSearchInsert = async (
       : new Date().toISOString();
 
   try {
-    const supabase = getSupabaseAdmin();
-    const { error } = await supabase.from("rental_clicks").insert({
+    const { error } = await insertRow("rental_clicks", {
       click_id: clickId,
       landing_id: asNullableString(body.landing_id),
       partner,
@@ -92,7 +91,7 @@ export const handleSearchInsert = async (
     });
 
     if (error) {
-      return { status: 500, body: { error: error.message } };
+      return { status: 500, body: { error } };
     }
 
     return { status: 201, body: { ok: true, click_id: clickId } };

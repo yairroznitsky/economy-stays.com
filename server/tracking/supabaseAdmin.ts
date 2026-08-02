@@ -1,1 +1,1 @@
-export { getSupabaseAdmin, getSourceApp } from "../../api/lib/supabaseAdmin";
+export { getSourceApp, insertRow } from "../../api/lib/supabaseRest";

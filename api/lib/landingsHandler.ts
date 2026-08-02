@@ -1,5 +1,5 @@
 import { getClientIp, getReferrer, getUserAgent, type RequestLike } from "./requestMeta";
-import { getSourceApp, getSupabaseAdmin } from "./supabaseAdmin";
+import { getSourceApp, insertRow } from "./supabaseRest";
 
 export interface LandingInsertBody {
   landing_id?: unknown;
@@ -42,15 +42,14 @@ export const handleLandingsInsert = async (
       source_app: getSourceApp(),
     };
 
-    const supabase = getSupabaseAdmin();
-    const { error } = await supabase.from("landings").insert({
+    const { error } = await insertRow("landings", {
       landing_id: landingId,
       url_params: urlParams,
       metadata,
     });
 
     if (error) {
-      return { status: 500, body: { error: error.message } };
+      return { status: 500, body: { error } };
     }
 
     return { status: 201, body: { ok: true, landing_id: landingId } };
