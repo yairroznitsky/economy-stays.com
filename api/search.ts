@@ -1,4 +1,4 @@
-import { handleSearchInsert } from "../server/tracking/searchHandler";
+import { handleSearchInsert } from "./lib/searchHandler";
 
 interface ApiRequest {
   method?: string;

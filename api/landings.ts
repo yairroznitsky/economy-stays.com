@@ -1,4 +1,4 @@
-import { handleLandingsInsert } from "../server/tracking/landingsHandler";
+import { handleLandingsInsert } from "./lib/landingsHandler";
 
 interface ApiRequest {
   method?: string;
