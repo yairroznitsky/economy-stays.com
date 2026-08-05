@@ -27,7 +27,7 @@ const HotelLanding = () => {
     [normalizedPath, citySlug, intentSlug]
   );
 
-  const { data, isFetched, isError } = useQuery({
+  const { data, isFetched } = useQuery({
     queryKey: ["landing-page", normalizedPath],
     queryFn: () => loadLandingPageConfig(normalizedPath),
     placeholderData: placeholder,
@@ -39,7 +39,7 @@ const HotelLanding = () => {
     return <Navigate to={`${canonicalPath}${location.search}`} replace />;
   }
 
-  if (isFetched && (data === null || isError)) {
+  if (isFetched && data === null) {
     return <NotFound />;
   }
 

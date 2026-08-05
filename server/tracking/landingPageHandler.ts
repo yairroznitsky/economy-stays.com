@@ -2,4 +2,4 @@ export {
   handleLandingPageGet,
   normalizeLandingPath,
   type LandingPageHandlerResult,
-} from "../../api/lib/landingPageHandler";
+} from "../../api/_lib/landingPageHandler";

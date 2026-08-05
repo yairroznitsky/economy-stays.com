@@ -1,1 +1,1 @@
-export { getSourceApp, insertRow } from "../../api/lib/supabaseRest";
+export { getSourceApp, insertRow } from "../../api/_lib/supabaseRest";

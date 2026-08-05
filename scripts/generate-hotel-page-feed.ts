@@ -6,7 +6,7 @@ import {
   buildHotelPath,
   buildIntentPath,
   slugifyName,
-} from "../api/lib/hotelSlug.ts";
+} from "../api/_lib/hotelSlug.ts";
 import { loadDotEnv, selectRows } from "./lib/supabaseAdmin.ts";
 
 /**
