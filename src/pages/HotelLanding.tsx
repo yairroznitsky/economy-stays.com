@@ -1,13 +1,14 @@
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Navigate, useLocation, useParams } from "react-router-dom";
 import LandingPage from "@/components/landing/LandingPage";
 import { LandingLocaleProvider } from "@/i18n/landing";
+import { buildPlaceholderConfig } from "@/lib/landingPlaceholder";
 import {
   buildLandingPath,
   loadLandingPageConfig,
   normalizeLandingPath,
 } from "@/lib/landingPages";
-import type { LandingPageConfig } from "@/types/landingPage";
 import NotFound from "./NotFound";
 
 const HotelLanding = () => {
@@ -16,54 +17,35 @@ const HotelLanding = () => {
     intentSlug?: string;
   }>();
   const location = useLocation();
-  const [config, setConfig] = useState<LandingPageConfig | null>(null);
-  const [status, setStatus] = useState<"loading" | "ready" | "missing">("loading");
 
   const canonicalPath = buildLandingPath(citySlug ?? "", intentSlug);
   const normalizedPath = normalizeLandingPath(location.pathname);
 
-  useEffect(() => {
-    let cancelled = false;
-    setStatus("loading");
+  const placeholder = useMemo(
+    () =>
+      buildPlaceholderConfig(normalizedPath, citySlug ?? "", intentSlug),
+    [normalizedPath, citySlug, intentSlug]
+  );
 
-    void loadLandingPageConfig(normalizedPath)
-      .then((pageConfig) => {
-        if (cancelled) return;
-        if (!pageConfig) {
-          setStatus("missing");
-          return;
-        }
-        setConfig(pageConfig);
-        setStatus("ready");
-      })
-      .catch(() => {
-        if (!cancelled) setStatus("missing");
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [normalizedPath]);
+  const { data, isFetched, isError } = useQuery({
+    queryKey: ["landing-page", normalizedPath],
+    queryFn: () => loadLandingPageConfig(normalizedPath),
+    placeholderData: placeholder,
+    staleTime: 60 * 60 * 1000,
+    retry: 1,
+  });
 
   if (normalizedPath !== canonicalPath && citySlug) {
     return <Navigate to={`${canonicalPath}${location.search}`} replace />;
   }
 
-  if (status === "loading") {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <p className="text-muted-foreground">Loading…</p>
-      </div>
-    );
-  }
-
-  if (status === "missing" || !config) {
+  if (isFetched && (data === null || isError)) {
     return <NotFound />;
   }
 
   return (
     <LandingLocaleProvider locale="en">
-      <LandingPage config={config} />
+      <LandingPage config={data ?? placeholder} />
     </LandingLocaleProvider>
   );
 };

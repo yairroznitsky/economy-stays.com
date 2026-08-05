@@ -31,6 +31,16 @@ export interface LandingPageIntent {
   audience?: string;
 }
 
+export interface LandingPageHotel {
+  id: string;
+  name: string;
+  type?: string;
+  address?: string;
+  starRating?: number;
+  rating?: number;
+  reviews?: number;
+}
+
 export interface LandingPageContent {
   h1: string;
   subtitle: string;
@@ -66,13 +76,11 @@ export interface LandingPageConfig {
   path: string;
   city: LandingPageCity;
   intent?: LandingPageIntent;
+  /** Present on per-hotel pages resolved from the hotels catalog. */
+  hotel?: LandingPageHotel;
   content: LandingPageContent;
   searchDefaults: LandingPageSearchDefaults;
   seo: LandingPageSeo;
   tracking: LandingPageTracking;
 }
 
-export interface LandingPageManifest {
-  pages: Record<string, string>;
-  generatedAt?: string;
-}

@@ -1,3 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-</urlset>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap>
+    <loc>https://cheap-stays.com/sitemap-cities.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://cheap-stays.com/sitemap-hotels-1.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://cheap-stays.com/sitemap-hotels-2.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://cheap-stays.com/sitemap-hotels-3.xml</loc>
+  </sitemap>
+</sitemapindex>

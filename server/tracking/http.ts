@@ -1,16 +1,16 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { handleLandingsInsert } from "./landingsHandler";
+import { handleLandingPageGet } from "./landingPageHandler";
 import { handleSearchInsert } from "./searchHandler";
-import { handleLpEventsRequest } from "./lpEventsHandler";
 
-export type TrackingRoute = "landings" | "search" | "lp-events";
+export type TrackingRoute = "landings" | "search" | "landing-page";
 
 const matchTrackingPath = (url: string | undefined): TrackingRoute | null => {
   if (!url) return null;
   const pathname = url.split("?")[0];
   if (pathname === "/api/landings" || pathname === "/landings") return "landings";
   if (pathname === "/api/search" || pathname === "/search") return "search";
-  if (pathname === "/api/lp-events" || pathname === "/lp-events") return "lp-events";
+  if (pathname === "/api/landing-page") return "landing-page";
   return null;
 };
 
@@ -32,7 +32,7 @@ const sendJson = (res: ServerResponse, status: number, body: Record<string, unkn
 const setCors = (res: ServerResponse) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Headers", "content-type");
-  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
 };
 
 export const handleTrackingRequest = async (
@@ -46,6 +46,18 @@ export const handleTrackingRequest = async (
     res.statusCode = 204;
     setCors(res);
     res.end();
+    return true;
+  }
+
+  if (route === "landing-page") {
+    if (req.method !== "GET") {
+      sendJson(res, 405, { error: "Method not allowed" });
+      return true;
+    }
+    const query = new URLSearchParams(req.url?.split("?")[1] ?? "");
+    const result = await handleLandingPageGet(query.get("path") ?? undefined);
+    res.setHeader("Cache-Control", result.cacheControl);
+    sendJson(res, result.status, result.body);
     return true;
   }
 
@@ -66,14 +78,8 @@ export const handleTrackingRequest = async (
   const result =
     route === "landings"
       ? await handleLandingsInsert(req, payload)
-      : route === "search"
-        ? await handleSearchInsert(payload)
-        : null;
+      : await handleSearchInsert(payload);
 
-  if (result) {
-    sendJson(res, result.status, result.body);
-    return true;
-  }
-
-  return handleLpEventsRequest(req, res, payload);
+  sendJson(res, result.status, result.body);
+  return true;
 };

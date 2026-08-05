@@ -19,9 +19,9 @@ const main = async () => {
   console.log("Run the following commands to expand published pages:");
   console.log("");
   console.log(`npm run create:pages -- --cities=${values.cities} --intents=${values.intents} --top-cities=${values["top-cities"]}`);
-  console.log("npm run generate:content -- --status draft --batch 50");
-  console.log("npm run publish:pages -- --all-drafts");
-  console.log("npm run export:pages");
+  console.log("npx tsx scripts/generate-template-content.ts --batch 800");
+  console.log("npx tsx scripts/publish-pages.ts --with-content");
+  console.log("Pages go live via /api/landing-page immediately after publish.");
 };
 
 main();

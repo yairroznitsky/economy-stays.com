@@ -14,12 +14,3 @@ export const buildLandingPagePath = (
   if (!intentSlug) return `/hotels/${city}`;
   return `/hotels/${city}/${slugify(intentSlug)}`;
 };
-
-export const buildLandingDataFilePath = (
-  citySlug: string,
-  intentSlug?: string | null
-): string => {
-  const city = slugify(citySlug);
-  if (!intentSlug) return `${city}/index.json`;
-  return `${city}/${slugify(intentSlug)}.json`;
-};

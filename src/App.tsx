@@ -1,4 +1,3 @@
-import { lazy, Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -10,8 +9,7 @@ import About from "./pages/About.tsx";
 import Contact from "./pages/Contact.tsx";
 import Privacy from "./pages/Privacy.tsx";
 import NotFound from "./pages/NotFound.tsx";
-
-const HotelLanding = lazy(() => import("./pages/HotelLanding.tsx"));
+import HotelLanding from "./pages/HotelLanding.tsx";
 
 const queryClient = new QueryClient();
 
@@ -26,22 +24,8 @@ const AppRoutes = () => {
       <Route path="/about" element={<About />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/privacy" element={<Privacy />} />
-      <Route
-        path="/hotels/:citySlug/:intentSlug"
-        element={
-          <Suspense fallback={null}>
-            <HotelLanding />
-          </Suspense>
-        }
-      />
-      <Route
-        path="/hotels/:citySlug"
-        element={
-          <Suspense fallback={null}>
-            <HotelLanding />
-          </Suspense>
-        }
-      />
+      <Route path="/hotels/:citySlug/:intentSlug" element={<HotelLanding />} />
+      <Route path="/hotels/:citySlug" element={<HotelLanding />} />
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
       <Route path="*" element={<NotFound />} />
     </Routes>

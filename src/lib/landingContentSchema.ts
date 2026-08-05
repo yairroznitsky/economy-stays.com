@@ -29,6 +29,70 @@ export const generatedContentSchema = z.object({
 
 export type GeneratedLandingContent = z.infer<typeof generatedContentSchema>;
 
+const readString = (value: unknown): string =>
+  typeof value === "string" ? value.trim() : "";
+
+const normalizeFaq = (item: unknown): { q: string; a: string } | null => {
+  if (!item || typeof item !== "object") return null;
+  const record = item as Record<string, unknown>;
+  const q = readString(record.q ?? record.question ?? record.questionText);
+  const a = readString(record.a ?? record.answer ?? record.answerText);
+  if (!q || !a) return null;
+  return { q, a };
+};
+
+const normalizeBenefit = (
+  item: unknown,
+  index: number
+): { title: string; text: string } | null => {
+  if (typeof item === "string") {
+    const text = item.trim();
+    if (!text) return null;
+    const split = text.split(/(?<=[.!?])\s+/);
+    if (split.length >= 2 && split[0].length <= 60) {
+      return { title: split[0].replace(/[.!?]+$/, ""), text: split.slice(1).join(" ") };
+    }
+    return { title: `Benefit ${index + 1}`, text };
+  }
+
+  if (!item || typeof item !== "object") return null;
+  const record = item as Record<string, unknown>;
+  const title = readString(record.title ?? record.heading ?? record.name);
+  const text = readString(record.text ?? record.description ?? record.body);
+  if (!title || !text) return null;
+  return { title, text };
+};
+
+/** Coerce common OpenAI JSON variants into the schema we validate against. */
+export const normalizeGeneratedContent = (raw: unknown): unknown => {
+  if (!raw || typeof raw !== "object") return raw;
+  const record = raw as Record<string, unknown>;
+
+  const faqs = (Array.isArray(record.faqs) ? record.faqs : [])
+    .map(normalizeFaq)
+    .filter((item): item is { q: string; a: string } => item !== null)
+    .slice(0, 5);
+
+  const benefits = (Array.isArray(record.benefits) ? record.benefits : [])
+    .map(normalizeBenefit)
+    .filter((item): item is { title: string; text: string } => item !== null)
+    .slice(0, 4);
+
+  return {
+    h1: readString(record.h1 ?? record.headline ?? record.title),
+    subtitle: readString(record.subtitle ?? record.subHeading),
+    metaTitle: readString(record.metaTitle ?? record.meta_title),
+    metaDescription: readString(record.metaDescription ?? record.meta_description),
+    introText: readString(record.introText ?? record.intro_text ?? record.intro),
+    faqs,
+    benefits,
+    ctaText: readString(record.ctaText ?? record.cta_text ?? record.cta),
+  };
+};
+
+export const parseGeneratedContent = (raw: unknown): GeneratedLandingContent =>
+  generatedContentSchema.parse(normalizeGeneratedContent(raw));
+
 const bannedPatterns = [
   /\bcheapest\b/i,
   /\bbest price\b/i,

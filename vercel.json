@@ -2,18 +2,6 @@
   "rewrites": [
     { "source": "/landings", "destination": "/api/landings" },
     { "source": "/search", "destination": "/api/search" },
-    { "source": "/lp-events", "destination": "/api/lp-events" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
-  ],
-  "headers": [
-    {
-      "source": "/landing-data/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=300, s-maxage=86400, stale-while-revalidate=604800"
-        }
-      ]
-    }
   ]
 }

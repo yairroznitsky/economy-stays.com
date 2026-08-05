@@ -64,7 +64,6 @@ import {
 } from "@/lib/spiderMode";
 import { trackTikTokSearch } from "@/lib/tiktokPixelTracking";
 import type { HotelDestinationSuggestion } from "@/types/hotels";
-import { trackLandingPageEvent } from "@/lib/landingPageEvents";
 
 export interface SearchFormDefaults {
   destinationQuery: string;
@@ -259,7 +258,9 @@ const SearchForm = ({ defaults, trackingContext }: SearchFormProps = {}) => {
     if (!defaults || defaultsAppliedRef.current) return;
     defaultsAppliedRef.current = true;
 
-    setDestination(defaults.destinationQuery);
+    const displayDestination =
+      defaults.cityName?.trim() || defaults.destinationQuery;
+    setDestination(displayDestination);
     setAdults(defaults.adults ?? 2);
     setRooms(defaults.rooms ?? 1);
 
@@ -271,16 +272,53 @@ const SearchForm = ({ defaults, trackingContext }: SearchFormProps = {}) => {
     checkOut.setDate(checkOut.getDate() + stayNights);
     setRange({ from: checkIn, to: checkOut });
 
-    if (defaults.kayakDestinationId && defaults.lockDestination !== false) {
+    setSuggestions([]);
+    setIsDropdownOpen(false);
+    setIsAutocompleteLoading(false);
+    setActiveSuggestionIndex(-1);
+
+    const shouldLock =
+      defaults.lockDestination !== false && Boolean(displayDestination);
+
+    if (!shouldLock) return;
+
+    if (defaults.kayakDestinationId) {
       const suggestion: HotelDestinationSuggestion = {
         id: defaults.kayakDestinationId,
-        label: defaults.destinationQuery,
+        label: displayDestination,
         type: "city",
         subtitle: defaults.countryName,
       };
       setSelectedSuggestion(suggestion);
       setIsDestinationLocked(true);
+      return;
     }
+
+    setIsDestinationLocked(true);
+
+    void (async () => {
+      try {
+        const { locale, marketCountry } = getDeviceKayakAutocompleteContext();
+        const query = [defaults.cityName, defaults.countryName]
+          .filter(Boolean)
+          .join(", ");
+        const results = await requestHotelDestinationAutocomplete({
+          query,
+          locale,
+          country: marketCountry,
+        });
+        const top = results[0];
+        if (top) {
+          setSelectedSuggestion(top);
+        }
+      } catch {
+        // Submit flow resolves destination if needed.
+      } finally {
+        setSuggestions([]);
+        setIsDropdownOpen(false);
+        setIsAutocompleteLoading(false);
+      }
+    })();
   }, [defaults]);
 
   const startOfToday = startOfDay(new Date());
@@ -551,11 +589,14 @@ const SearchForm = ({ defaults, trackingContext }: SearchFormProps = {}) => {
 
   useEffect(() => {
     if (!selectedSuggestion) return;
-    if (selectedSuggestion.label !== destination.trim()) {
+    const display = destination.trim();
+    const prefillCity = defaults?.cityName?.trim();
+    if (prefillCity && display === prefillCity) return;
+    if (selectedSuggestion.label !== display) {
       setSelectedSuggestion(null);
       setIsDestinationLocked(false);
     }
-  }, [destination, selectedSuggestion]);
+  }, [destination, selectedSuggestion, defaults?.cityName]);
 
   useEffect(() => {
     const vv = window.visualViewport;
@@ -768,15 +809,6 @@ const SearchForm = ({ defaults, trackingContext }: SearchFormProps = {}) => {
         // Pixel tracking must not block the redirect.
       }
 
-      void trackLandingPageEvent({
-        eventType: "search",
-        landingPageId: trackingContext?.landingPageId,
-        cityId: trackingContext?.cityId,
-        intentId: trackingContext?.intentId,
-        clickId,
-        params: trackingExtras,
-      });
-
       await trackPartnerExit({
         partner,
         redirectUrl: response.redirectUrl,
@@ -789,17 +821,6 @@ const SearchForm = ({ defaults, trackingContext }: SearchFormProps = {}) => {
         dropoffDateNew: search.checkOut ?? null,
         searchParams: buildHotelClickSearchParams(search, trackingExtras),
         autoParams: false,
-        onBeforeRedirect: trackingContext
-          ? () =>
-              trackLandingPageEvent({
-                eventType: "clickout",
-                landingPageId: trackingContext.landingPageId,
-                cityId: trackingContext.cityId,
-                intentId: trackingContext.intentId,
-                clickId,
-                params: trackingExtras,
-              })
-          : undefined,
       });
     } catch (error) {
       const message =

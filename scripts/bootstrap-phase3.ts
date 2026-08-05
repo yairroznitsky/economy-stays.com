@@ -30,9 +30,9 @@ const main = () => {
   );
 
   console.log("\nNext steps:");
-  console.log("1. npm run generate:content -- --status draft --batch 50");
-  console.log("2. npm run publish:pages -- --all-drafts");
-  console.log("3. npm run export:pages");
+  console.log("1. npx tsx scripts/generate-template-content.ts --batch 800 (or generate-content.ts for AI copy)");
+  console.log("2. npx tsx scripts/publish-pages.ts --with-content");
+  console.log("Pages go live via /api/landing-page immediately after publish.");
 };
 
 main();

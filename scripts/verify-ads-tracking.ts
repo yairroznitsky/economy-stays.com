@@ -3,12 +3,12 @@ import { loadDotEnv, selectRows } from "./lib/supabaseAdmin.ts";
 
 loadDotEnv();
 
-type EventRow = {
-  event_type: string;
-  gclid: string | null;
-  click_id: string | null;
-  session_landing_id: string | null;
-  created_at: string;
+type RentalClickRow = {
+  click_id: string;
+  landing_id: string | null;
+  partner: string;
+  search_params: Record<string, string> | null;
+  timestamp: string;
 };
 
 const main = async () => {
@@ -20,21 +20,34 @@ const main = async () => {
   });
 
   const limit = Number.parseInt(values.limit!, 10);
-  const query = values.gclid
-    ? `select=event_type,gclid,click_id,session_landing_id,created_at&gclid=eq.${values.gclid}&order=created_at.desc&limit=${limit}`
-    : `select=event_type,gclid,click_id,session_landing_id,created_at&order=created_at.desc&limit=${limit}`;
+  const query = `select=click_id,landing_id,partner,search_params,timestamp&order=timestamp.desc&limit=${limit}`;
 
-  const events = await selectRows<EventRow>("landing_page_events", query);
-  if (events.length === 0) {
-    console.log("No landing_page_events found.");
+  const clicks = await selectRows<RentalClickRow>("rental_clicks", query);
+  const filtered = values.gclid
+    ? clicks.filter((click) => click.search_params?.gclid === values.gclid)
+    : clicks;
+
+  if (filtered.length === 0) {
+    console.log("No rental_clicks found.");
     return;
   }
 
-  console.table(events);
-  const clickouts = events.filter((event) => event.event_type === "clickout").length;
-  const searches = events.filter((event) => event.event_type === "search").length;
-  const pageViews = events.filter((event) => event.event_type === "page_view").length;
-  console.log(`Summary: page_view=${pageViews}, search=${searches}, clickout=${clickouts}`);
+  console.table(
+    filtered.map((click) => ({
+      click_id: click.click_id,
+      landing_id: click.landing_id,
+      partner: click.partner,
+      gclid: click.search_params?.gclid ?? null,
+      surface: click.search_params?.surface ?? null,
+      landing_page_id: click.search_params?.landing_page_id ?? null,
+      timestamp: click.timestamp,
+    }))
+  );
+
+  const landingPages = filtered.filter(
+    (click) => click.search_params?.surface === "hotel_landing"
+  ).length;
+  console.log(`Summary: total=${filtered.length}, hotel_landing=${landingPages}`);
 };
 
 main().catch((error) => {

@@ -16,6 +16,30 @@ const getSupabaseConfig = (): { url: string; key: string } => {
   return { url, key };
 };
 
+export const selectRows = async <T>(
+  table: string,
+  query: string
+): Promise<T[]> => {
+  const { url, key } = getSupabaseConfig();
+  const response = await fetch(
+    `${url}/rest/v1/${encodeURIComponent(table)}?${query}`,
+    {
+      headers: {
+        apikey: key,
+        Authorization: `Bearer ${key}`,
+      },
+    }
+  );
+
+  if (!response.ok) {
+    const text = await response.text().catch(() => "");
+    throw new Error(
+      `Select ${table} failed: ${text || response.statusText || `HTTP ${response.status}`}`
+    );
+  }
+  return (await response.json()) as T[];
+};
+
 export const insertRow = async (
   table: string,
   row: Record<string, unknown>

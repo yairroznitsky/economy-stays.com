@@ -5,7 +5,7 @@ export const trackingApiBase = (
   import.meta.env.VITE_TRACKING_API_BASE?.trim() ?? ""
 ).replace(/\/$/, "");
 
-export type TrackingApiPath = "/landings" | "/search" | "/lp-events";
+export type TrackingApiPath = "/landings" | "/search";
 
 export const trackingApiUrl = (path: TrackingApiPath): string => {
   if (trackingApiBase) {
