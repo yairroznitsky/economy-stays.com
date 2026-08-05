@@ -13,6 +13,8 @@ interface ImportMetaEnv {
   readonly VITE_LANDING_ID_PREFIX?: string;
   readonly VITE_META_PIXEL_ID?: string;
   readonly VITE_TIKTOK_PIXEL_ID?: string;
+  readonly VITE_GOOGLE_ADS_ID?: string;
+  readonly VITE_GOOGLE_ADS_CONVERSION_LABEL?: string;
   readonly VITE_USE_API_PROXY?: string;
   /** Production: route edge calls via /api/edge (default on). Set "false" for direct Supabase. */
   readonly VITE_USE_EDGE_PROXY?: string;

@@ -1,0 +1,74 @@
+{
+  "id": "lp-london-cheap-hotels",
+  "path": "/hotels/london/cheap-hotels",
+  "city": {
+    "id": "city-london",
+    "slug": "london",
+    "name": "London",
+    "country": "United Kingdom",
+    "countryCode": "GB",
+    "lat": 51.5074,
+    "lng": -0.1278,
+    "airportCode": "LHR",
+    "kayakDestinationId": "27544008",
+    "kayakCitySlug": "London"
+  },
+  "intent": {
+    "id": "intent-cheap-hotels",
+    "slug": "cheap-hotels",
+    "label": "Cheap Hotels",
+    "category": "price"
+  },
+  "content": {
+    "h1": "Cheap Hotels in London",
+    "subtitle": "Compare affordable hotel rates for your London trip.",
+    "metaTitle": "Cheap Hotels in London | Compare Rates | Cheap Stays",
+    "metaDescription": "Compare affordable hotel rates in London across travel sites. Search by dates and guests to find budget-friendly stays.",
+    "introText": "London hotel prices vary widely by area and season. Comparing rates across booking partners can help you find lower-cost options that still fit your itinerary.\n\nUse the search above to compare budget hotel rates for your dates.",
+    "faqs": [
+      {
+        "q": "Are there affordable hotel areas in London?",
+        "a": "Some travelers find better value in zones with strong Tube connections outside the most central districts."
+      },
+      {
+        "q": "Does comparing sites help find lower rates?",
+        "a": "Yes. Different partners may show different availability and prices for the same dates."
+      },
+      {
+        "q": "Is booking handled by Cheap Stays?",
+        "a": "No. You book directly on the partner site after choosing a rate."
+      }
+    ],
+    "benefits": [
+      {
+        "title": "Budget comparison",
+        "text": "Review affordable options across multiple travel sites."
+      },
+      {
+        "title": "Flexible dates",
+        "text": "Adjust your stay to see how rates change."
+      },
+      {
+        "title": "Simple next step",
+        "text": "Continue to a partner site to complete your booking."
+      }
+    ],
+    "ctaText": "Compare cheap hotel rates in London"
+  },
+  "searchDefaults": {
+    "destinationQuery": "London, England, United Kingdom",
+    "nightsOffsetDays": 10,
+    "stayNights": 3,
+    "adults": 2,
+    "rooms": 1
+  },
+  "seo": {
+    "noindex": true,
+    "canonical": "/hotels/london/cheap-hotels"
+  },
+  "tracking": {
+    "landingPageId": "lp-london-cheap-hotels",
+    "cityId": "city-london",
+    "intentId": "intent-cheap-hotels"
+  }
+}

@@ -5,7 +5,9 @@ export const trackingApiBase = (
   import.meta.env.VITE_TRACKING_API_BASE?.trim() ?? ""
 ).replace(/\/$/, "");
 
-export const trackingApiUrl = (path: "/landings" | "/search"): string => {
+export type TrackingApiPath = "/landings" | "/search" | "/lp-events";
+
+export const trackingApiUrl = (path: TrackingApiPath): string => {
   if (trackingApiBase) {
     // e.g. https://api.cheap-stays.com/landings (Vercel rewrites → /api/landings)
     return `${trackingApiBase}${path}`;
@@ -14,7 +16,7 @@ export const trackingApiUrl = (path: "/landings" | "/search"): string => {
 };
 
 export const postTrackingJson = async (
-  path: "/landings" | "/search",
+  path: TrackingApiPath,
   body: Record<string, unknown>
 ): Promise<void> => {
   if (!siteConfig.enableDbTracking) return;

@@ -1,0 +1,74 @@
+{
+  "id": "lp-paris-cheap-hotels",
+  "path": "/hotels/paris/cheap-hotels",
+  "city": {
+    "id": "city-paris",
+    "slug": "paris",
+    "name": "Paris",
+    "country": "France",
+    "countryCode": "FR",
+    "lat": 48.8566,
+    "lng": 2.3522,
+    "airportCode": "CDG",
+    "kayakDestinationId": "662",
+    "kayakCitySlug": "Paris"
+  },
+  "intent": {
+    "id": "intent-cheap-hotels",
+    "slug": "cheap-hotels",
+    "label": "Cheap Hotels",
+    "category": "price"
+  },
+  "content": {
+    "h1": "Cheap Hotels in Paris",
+    "subtitle": "Compare budget-friendly hotel rates across travel sites for your Paris trip.",
+    "metaTitle": "Cheap Hotels in Paris | Compare Rates | Cheap Stays",
+    "metaDescription": "Compare affordable hotel rates in Paris. Search by dates and guests to find budget-friendly stays across leading travel sites.",
+    "introText": "Looking for a lower-cost hotel in Paris? Comparing rates across multiple booking sites can help you find options that fit your budget while keeping your preferred dates and neighborhood in mind.\n\nStart with the search above to compare budget hotel options for your travel dates.",
+    "faqs": [
+      {
+        "q": "How can I find lower hotel rates in Paris?",
+        "a": "Try flexible dates, compare multiple travel sites, and consider neighborhoods slightly outside the most central districts."
+      },
+      {
+        "q": "Are budget hotels in Paris still well connected?",
+        "a": "Many affordable areas remain close to Metro lines, making it easy to reach major sights."
+      },
+      {
+        "q": "Will I book directly on Cheap Stays?",
+        "a": "No. We help you compare options, then you complete your booking on the partner travel site."
+      }
+    ],
+    "benefits": [
+      {
+        "title": "Budget-focused search",
+        "text": "Start with dates and guests to compare affordable hotel options."
+      },
+      {
+        "title": "Multiple partners",
+        "text": "See results from established travel booking sites in one place."
+      },
+      {
+        "title": "Flexible planning",
+        "text": "Adjust your stay length and travel dates as you compare."
+      }
+    ],
+    "ctaText": "Compare cheap hotel rates in Paris"
+  },
+  "searchDefaults": {
+    "destinationQuery": "Paris, Île-de-France, France",
+    "nightsOffsetDays": 14,
+    "stayNights": 3,
+    "adults": 2,
+    "rooms": 1
+  },
+  "seo": {
+    "noindex": true,
+    "canonical": "/hotels/paris/cheap-hotels"
+  },
+  "tracking": {
+    "landingPageId": "lp-paris-cheap-hotels",
+    "cityId": "city-paris",
+    "intentId": "intent-cheap-hotels"
+  }
+}

@@ -1,14 +1,16 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { handleLandingsInsert } from "./landingsHandler";
 import { handleSearchInsert } from "./searchHandler";
+import { handleLpEventsRequest } from "./lpEventsHandler";
 
-export type TrackingRoute = "landings" | "search";
+export type TrackingRoute = "landings" | "search" | "lp-events";
 
 const matchTrackingPath = (url: string | undefined): TrackingRoute | null => {
   if (!url) return null;
   const pathname = url.split("?")[0];
   if (pathname === "/api/landings" || pathname === "/landings") return "landings";
   if (pathname === "/api/search" || pathname === "/search") return "search";
+  if (pathname === "/api/lp-events" || pathname === "/lp-events") return "lp-events";
   return null;
 };
 
@@ -64,8 +66,14 @@ export const handleTrackingRequest = async (
   const result =
     route === "landings"
       ? await handleLandingsInsert(req, payload)
-      : await handleSearchInsert(payload);
+      : route === "search"
+        ? await handleSearchInsert(payload)
+        : null;
 
-  sendJson(res, result.status, result.body);
-  return true;
+  if (result) {
+    sendJson(res, result.status, result.body);
+    return true;
+  }
+
+  return handleLpEventsRequest(req, res, payload);
 };

@@ -1,0 +1,88 @@
+[
+  {
+    "slug": "cheap-hotels",
+    "label": "Cheap Hotels",
+    "category": "price",
+    "prompt_notes": "Focus on budget-conscious travelers comparing affordable options. Do not mention specific prices or savings percentages.",
+    "priority": 100,
+    "active": true
+  },
+  {
+    "slug": "family-hotels",
+    "label": "Family Hotels",
+    "category": "audience",
+    "audience": "families",
+    "prompt_notes": "Focus on room setup, group travel, and family-friendly planning.",
+    "priority": 90,
+    "active": true
+  },
+  {
+    "slug": "4-star-hotels",
+    "label": "4-Star Hotels",
+    "category": "star",
+    "star_rating": 4,
+    "prompt_notes": "Focus on comfort and quality without claiming specific rates.",
+    "priority": 80,
+    "active": true
+  },
+  {
+    "slug": "hotels-with-breakfast",
+    "label": "Hotels with Breakfast",
+    "category": "amenity",
+    "amenities": ["breakfast"],
+    "prompt_notes": "Mention breakfast as an amenity travelers may filter for.",
+    "priority": 70,
+    "active": true
+  },
+  {
+    "slug": "luxury-hotels",
+    "label": "Luxury Hotels",
+    "category": "price",
+    "prompt_notes": "Focus on premium stays and comfort without price claims.",
+    "priority": 60,
+    "active": true
+  },
+  {
+    "slug": "5-star-hotels",
+    "label": "5-Star Hotels",
+    "category": "star",
+    "star_rating": 5,
+    "prompt_notes": "Focus on high-end hotel experiences without specific prices.",
+    "priority": 50,
+    "active": true
+  },
+  {
+    "slug": "3-star-hotels",
+    "label": "3-Star Hotels",
+    "category": "star",
+    "star_rating": 3,
+    "prompt_notes": "Focus on practical mid-range hotel options.",
+    "priority": 40,
+    "active": true
+  },
+  {
+    "slug": "hotels-with-pool",
+    "label": "Hotels with Pool",
+    "category": "amenity",
+    "amenities": ["pool"],
+    "prompt_notes": "Mention pool access as a useful amenity for travelers.",
+    "priority": 30,
+    "active": true
+  },
+  {
+    "slug": "hotels-near-airport",
+    "label": "Hotels Near Airport",
+    "category": "location",
+    "prompt_notes": "Focus on airport convenience and transit without inventing distances.",
+    "priority": 20,
+    "active": true
+  },
+  {
+    "slug": "last-minute-hotels",
+    "label": "Last-Minute Hotels",
+    "category": "price",
+    "prompt_notes": "Focus on flexible, near-term travel planning without urgency price claims.",
+    "priority": 10,
+    "active": true
+  }
+]

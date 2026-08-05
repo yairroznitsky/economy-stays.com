@@ -1,0 +1,67 @@
+{
+  "id": "lp-london-base",
+  "path": "/hotels/london",
+  "city": {
+    "id": "city-london",
+    "slug": "london",
+    "name": "London",
+    "country": "United Kingdom",
+    "countryCode": "GB",
+    "lat": 51.5074,
+    "lng": -0.1278,
+    "airportCode": "LHR",
+    "kayakDestinationId": "27544008",
+    "kayakCitySlug": "London"
+  },
+  "content": {
+    "h1": "Compare Hotels in London",
+    "subtitle": "Search hotel rates across travel sites for your London stay.",
+    "metaTitle": "Hotels in London | Compare Rates | Cheap Stays",
+    "metaDescription": "Compare hotel rates in London across leading travel sites. Search by dates and guests to find a stay that fits your trip.",
+    "introText": "London offers everything from central sightseeing bases to quieter neighborhood stays. Comparing hotel rates before you book can help you balance location, transit access, and price.\n\nStart your search above to compare London hotel options for your travel dates.",
+    "faqs": [
+      {
+        "q": "Which London areas are popular for hotels?",
+        "a": "Visitors often stay in Westminster, the West End, South Bank, or near major rail hubs depending on their plans."
+      },
+      {
+        "q": "Can I compare rates for specific dates?",
+        "a": "Yes. Enter your check-in and check-out dates to compare options for your trip."
+      },
+      {
+        "q": "Where do I complete my booking?",
+        "a": "After comparing rates, you continue to a partner travel site to book."
+      }
+    ],
+    "benefits": [
+      {
+        "title": "One search, multiple sites",
+        "text": "Compare hotel results from established travel partners."
+      },
+      {
+        "title": "Date-driven results",
+        "text": "Search with your exact travel dates and guest count."
+      },
+      {
+        "title": "Trusted booking flow",
+        "text": "Complete your reservation on the partner site you choose."
+      }
+    ],
+    "ctaText": "Ready to compare London hotel rates?"
+  },
+  "searchDefaults": {
+    "destinationQuery": "London, England, United Kingdom",
+    "nightsOffsetDays": 7,
+    "stayNights": 2,
+    "adults": 2,
+    "rooms": 1
+  },
+  "seo": {
+    "noindex": true,
+    "canonical": "/hotels/london"
+  },
+  "tracking": {
+    "landingPageId": "lp-london-base",
+    "cityId": "city-london"
+  }
+}

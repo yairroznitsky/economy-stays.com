@@ -27,6 +27,8 @@ export const siteConfig = {
   landingIdPrefix: readEnv(import.meta.env.VITE_LANDING_ID_PREFIX, "CS-"),
   metaPixelId: readEnv(import.meta.env.VITE_META_PIXEL_ID, ""),
   tiktokPixelId: readEnv(import.meta.env.VITE_TIKTOK_PIXEL_ID, ""),
+  googleAdsId: readEnv(import.meta.env.VITE_GOOGLE_ADS_ID, ""),
+  googleAdsConversionLabel: readEnv(import.meta.env.VITE_GOOGLE_ADS_CONVERSION_LABEL, ""),
   useApiProxy,
   enableDbTracking: useApiProxy
     ? false

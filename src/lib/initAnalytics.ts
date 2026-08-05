@@ -1,8 +1,25 @@
 import { siteConfig } from "@/lib/siteConfig";
 
-/** Loads Meta/TikTok pixels only when deployment env IDs are set. */
+/** Loads Meta/TikTok/Google Ads tags when deployment env IDs are set. */
 export const initAnalytics = (): void => {
-  const { metaPixelId, tiktokPixelId } = siteConfig;
+  const { metaPixelId, tiktokPixelId, googleAdsId } = siteConfig;
+
+  if (googleAdsId) {
+    const gtagScript = document.createElement("script");
+    gtagScript.async = true;
+    gtagScript.src = `https://www.googletagmanager.com/gtag/js?id=${googleAdsId}`;
+    document.head.appendChild(gtagScript);
+
+    const inlineScript = document.createElement("script");
+    inlineScript.text = `
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      window.gtag = gtag;
+      gtag('js', new Date());
+      gtag('config', '${googleAdsId}');
+    `;
+    document.head.appendChild(inlineScript);
+  }
 
   if (metaPixelId) {
     const metaScript = document.createElement("script");

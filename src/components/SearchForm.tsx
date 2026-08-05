@@ -64,6 +64,32 @@ import {
 } from "@/lib/spiderMode";
 import { trackTikTokSearch } from "@/lib/tiktokPixelTracking";
 import type { HotelDestinationSuggestion } from "@/types/hotels";
+import { trackLandingPageEvent } from "@/lib/landingPageEvents";
+
+export interface SearchFormDefaults {
+  destinationQuery: string;
+  nightsOffsetDays?: number;
+  stayNights?: number;
+  adults?: number;
+  rooms?: number;
+  kayakDestinationId?: string;
+  kayakCitySlug?: string;
+  cityName?: string;
+  countryName?: string;
+  lockDestination?: boolean;
+}
+
+export interface SearchFormTrackingContext {
+  landingPageId?: string;
+  cityId?: string;
+  intentId?: string;
+  surface?: string;
+}
+
+export interface SearchFormProps {
+  defaults?: SearchFormDefaults;
+  trackingContext?: SearchFormTrackingContext;
+}
 
 const dateStepActive =
   "border-primary bg-primary/15 ring-2 ring-primary/40 shadow-sm scale-[1.02]";
@@ -182,7 +208,7 @@ const searchFieldValueRow = "mt-1 flex min-w-0 items-center justify-start gap-2 
 const searchFieldValueText =
   "min-w-0 flex-1 truncate whitespace-nowrap text-left text-base text-foreground";
 
-const SearchForm = () => {
+const SearchForm = ({ defaults, trackingContext }: SearchFormProps = {}) => {
   const { locale: landingLocale, t } = useLandingI18n();
   const dateLocale =
     landingLocale === "es" ? esLocale : landingLocale === "pt-BR" ? ptBRLocale : enUS;
@@ -227,6 +253,35 @@ const SearchForm = () => {
   const [datesOpen, setDatesOpen] = useState(false);
   const [draftRange, setDraftRange] = useState<DateRange | undefined>(range);
   const [calendarMonth, setCalendarMonth] = useState<Date>(range?.from ?? today);
+  const defaultsAppliedRef = useRef(false);
+
+  useEffect(() => {
+    if (!defaults || defaultsAppliedRef.current) return;
+    defaultsAppliedRef.current = true;
+
+    setDestination(defaults.destinationQuery);
+    setAdults(defaults.adults ?? 2);
+    setRooms(defaults.rooms ?? 1);
+
+    const offsetDays = defaults.nightsOffsetDays ?? 1;
+    const stayNights = defaults.stayNights ?? 1;
+    const checkIn = new Date();
+    checkIn.setDate(checkIn.getDate() + offsetDays);
+    const checkOut = new Date(checkIn);
+    checkOut.setDate(checkOut.getDate() + stayNights);
+    setRange({ from: checkIn, to: checkOut });
+
+    if (defaults.kayakDestinationId && defaults.lockDestination !== false) {
+      const suggestion: HotelDestinationSuggestion = {
+        id: defaults.kayakDestinationId,
+        label: defaults.destinationQuery,
+        type: "city",
+        subtitle: defaults.countryName,
+      };
+      setSelectedSuggestion(suggestion);
+      setIsDestinationLocked(true);
+    }
+  }, [defaults]);
 
   const startOfToday = startOfDay(new Date());
   const datePickerPhase: "check-in" | "check-out" =
@@ -680,14 +735,28 @@ const SearchForm = () => {
       const landingId = await LandingTrackingService.getOrCreateLandingId();
       const { affiliateSource, partner } = getHotelAffiliateRouting();
 
+      const surface = trackingContext?.surface ?? "search_form";
+      const trackingExtras: Record<string, string> = {
+        surface,
+        destination_type: suggestion.type ?? "free_text",
+      };
+      if (trackingContext?.landingPageId) {
+        trackingExtras.landing_page_id = trackingContext.landingPageId;
+      }
+      if (trackingContext?.cityId) {
+        trackingExtras.city_id = trackingContext.cityId;
+      }
+      if (trackingContext?.intentId) {
+        trackingExtras.intent_id = trackingContext.intentId;
+      }
+
       const response = await requestHotelRedirectUrl({
         search,
         clickId,
         landingId,
         affiliateSource,
         metadata: {
-          surface: "search_form",
-          destination_type: suggestion.type ?? "free_text",
+          ...trackingExtras,
           destination_id: suggestion.id ?? "",
         },
       });
@@ -699,6 +768,15 @@ const SearchForm = () => {
         // Pixel tracking must not block the redirect.
       }
 
+      void trackLandingPageEvent({
+        eventType: "search",
+        landingPageId: trackingContext?.landingPageId,
+        cityId: trackingContext?.cityId,
+        intentId: trackingContext?.intentId,
+        clickId,
+        params: trackingExtras,
+      });
+
       await trackPartnerExit({
         partner,
         redirectUrl: response.redirectUrl,
@@ -709,11 +787,19 @@ const SearchForm = () => {
         locationId: response.entityId,
         pickupDateNew: search.checkIn ?? null,
         dropoffDateNew: search.checkOut ?? null,
-        searchParams: buildHotelClickSearchParams(search, {
-          surface: "search_form",
-          destination_type: suggestion.type ?? "free_text",
-        }),
+        searchParams: buildHotelClickSearchParams(search, trackingExtras),
         autoParams: false,
+        onBeforeRedirect: trackingContext
+          ? () =>
+              trackLandingPageEvent({
+                eventType: "clickout",
+                landingPageId: trackingContext.landingPageId,
+                cityId: trackingContext.cityId,
+                intentId: trackingContext.intentId,
+                clickId,
+                params: trackingExtras,
+              })
+          : undefined,
       });
     } catch (error) {
       const message =
@@ -1120,3 +1206,4 @@ const SearchForm = () => {
 };
 
 export default SearchForm;
+export type { SearchFormDefaults, SearchFormProps, SearchFormTrackingContext };

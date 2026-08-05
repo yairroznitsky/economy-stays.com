@@ -1,3 +1,4 @@
+import { trackGoogleAdsConversion } from "@/lib/googleAdsTracking";
 import { generateClickId, LandingTrackingService } from "@/lib/landingTrackingService";
 import { postTrackingJson } from "@/lib/trackingApi";
 import type { HotelSearchInput } from "@/types/hotels";
@@ -18,6 +19,7 @@ export interface PartnerExitOptions {
   dropoffTimeNew?: string | null;
   searchParams?: Record<string, string>;
   autoParams?: boolean;
+  onBeforeRedirect?: () => void | Promise<void>;
 }
 
 const parseWindowSearchParams = (): Record<string, string> => {
@@ -136,6 +138,14 @@ export const trackPartnerExit = async (
       setTimeout(resolve, 500);
     }),
   ]).catch(() => {});
+
+  try {
+    await options.onBeforeRedirect?.();
+  } catch {
+    // Tracking hooks must not block redirect.
+  }
+
+  trackGoogleAdsConversion(clickId);
 
   if (options.placement === "new_tab") {
     window.open(options.redirectUrl, "_blank", "noopener,noreferrer");

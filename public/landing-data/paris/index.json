@@ -1,0 +1,67 @@
+{
+  "id": "lp-paris-base",
+  "path": "/hotels/paris",
+  "city": {
+    "id": "city-paris",
+    "slug": "paris",
+    "name": "Paris",
+    "country": "France",
+    "countryCode": "FR",
+    "lat": 48.8566,
+    "lng": 2.3522,
+    "airportCode": "CDG",
+    "kayakDestinationId": "662",
+    "kayakCitySlug": "Paris"
+  },
+  "content": {
+    "h1": "Compare Hotels in Paris",
+    "subtitle": "Search rates across travel sites and pick the stay that fits your trip.",
+    "metaTitle": "Hotels in Paris | Compare Rates | Cheap Stays",
+    "metaDescription": "Compare hotel rates in Paris across leading travel sites. Search by dates and guests to find a stay that fits your budget.",
+    "introText": "Paris draws visitors year-round for its museums, neighborhoods, and classic landmarks. Whether you are planning a short city break or a longer stay, comparing hotel options before you book can help you match location, amenities, and price to your trip.\n\nUse the search above to compare rates from multiple travel partners in one place.",
+    "faqs": [
+      {
+        "q": "What is the best area to stay in Paris?",
+        "a": "Popular areas include the Marais, Saint-Germain-des-Prés, and areas near major transit hubs. Choose based on how you plan to get around and what you want to see."
+      },
+      {
+        "q": "When should I book a hotel in Paris?",
+        "a": "Booking early can help during peak seasons and major events. Flexible dates may give you more options when comparing rates."
+      },
+      {
+        "q": "How does Cheap Stays work?",
+        "a": "We help you compare hotel search results from partner travel sites. When you choose a rate, you complete your booking on the partner site."
+      }
+    ],
+    "benefits": [
+      {
+        "title": "Compare multiple sites",
+        "text": "See hotel options from trusted travel partners in one search."
+      },
+      {
+        "title": "Search by your dates",
+        "text": "Adjust check-in, check-out, guests, and rooms to match your trip."
+      },
+      {
+        "title": "Book with partners you know",
+        "text": "Continue to established booking sites to complete your reservation."
+      }
+    ],
+    "ctaText": "Ready to compare Paris hotel rates?"
+  },
+  "searchDefaults": {
+    "destinationQuery": "Paris, Île-de-France, France",
+    "nightsOffsetDays": 7,
+    "stayNights": 2,
+    "adults": 2,
+    "rooms": 1
+  },
+  "seo": {
+    "noindex": true,
+    "canonical": "/hotels/paris"
+  },
+  "tracking": {
+    "landingPageId": "lp-paris-base",
+    "cityId": "city-paris"
+  }
+}
