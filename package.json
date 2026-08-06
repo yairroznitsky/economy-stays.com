@@ -14,6 +14,7 @@
     "publish:pages": "tsx scripts/publish-pages.ts",
     "generate:sitemap": "tsx scripts/generate-sitemap.ts",
     "generate:hotel-feed": "tsx scripts/generate-hotel-page-feed.ts",
+    "generate:city-heroes": "tsx scripts/generate-city-heroes.ts",
     "backfill:hotel-city-slugs": "tsx scripts/backfill-hotel-city-slugs.ts",
     "verify:landing-pages": "tsx scripts/verify-landing-pages.ts",
     "expand:pages": "tsx scripts/expand-pages.ts",

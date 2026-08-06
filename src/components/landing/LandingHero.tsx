@@ -1,7 +1,10 @@
 import Header from "@/components/Header";
 import SearchForm, { type SearchFormProps } from "@/components/SearchForm";
-import { getDestinationHeroImage } from "@/lib/destinationImages";
+import HotelFactsStrip from "@/components/landing/HotelFactsStrip";
+import IntentBadges from "@/components/landing/IntentBadges";
+import { getDestinationHeroFallback, getDestinationHeroImage } from "@/lib/destinationImages";
 import type { LandingPageConfig } from "@/types/landingPage";
+import { useState } from "react";
 
 type LandingHeroProps = {
   config: LandingPageConfig;
@@ -9,7 +12,10 @@ type LandingHeroProps = {
 };
 
 const LandingHero = ({ config, searchFormProps }: LandingHeroProps) => {
-  const heroImage = getDestinationHeroImage(config.city.slug);
+  const fallbackHero = getDestinationHeroFallback();
+  const [heroImage, setHeroImage] = useState(() =>
+    getDestinationHeroImage(config.city.slug)
+  );
 
   return (
     <section className="relative min-h-[85svh] w-full md:min-h-[680px]">
@@ -19,6 +25,11 @@ const LandingHero = ({ config, searchFormProps }: LandingHeroProps) => {
         width={1920}
         height={1280}
         className="absolute inset-0 h-full w-full object-cover"
+        onError={() => {
+          if (heroImage !== fallbackHero) {
+            setHeroImage(fallbackHero);
+          }
+        }}
       />
       <div className="absolute inset-0 bg-gradient-hero" />
       <div className="absolute inset-0 bg-gradient-to-b from-primary/40 via-primary/15 to-primary/70" />
@@ -35,6 +46,10 @@ const LandingHero = ({ config, searchFormProps }: LandingHeroProps) => {
         <p className="mt-4 max-w-2xl text-base text-white/85 md:text-lg">
           {config.content.subtitle}
         </p>
+        {config.hotel ? (
+          <HotelFactsStrip hotel={config.hotel} cityName={config.city.name} />
+        ) : null}
+        {config.intent ? <IntentBadges intent={config.intent} /> : null}
         <div className="mt-7 w-full max-w-5xl desktop:mt-10 desktop:max-w-[73.6rem]">
           <SearchForm {...searchFormProps} />
         </div>

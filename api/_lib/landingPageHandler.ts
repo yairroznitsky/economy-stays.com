@@ -106,6 +106,9 @@ const HIT_CACHE = "public, s-maxage=3600, stale-while-revalidate=86400";
 const MISS_CACHE = "public, s-maxage=300";
 const NO_CACHE = "no-store";
 const HOTEL_PAGE_SIZE = 1000;
+const RELATED_HOTELS_LIMIT = 6;
+const RELATED_HOTEL_SELECT =
+  "external_id,name,city_name,star_rating,rating,reviews";
 
 export const normalizeLandingPath = (raw: string): string => {
   let path = raw.trim();
@@ -321,6 +324,8 @@ const buildHotelConfig = (
       starRating: hotel.star_rating ?? undefined,
       rating: hotel.rating ?? undefined,
       reviews: hotel.reviews ?? undefined,
+      latitude: hotel.latitude ?? undefined,
+      longitude: hotel.longitude ?? undefined,
     },
     content: buildHotelContent(hotel, cityName, country),
     searchDefaults: {
@@ -422,6 +427,85 @@ const findHotelInCity = async (
   return best;
 };
 
+type RelatedHotelRow = {
+  external_id: number;
+  name: string;
+  city_name: string | null;
+  star_rating: number | null;
+  rating: number | null;
+  reviews: number | null;
+};
+
+const mapRelatedHotel = (row: RelatedHotelRow) => ({
+  id: String(row.external_id),
+  name: row.name,
+  path: buildHotelPath(row.city_name, row.name),
+  starRating: row.star_rating ?? undefined,
+  rating: row.rating ?? undefined,
+  reviews: row.reviews ?? undefined,
+});
+
+const fetchRelatedHotels = async (
+  citySlug: string,
+  intent: IntentRow | null
+): Promise<ReturnType<typeof mapRelatedHotel>[]> => {
+  const buildQuery = (cityFilter: string): string => {
+    const parts = [
+      `select=${RELATED_HOTEL_SELECT}`,
+      cityFilter,
+      "order=reviews.desc.nullslast,external_id.asc",
+      "limit=500",
+    ];
+    if (intent?.star_rating) {
+      parts.push(`star_rating=eq.${intent.star_rating}`);
+    }
+    return parts.join("&");
+  };
+
+  let rows = await selectRows<RelatedHotelRow>(
+    "staging_hotels",
+    buildQuery(`city_slug=eq.${encodeURIComponent(citySlug)}`)
+  );
+
+  if (rows.length === 0) {
+    rows = await selectRows<RelatedHotelRow>(
+      "staging_hotels",
+      buildQuery(
+        `city_name=ilike.${encodeURIComponent(slugToCityName(citySlug))}`
+      )
+    );
+  }
+
+  const bestByPath = new Map<string, RelatedHotelRow>();
+  for (const row of rows) {
+    const path = buildHotelPath(row.city_name, row.name);
+    if (!bestByPath.has(path)) {
+      bestByPath.set(path, row);
+    }
+  }
+
+  return [...bestByPath.values()]
+    .sort((a, b) => (b.reviews ?? 0) - (a.reviews ?? 0))
+    .slice(0, RELATED_HOTELS_LIMIT)
+    .map(mapRelatedHotel);
+};
+
+const attachRelatedHotels = async (
+  body: Record<string, unknown>,
+  citySlug: string,
+  intent: IntentRow | null
+): Promise<void> => {
+  if (body.hotel) return;
+  try {
+    const relatedHotels = await fetchRelatedHotels(citySlug, intent);
+    if (relatedHotels.length > 0) {
+      body.relatedHotels = relatedHotels;
+    }
+  } catch {
+    // Related hotels are optional enrichment; page still renders without them.
+  }
+};
+
 export const handleLandingPageGet = async (
   rawPath: string | undefined
 ): Promise<LandingPageHandlerResult> => {
@@ -446,9 +530,15 @@ export const handleLandingPageGet = async (
   try {
     const published = await lookupPublishedPage(path);
     if (published) {
+      const body = buildConfig(published);
+      await attachRelatedHotels(
+        body,
+        published.city.slug,
+        published.intent
+      );
       return {
         status: 200,
-        body: buildConfig(published),
+        body,
         cacheControl: HIT_CACHE,
       };
     }
@@ -463,22 +553,26 @@ export const handleLandingPageGet = async (
           cacheControl: MISS_CACHE,
         };
       }
+      const body = buildTemplateConfig(city, null, buildCityPath(city.slug));
+      await attachRelatedHotels(body, city.slug, null);
       return {
         status: 200,
-        body: buildTemplateConfig(city, null, buildCityPath(city.slug)),
+        body,
         cacheControl: HIT_CACHE,
       };
     }
 
     const intent = await lookupIntentBySlug(pathRef.segmentSlug);
     if (intent && city) {
+      const body = buildTemplateConfig(
+        city,
+        intent,
+        buildIntentPath(city.slug, intent.slug)
+      );
+      await attachRelatedHotels(body, city.slug, intent);
       return {
         status: 200,
-        body: buildTemplateConfig(
-          city,
-          intent,
-          buildIntentPath(city.slug, intent.slug)
-        ),
+        body,
         cacheControl: HIT_CACHE,
       };
     }

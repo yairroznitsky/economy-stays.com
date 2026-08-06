@@ -5,6 +5,7 @@ import DestinationContent from "@/components/landing/DestinationContent";
 import FAQ from "@/components/landing/FAQ";
 import LandingHero from "@/components/landing/LandingHero";
 import LandingPageMeta from "@/components/landing/LandingPageMeta";
+import RelatedHotels from "@/components/landing/RelatedHotels";
 import type { SearchFormProps } from "@/components/SearchForm";
 import type { LandingPageConfig } from "@/types/landingPage";
 import { useMemo } from "react";
@@ -30,6 +31,8 @@ const LandingPage = ({ config }: LandingPageProps) => {
           cityName: config.hotel.name,
           countryName: `${config.city.name}, ${config.city.country}`,
           lockDestination: true,
+          latitude: config.hotel.latitude,
+          longitude: config.hotel.longitude,
         }
       : {
           destinationQuery: config.city.name,
@@ -56,6 +59,13 @@ const LandingPage = ({ config }: LandingPageProps) => {
       <LandingPageMeta config={config} />
       <LandingHero config={config} searchFormProps={searchFormProps} />
       <Benefits benefits={config.content.benefits} />
+      {config.relatedHotels?.length && !config.hotel ? (
+        <RelatedHotels
+          cityName={config.city.name}
+          hotels={config.relatedHotels}
+          intentLabel={config.intent?.label}
+        />
+      ) : null}
       <DestinationContent config={config} />
       <FAQ faqs={config.content.faqs} />
       <CTASection ctaText={config.content.ctaText} cityName={config.city.name} />

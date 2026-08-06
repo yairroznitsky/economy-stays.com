@@ -39,6 +39,17 @@ export interface LandingPageHotel {
   starRating?: number;
   rating?: number;
   reviews?: number;
+  latitude?: number;
+  longitude?: number;
+}
+
+export interface LandingPageRelatedHotel {
+  id: string;
+  name: string;
+  path: string;
+  starRating?: number;
+  rating?: number;
+  reviews?: number;
 }
 
 export interface LandingPageContent {
@@ -78,6 +89,8 @@ export interface LandingPageConfig {
   intent?: LandingPageIntent;
   /** Present on per-hotel pages resolved from the hotels catalog. */
   hotel?: LandingPageHotel;
+  /** Top hotels in the city — city and intent pages only. */
+  relatedHotels?: LandingPageRelatedHotel[];
   content: LandingPageContent;
   searchDefaults: LandingPageSearchDefaults;
   seo: LandingPageSeo;

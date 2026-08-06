@@ -76,6 +76,8 @@ export interface SearchFormDefaults {
   cityName?: string;
   countryName?: string;
   lockDestination?: boolean;
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface SearchFormTrackingContext {
@@ -253,10 +255,17 @@ const SearchForm = ({ defaults, trackingContext }: SearchFormProps = {}) => {
   const [draftRange, setDraftRange] = useState<DateRange | undefined>(range);
   const [calendarMonth, setCalendarMonth] = useState<Date>(range?.from ?? today);
   const defaultsAppliedRef = useRef(false);
+  const defaultCoordinatesRef = useRef<{ latitude?: number; longitude?: number }>(
+    {}
+  );
 
   useEffect(() => {
     if (!defaults || defaultsAppliedRef.current) return;
     defaultsAppliedRef.current = true;
+    defaultCoordinatesRef.current = {
+      latitude: defaults.latitude,
+      longitude: defaults.longitude,
+    };
 
     const displayDestination =
       defaults.cityName?.trim() || defaults.destinationQuery;
@@ -771,6 +780,17 @@ const SearchForm = ({ defaults, trackingContext }: SearchFormProps = {}) => {
         locale,
         marketCountry,
       });
+
+      const { latitude, longitude } = defaultCoordinatesRef.current;
+      if (
+        latitude != null &&
+        longitude != null &&
+        search.latitude == null &&
+        search.longitude == null
+      ) {
+        search.latitude = latitude;
+        search.longitude = longitude;
+      }
 
       const clickId = generateClickId();
       const landingId = await LandingTrackingService.getOrCreateLandingId();
