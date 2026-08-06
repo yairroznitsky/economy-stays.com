@@ -1,54 +1,59 @@
 import type { LandingPageHotel } from "@/types/landingPage";
-import { MapPin, Star } from "lucide-react";
+import {
+  formatReviewCount,
+  getReviewScoreLabel,
+} from "@/lib/hotelReviewScore";
 
 type HotelFactsStripProps = {
   hotel: LandingPageHotel;
-  cityName: string;
 };
 
-const formatReviews = (count: number): string =>
-  count >= 1000 ? `${(count / 1000).toFixed(1).replace(/\.0$/, "")}k` : String(count);
+const HotelFactsStrip = ({ hotel }: HotelFactsStripProps) => {
+  const hasReviewScore = hotel.rating != null && hotel.reviews != null && hotel.reviews > 0;
 
-const HotelFactsStrip = ({ hotel, cityName }: HotelFactsStripProps) => {
-  const chips: string[] = [];
-
+  const propertyBits: string[] = [];
+  if (hotel.starRating) propertyBits.push(`${hotel.starRating}-star`);
   if (hotel.type) {
-    chips.push(hotel.type.charAt(0).toUpperCase() + hotel.type.slice(1).toLowerCase());
-  }
-  if (hotel.rating != null && hotel.reviews) {
-    chips.push(`${hotel.rating}/10 · ${formatReviews(hotel.reviews)} reviews`);
+    propertyBits.push(hotel.type.charAt(0).toUpperCase() + hotel.type.slice(1).toLowerCase());
+  } else if (hotel.starRating) {
+    propertyBits.push("hotel");
   }
 
-  if (chips.length === 0 && !hotel.starRating && !hotel.address) return null;
+  if (!hasReviewScore && propertyBits.length === 0) return null;
+
+  const scoreDisplay =
+    hasReviewScore && Number.isInteger(hotel.rating)
+      ? String(hotel.rating)
+      : hasReviewScore
+        ? hotel.rating!.toFixed(1)
+        : null;
+
+  const detailParts: string[] = [];
+  if (hasReviewScore) {
+    detailParts.push(getReviewScoreLabel(hotel.rating!));
+    detailParts.push(`${formatReviewCount(hotel.reviews!)} reviews`);
+  }
+  if (propertyBits.length > 0) {
+    detailParts.push(propertyBits.join(" "));
+  }
 
   return (
-    <div className="mt-4 flex max-w-2xl flex-col items-center gap-2 text-sm text-white/90 md:text-base">
-      {hotel.starRating || chips.length > 0 ? (
-        <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
-          {hotel.starRating ? (
-            <span className="inline-flex items-center gap-1 rounded-full bg-white/15 px-3 py-1 backdrop-blur-sm">
-              <Star className="h-3.5 w-3.5 fill-accent text-accent" aria-hidden />
-              {hotel.starRating}-star
-            </span>
-          ) : null}
-          {chips.map((chip) => (
-            <span
-              key={chip}
-              className="rounded-full bg-white/10 px-3 py-1 backdrop-blur-sm"
-            >
-              {chip}
-            </span>
-          ))}
-        </div>
-      ) : null}
-      {hotel.address ? (
-        <p className="inline-flex max-w-xl items-start justify-center gap-1.5 text-center text-white/80">
-          <MapPin className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
-          <span>
-            {hotel.address}, {cityName}
+    <div className="mt-4 md:mt-5">
+      {hasReviewScore ? (
+        <p
+          className="inline-flex items-center gap-2 text-sm text-white/75"
+          aria-label={`${hotel.rating} out of 10, ${getReviewScoreLabel(hotel.rating!)}. ${hotel.reviews} reviews`}
+        >
+          <span className="inline-flex h-6 min-w-6 items-center justify-center rounded bg-primary/85 px-1.5 text-xs font-bold tabular-nums text-primary-foreground">
+            {scoreDisplay}
           </span>
+          <span>{detailParts.join(" · ")}</span>
         </p>
-      ) : null}
+      ) : (
+        <p className="text-sm tracking-wide text-white/75">
+          {propertyBits.join(" · ")}
+        </p>
+      )}
     </div>
   );
 };

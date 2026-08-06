@@ -16,15 +16,19 @@ const LandingHero = ({ config, searchFormProps }: LandingHeroProps) => {
   const [heroImage, setHeroImage] = useState(() =>
     getDestinationHeroImage(config.city.slug)
   );
+  const isHotel = Boolean(config.hotel);
+  const imageAlt = isHotel
+    ? `${config.hotel!.name} in ${config.city.name}, ${config.city.country}`
+    : `Hotels in ${config.city.name}, ${config.city.country}`;
 
   return (
-    <section className="relative min-h-[85svh] w-full md:min-h-[680px]">
+    <section className="relative min-h-[88svh] w-full overflow-hidden md:min-h-[720px]">
       <img
         src={heroImage}
-        alt={`Hotels in ${config.city.name}, ${config.city.country}`}
+        alt={imageAlt}
         width={1920}
         height={1280}
-        className="absolute inset-0 h-full w-full object-cover"
+        className="absolute inset-0 h-full w-full object-cover motion-safe:animate-hero-ken"
         onError={() => {
           if (heroImage !== fallbackHero) {
             setHeroImage(fallbackHero);
@@ -32,26 +36,38 @@ const LandingHero = ({ config, searchFormProps }: LandingHeroProps) => {
         }}
       />
       <div className="absolute inset-0 bg-gradient-hero" />
-      <div className="absolute inset-0 bg-gradient-to-b from-primary/40 via-primary/15 to-primary/70" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/30" />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-[12%] bottom-[22%] bg-[radial-gradient(ellipse_at_center,hsl(215_45%_6%/0.42)_0%,transparent_68%)]"
+      />
 
       <Header />
 
-      <div className="container relative z-10 flex min-h-[85svh] flex-col items-center justify-start pt-24 pb-10 text-center md:min-h-[680px] md:justify-center md:pt-16 md:pb-24">
-        <p className="mt-2 text-sm font-medium uppercase tracking-widest text-accent md:mt-0">
-          {config.city.name}, {config.city.country}
-        </p>
-        <h1 className="mt-3 max-w-3xl font-display text-2xl font-bold leading-[1.15] text-white drop-shadow-md md:max-w-4xl md:text-5xl md:leading-[1.1]">
-          {config.content.h1}
-        </h1>
-        <p className="mt-4 max-w-2xl text-base text-white/85 md:text-lg">
-          {config.content.subtitle}
-        </p>
-        {config.hotel ? (
-          <HotelFactsStrip hotel={config.hotel} cityName={config.city.name} />
-        ) : null}
-        {config.intent ? <IntentBadges intent={config.intent} /> : null}
-        <div className="mt-7 w-full max-w-5xl desktop:mt-10 desktop:max-w-[73.6rem]">
-          <SearchForm {...searchFormProps} />
+      <div className="container relative z-10 flex min-h-[88svh] flex-col items-center justify-start pt-24 pb-10 text-center md:min-h-[720px] md:justify-center md:pt-28 md:pb-14">
+        <div className="flex w-full flex-col items-center opacity-0 motion-safe:animate-hero-rise motion-reduce:opacity-100">
+          <p className="mt-2 text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-accent md:mt-0 md:text-xs">
+            {config.city.name}, {config.city.country}
+          </p>
+          <h1
+            className={
+              isHotel
+                ? "mt-3 max-w-3xl font-serif text-[2rem] font-semibold leading-[1.12] tracking-[-0.01em] text-white drop-shadow-md sm:text-4xl md:mt-4 md:max-w-4xl md:text-[3.25rem] md:leading-[1.08]"
+                : "mt-3 max-w-3xl font-display text-2xl font-bold leading-[1.15] text-white drop-shadow-md md:mt-4 md:max-w-4xl md:text-5xl md:leading-[1.1]"
+            }
+          >
+            {config.content.h1}
+          </h1>
+          <p className="mt-3 max-w-xl text-[0.95rem] leading-relaxed text-white/85 md:mt-4 md:max-w-2xl md:text-lg">
+            {isHotel
+              ? "Compare rates across leading travel sites."
+              : config.content.subtitle}
+          </p>
+          {isHotel ? <HotelFactsStrip hotel={config.hotel!} /> : null}
+          {config.intent ? <IntentBadges intent={config.intent} /> : null}
+          <div className="mt-5 w-full max-w-5xl desktop:mt-6 desktop:max-w-[73.6rem]">
+            <SearchForm {...searchFormProps} />
+          </div>
         </div>
       </div>
     </section>

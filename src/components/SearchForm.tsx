@@ -921,7 +921,7 @@ const SearchForm = ({ defaults, trackingContext }: SearchFormProps = {}) => {
       ref={formRef}
       onSubmit={handleSubmit}
       noValidate
-      className="w-full rounded-2xl border border-border/80 bg-card/95 p-3 text-left shadow-search backdrop-blur-sm desktop:p-[1.15rem]"
+      className="w-full rounded-2xl border border-white/40 bg-card p-3 text-left shadow-elevated desktop:p-[1.15rem]"
     >
       <div className="grid grid-cols-1 gap-2 desktop:grid-cols-[1.5fr_1.5fr_1.35fr_auto] desktop:gap-[0.575rem] desktop:[&>*]:min-w-0">
         {/* Destination */}

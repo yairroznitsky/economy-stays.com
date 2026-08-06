@@ -82,6 +82,7 @@ export default {
       fontFamily: {
         display: ['"Plus Jakarta Sans"', "Inter", "system-ui", "sans-serif"],
         brand: ['"Sora"', "Inter", "system-ui", "sans-serif"],
+        serif: ['"Playfair Display"', "Georgia", "serif"],
         sans: ["Inter", "system-ui", "sans-serif"],
       },
       keyframes: {
@@ -101,10 +102,25 @@ export default {
             height: "0",
           },
         },
+        "hero-ken": {
+          from: { transform: "scale(1)" },
+          to: { transform: "scale(1.06)" },
+        },
+        "hero-rise": {
+          from: { opacity: "0", transform: "translateY(1.25rem)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
+        "hero-fade": {
+          from: { opacity: "0" },
+          to: { opacity: "1" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "hero-ken": "hero-ken 18s ease-out forwards",
+        "hero-rise": "hero-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards",
+        "hero-fade": "hero-fade 0.9s ease-out forwards",
       },
     },
   },

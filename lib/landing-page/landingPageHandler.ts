@@ -244,7 +244,7 @@ const buildHotelContent = (
 
   return {
     h1: hotel.name,
-    subtitle: `Compare rates for ${hotel.name}, a ${stars}${type} in ${cityName}, across leading travel sites.`,
+    subtitle: "Compare rates across leading travel sites.",
     metaTitle: truncate(`${hotel.name} | ${cityName} | ${brand}`, 70),
     metaDescription: truncate(
       `Compare room rates for ${hotel.name} in ${location}.${ratingSentence} Check availability for your dates and book with a trusted travel partner.`,
