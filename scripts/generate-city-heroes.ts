@@ -182,7 +182,7 @@ const main = async () => {
       limit: { type: "string" },
       force: { type: "boolean", default: false },
       model: { type: "string", default: "gpt-image-1" },
-      delay: { type: "string", default: "3000" },
+      delay: { type: "string", default: "15000" },
     },
   });
 

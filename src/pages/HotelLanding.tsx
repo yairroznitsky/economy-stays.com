@@ -3,7 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import { Navigate, useLocation, useParams } from "react-router-dom";
 import LandingPage from "@/components/landing/LandingPage";
 import { LandingLocaleProvider } from "@/i18n/landing";
-import { buildPlaceholderConfig } from "@/lib/landingPlaceholder";
 import {
   buildLandingPath,
   loadLandingPageConfig,
@@ -21,16 +20,9 @@ const HotelLanding = () => {
   const canonicalPath = buildLandingPath(citySlug ?? "", intentSlug);
   const normalizedPath = normalizeLandingPath(location.pathname);
 
-  const placeholder = useMemo(
-    () =>
-      buildPlaceholderConfig(normalizedPath, citySlug ?? "", intentSlug),
-    [normalizedPath, citySlug, intentSlug]
-  );
-
   const { data, isFetched } = useQuery({
     queryKey: ["landing-page", normalizedPath],
     queryFn: () => loadLandingPageConfig(normalizedPath),
-    placeholderData: placeholder,
     staleTime: 60 * 60 * 1000,
     retry: 1,
   });
@@ -43,9 +35,13 @@ const HotelLanding = () => {
     return <NotFound />;
   }
 
+  if (!data) {
+    return <div className="min-h-screen bg-background" aria-busy="true" />;
+  }
+
   return (
     <LandingLocaleProvider locale="en">
-      <LandingPage config={data ?? placeholder} />
+      <LandingPage config={data} />
     </LandingLocaleProvider>
   );
 };

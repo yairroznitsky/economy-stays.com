@@ -7,6 +7,7 @@ import {
   slugifyName,
   slugToCityName,
 } from "./hotelSlug";
+import { fetchRelatedHotels } from "./relatedHotels";
 import { buildTemplateContent } from "./templateContent";
 import { selectRows } from "./supabaseRest";
 
@@ -106,9 +107,6 @@ const HIT_CACHE = "public, s-maxage=3600, stale-while-revalidate=86400";
 const MISS_CACHE = "public, s-maxage=300";
 const NO_CACHE = "no-store";
 const HOTEL_PAGE_SIZE = 1000;
-const RELATED_HOTELS_LIMIT = 6;
-const RELATED_HOTEL_SELECT =
-  "external_id,name,city_name,star_rating,rating,reviews";
 
 export const normalizeLandingPath = (raw: string): string => {
   let path = raw.trim();
@@ -427,82 +425,16 @@ const findHotelInCity = async (
   return best;
 };
 
-type RelatedHotelRow = {
-  external_id: number;
-  name: string;
-  city_name: string | null;
-  star_rating: number | null;
-  rating: number | null;
-  reviews: number | null;
-};
-
-const mapRelatedHotel = (row: RelatedHotelRow) => ({
-  id: String(row.external_id),
-  name: row.name,
-  path: buildHotelPath(row.city_name, row.name),
-  starRating: row.star_rating ?? undefined,
-  rating: row.rating ?? undefined,
-  reviews: row.reviews ?? undefined,
-});
-
-const fetchRelatedHotels = async (
-  citySlug: string,
-  intent: IntentRow | null
-): Promise<ReturnType<typeof mapRelatedHotel>[]> => {
-  const buildQuery = (cityFilter: string): string => {
-    const parts = [
-      `select=${RELATED_HOTEL_SELECT}`,
-      cityFilter,
-      "order=reviews.desc.nullslast,external_id.asc",
-      "limit=500",
-    ];
-    if (intent?.star_rating) {
-      parts.push(`star_rating=eq.${intent.star_rating}`);
-    }
-    return parts.join("&");
-  };
-
-  let rows = await selectRows<RelatedHotelRow>(
-    "staging_hotels",
-    buildQuery(`city_slug=eq.${encodeURIComponent(citySlug)}`)
-  );
-
-  if (rows.length === 0) {
-    rows = await selectRows<RelatedHotelRow>(
-      "staging_hotels",
-      buildQuery(
-        `city_name=ilike.${encodeURIComponent(slugToCityName(citySlug))}`
-      )
-    );
-  }
-
-  const bestByPath = new Map<string, RelatedHotelRow>();
-  for (const row of rows) {
-    const path = buildHotelPath(row.city_name, row.name);
-    if (!bestByPath.has(path)) {
-      bestByPath.set(path, row);
-    }
-  }
-
-  return [...bestByPath.values()]
-    .sort((a, b) => (b.reviews ?? 0) - (a.reviews ?? 0))
-    .slice(0, RELATED_HOTELS_LIMIT)
-    .map(mapRelatedHotel);
-};
-
 const attachRelatedHotels = async (
   body: Record<string, unknown>,
   citySlug: string,
+  cityName: string | null | undefined,
   intent: IntentRow | null
 ): Promise<void> => {
   if (body.hotel) return;
-  try {
-    const relatedHotels = await fetchRelatedHotels(citySlug, intent);
-    if (relatedHotels.length > 0) {
-      body.relatedHotels = relatedHotels;
-    }
-  } catch {
-    // Related hotels are optional enrichment; page still renders without them.
+  const relatedHotels = await fetchRelatedHotels(citySlug, cityName, intent);
+  if (relatedHotels.length > 0) {
+    body.relatedHotels = relatedHotels;
   }
 };
 
@@ -534,6 +466,7 @@ export const handleLandingPageGet = async (
       await attachRelatedHotels(
         body,
         published.city.slug,
+        published.city.name,
         published.intent
       );
       return {
@@ -554,7 +487,7 @@ export const handleLandingPageGet = async (
         };
       }
       const body = buildTemplateConfig(city, null, buildCityPath(city.slug));
-      await attachRelatedHotels(body, city.slug, null);
+      await attachRelatedHotels(body, city.slug, city.name, null);
       return {
         status: 200,
         body,
@@ -569,7 +502,7 @@ export const handleLandingPageGet = async (
         intent,
         buildIntentPath(city.slug, intent.slug)
       );
-      await attachRelatedHotels(body, city.slug, intent);
+      await attachRelatedHotels(body, city.slug, city.name, intent);
       return {
         status: 200,
         body,
