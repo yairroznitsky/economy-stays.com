@@ -1,4 +1,4 @@
-import { handleLandingPageGet } from "./_lib/landingPageHandler";
+import { handleLandingPageGet } from "../lib/landing-page/landingPageHandler";
 
 interface ApiRequest {
   method?: string;

@@ -2,7 +2,7 @@ import { parseGeneratedContent } from "./contentSchema.ts";
 import {
   buildTemplateContent as buildTemplateContentRaw,
   type TemplateContent,
-} from "../../api/_lib/templateContent.ts";
+} from "../../lib/landing-page/templateContent.ts";
 
 export type { TemplateContent };
 

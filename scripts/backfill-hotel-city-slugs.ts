@@ -1,5 +1,5 @@
 import { parseArgs } from "node:util";
-import { slugifyName } from "../api/_lib/hotelSlug.ts";
+import { slugifyName } from "../lib/landing-page/hotelSlug.ts";
 import { loadDotEnv, selectRows, upsertRows } from "./lib/supabaseAdmin.ts";
 
 /**

@@ -3,4 +3,4 @@ export {
   getReferrer,
   getUserAgent,
   type RequestLike,
-} from "../../api/_lib/requestMeta";
+} from "../../lib/landing-page/requestMeta";

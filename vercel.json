@@ -1,4 +1,9 @@
 {
+  "functions": {
+    "api/landing-page.ts": {
+      "includeFiles": "lib/landing-page/**"
+    }
+  },
   "rewrites": [
     { "source": "/landings", "destination": "/api/landings" },
     { "source": "/search", "destination": "/api/search" },

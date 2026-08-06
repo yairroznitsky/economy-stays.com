@@ -2,4 +2,4 @@ export {
   handleLandingsInsert,
   type LandingInsertBody,
   type TrackingHandlerResult,
-} from "../../api/_lib/landingsHandler";
+} from "../../lib/landing-page/landingsHandler";

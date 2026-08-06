@@ -1,6 +1,6 @@
 export {
   handleSearchInsert,
   type SearchInsertBody,
-} from "../../api/_lib/searchHandler";
+} from "../../lib/landing-page/searchHandler";
 
-export type { TrackingHandlerResult } from "../../api/_lib/landingsHandler";
+export type { TrackingHandlerResult } from "../../lib/landing-page/landingsHandler";

@@ -3,7 +3,7 @@ import {
   buildRelatedHotelCityFilters,
   dedupeRelatedHotels,
   type RelatedHotelRow,
-} from "../../api/_lib/relatedHotels";
+} from "../../lib/landing-page/relatedHotels";
 
 describe("buildRelatedHotelCityFilters", () => {
   it("prefers city_slug then exact and wildcard city_name matches", () => {

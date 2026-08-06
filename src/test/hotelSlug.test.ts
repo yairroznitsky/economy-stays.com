@@ -5,7 +5,7 @@ import {
   buildIntentPath,
   parseLandingPath,
   slugifyName,
-} from "../../api/_lib/hotelSlug";
+} from "../../lib/landing-page/hotelSlug";
 
 describe("slugifyName", () => {
   it("lowercases and hyphenates", () => {
