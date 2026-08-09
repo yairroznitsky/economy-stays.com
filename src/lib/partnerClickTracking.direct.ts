@@ -145,11 +145,14 @@ export const trackPartnerExit = async (
     // Tracking hooks must not block redirect.
   }
 
-  trackGoogleAdsConversion(clickId);
-
   if (options.placement === "new_tab") {
+    trackGoogleAdsConversion({ clickId });
     window.open(options.redirectUrl, "_blank", "noopener,noreferrer");
   } else {
-    window.location.assign(options.redirectUrl);
+    // Navigate in event_callback so the conversion hit isn't dropped.
+    trackGoogleAdsConversion({
+      clickId,
+      redirectUrl: options.redirectUrl,
+    });
   }
 };

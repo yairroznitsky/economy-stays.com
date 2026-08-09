@@ -1,4 +1,5 @@
-import { LandingTrackingService } from "@/lib/landingTrackingService";
+import { trackGoogleAdsConversion } from "@/lib/googleAdsTracking";
+import { generateClickId, LandingTrackingService } from "@/lib/landingTrackingService";
 import type { HotelSearchInput } from "@/types/hotels";
 
 export type PartnerPlacement = "redirect" | "new_tab";
@@ -73,9 +74,16 @@ export const trackPartnerExit = async (
     }
   }
 
+  const clickId = options.clickId ?? generateClickId();
+
   if (options.placement === "new_tab") {
+    trackGoogleAdsConversion({ clickId });
     window.open(options.redirectUrl, "_blank", "noopener,noreferrer");
   } else {
-    window.location.assign(options.redirectUrl);
+    // Navigate in event_callback so the conversion hit isn't dropped.
+    trackGoogleAdsConversion({
+      clickId,
+      redirectUrl: options.redirectUrl,
+    });
   }
 };
