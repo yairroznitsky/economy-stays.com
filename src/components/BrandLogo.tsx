@@ -25,7 +25,6 @@ const BrandLogo = ({
 
   return (
     <span
-      aria-label={siteConfig.name}
       className={cn(
         "inline-flex max-w-full items-center justify-center leading-none",
         !compact && ["gap-[0.0875rem]", fluidWordmarkSize, "md:gap-[0.175rem]", textClassName],
@@ -45,18 +44,14 @@ const BrandLogo = ({
               iconClassName
             )}
           />
-          <span className={wordmarkClass} aria-hidden>
-            {siteConfig.wordmark}
-          </span>
+          <span className={wordmarkClass}>{siteConfig.wordmark}</span>
         </>
       ) : (
         <img
           src="/logo-icon.png"
           width={180}
           height={180}
-          alt=""
-          role="img"
-          aria-label={siteConfig.name}
+          alt={siteConfig.name}
           className={cn(
             "h-[1.94em] w-[1.94em] shrink-0 self-center bg-transparent object-contain",
             iconClassName
