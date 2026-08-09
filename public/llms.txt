@@ -1,0 +1,17 @@
+# Cheap Stays
+
+> A calmer way to compare stays. Search hotels, apartments, and vacation rentals in one place and book through trusted travel partners.
+
+## Pages
+
+- [Home](https://cheap-stays.com/): Hotel and stay search
+- [Español](https://cheap-stays.com/es): Spanish home page
+- [Português (Brasil)](https://cheap-stays.com/br): Brazilian Portuguese home page
+- [About](https://cheap-stays.com/about): About Cheap Stays
+- [Contact](https://cheap-stays.com/contact): Contact and support
+- [Privacy](https://cheap-stays.com/privacy): Privacy policy
+
+## Optional
+
+- [Sitemap](https://cheap-stays.com/sitemap.xml): Index of city and hotel pages
+- [Robots](https://cheap-stays.com/robots.txt): Crawler guidance
