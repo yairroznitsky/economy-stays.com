@@ -1,13 +1,14 @@
-import { execSync } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
 import { parseArgs } from "node:util";
 import OpenAI from "openai";
+import sharp from "sharp";
 import { slugify } from "./lib/paths.ts";
 import { loadDotEnv } from "./lib/supabaseAdmin.ts";
 
 /**
- * Generate city hero images for landing pages via OpenAI Images API.
+ * Generate optimized city hero images for landing pages via OpenAI Images API.
+ * Outputs resized WebP variants into public/images/city-heroes-optimized.
  *
  * Usage:
  *   npm run generate:city-heroes
@@ -23,7 +24,7 @@ type CityRow = {
   country_code: string;
 };
 
-const OUTPUT_DIR = join("public", "images", "city-heroes");
+const OUTPUT_DIR = join("public", "images", "city-heroes-optimized");
 const LEGACY_ASSET_DIR = join("src", "assets", "destinations");
 const CSV_PATH = "data/cities-top200.csv";
 const MANIFEST_PATH = join(OUTPUT_DIR, "manifest.json");
@@ -62,36 +63,51 @@ const buildPrompt = (city: CityRow): string =>
     "Horizontal composition for a hotel booking website hero banner.",
   ].join(" ");
 
-const convertToWebp = (inputPath: string, outputPath: string): void => {
-  const input = resolve(inputPath).replace(/\\/g, "/");
-  const output = resolve(outputPath).replace(/\\/g, "/");
-  execSync(`npx --yes sharp-cli -i "${input}" -o "${output}" -f webp -q 82`, {
-    stdio: "pipe",
-  });
+const DESKTOP_WIDTH = 1600;
+const MOBILE_WIDTH = 960;
+const WEBP_QUALITY = 72;
+
+const encodeHeroVariants = async (input: Buffer | string) => {
+  const buffer = typeof input === "string" ? await sharp(input).toBuffer() : input;
+  const desktop = await sharp(buffer)
+    .rotate()
+    .resize({
+      width: DESKTOP_WIDTH,
+      withoutEnlargement: true,
+      fit: "inside",
+    })
+    .webp({ quality: WEBP_QUALITY, effort: 6 })
+    .toBuffer();
+  const mobile = await sharp(buffer)
+    .rotate()
+    .resize({
+      width: MOBILE_WIDTH,
+      withoutEnlargement: true,
+      fit: "inside",
+    })
+    .webp({ quality: WEBP_QUALITY, effort: 6 })
+    .toBuffer();
+  return { desktop, mobile };
 };
 
-const writeWebpFromBuffer = (pngBuffer: Buffer, outputPath: string): void => {
-  const tmpPng = `${outputPath}.tmp.png`;
-  writeFileSync(tmpPng, pngBuffer);
-  try {
-    convertToWebp(tmpPng, outputPath);
-  } finally {
-    if (existsSync(tmpPng)) {
-      unlinkSync(tmpPng);
-    }
-  }
+const writeHeroVariants = async (
+  input: Buffer | string,
+  outputPath: string
+): Promise<void> => {
+  const { desktop, mobile } = await encodeHeroVariants(input);
+  writeFileSync(outputPath, desktop);
+  writeFileSync(outputPath.replace(/\.webp$/i, "-960.webp"), mobile);
 };
 
-const migrateLegacyAsset = (slug: string, outputPath: string): boolean => {
+const migrateLegacyAsset = async (
+  slug: string,
+  outputPath: string
+): Promise<boolean> => {
   for (const ext of [".jpg", ".jpeg", ".png", ".webp"]) {
     const legacyPath = join(LEGACY_ASSET_DIR, `${slug}${ext}`);
     if (!existsSync(legacyPath)) continue;
     try {
-      if (ext === ".webp") {
-        writeFileSync(outputPath, readFileSync(legacyPath));
-      } else {
-        convertToWebp(legacyPath, outputPath);
-      }
+      await writeHeroVariants(legacyPath, outputPath);
       return true;
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
@@ -143,16 +159,11 @@ const generateImage = async (
   };
 };
 
-const saveHeroImage = (
+const saveHeroImage = async (
   buffer: Buffer,
-  outputPath: string,
-  isWebp: boolean
-): void => {
-  if (isWebp) {
-    writeFileSync(outputPath, buffer);
-    return;
-  }
-  writeWebpFromBuffer(buffer, outputPath);
+  outputPath: string
+): Promise<void> => {
+  await writeHeroVariants(buffer, outputPath);
 };
 
 const loadManifest = (): Set<string> => {
@@ -221,7 +232,7 @@ const main = async () => {
       continue;
     }
 
-    if (!values.force && migrateLegacyAsset(city.slug, outputPath)) {
+    if (!values.force && (await migrateLegacyAsset(city.slug, outputPath))) {
       manifest.add(city.slug);
       migrated += 1;
       console.log(`Migrated legacy asset for ${city.slug}`);
@@ -230,8 +241,8 @@ const main = async () => {
 
     try {
       console.log(`Generating ${city.slug} (${city.name}, ${city.country})...`);
-      const { buffer, isWebp } = await generateImage(client, city, values.model!);
-      saveHeroImage(buffer, outputPath, isWebp);
+      const { buffer } = await generateImage(client, city, values.model!);
+      await saveHeroImage(buffer, outputPath);
       manifest.add(city.slug);
       generated += 1;
       console.log(`Saved ${outputPath}`);

@@ -72,6 +72,8 @@ const SitelinkPageContent = ({ slug }: SitelinkPageProps) => {
           alt=""
           width={1920}
           height={1280}
+          fetchPriority="high"
+          decoding="async"
           className="absolute inset-0 h-full w-full object-cover motion-safe:animate-hero-ken"
         />
         <div className="absolute inset-0 bg-gradient-hero" />

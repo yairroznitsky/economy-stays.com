@@ -2,7 +2,12 @@ import Header from "@/components/Header";
 import SearchForm, { type SearchFormProps } from "@/components/SearchForm";
 import HotelFactsStrip from "@/components/landing/HotelFactsStrip";
 import IntentBadges from "@/components/landing/IntentBadges";
-import { getDestinationHeroFallback, getDestinationHeroImage } from "@/lib/destinationImages";
+import {
+  CITY_HERO_SIZES,
+  getCityHeroSrcSet,
+  getDestinationHeroFallback,
+  getDestinationHeroImage,
+} from "@/lib/destinationImages";
 import type { LandingPageConfig } from "@/types/landingPage";
 import { useState } from "react";
 
@@ -13,9 +18,9 @@ type LandingHeroProps = {
 
 const LandingHero = ({ config, searchFormProps }: LandingHeroProps) => {
   const fallbackHero = getDestinationHeroFallback();
-  const [heroImage, setHeroImage] = useState(() =>
-    getDestinationHeroImage(config.city.slug)
-  );
+  const primaryHero = getDestinationHeroImage(config.city.slug);
+  const [heroImage, setHeroImage] = useState(primaryHero);
+  const usingFallback = heroImage === fallbackHero;
   const isHotel = Boolean(config.hotel);
   const imageAlt = isHotel
     ? `${config.hotel!.name} in ${config.city.name}, ${config.city.country}`
@@ -25,9 +30,13 @@ const LandingHero = ({ config, searchFormProps }: LandingHeroProps) => {
     <section className="relative min-h-[88svh] w-full overflow-hidden md:min-h-[720px]">
       <img
         src={heroImage}
+        srcSet={usingFallback ? undefined : getCityHeroSrcSet(config.city.slug)}
+        sizes={usingFallback ? undefined : CITY_HERO_SIZES}
         alt={imageAlt}
-        width={1920}
-        height={1280}
+        width={1600}
+        height={1067}
+        fetchPriority="high"
+        decoding="async"
         className="absolute inset-0 h-full w-full object-cover motion-safe:animate-hero-ken"
         onError={() => {
           if (heroImage !== fallbackHero) {

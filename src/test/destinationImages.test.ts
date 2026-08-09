@@ -1,5 +1,6 @@
 import {
   getCityHeroImagePath,
+  getCityHeroSrcSet,
   getDestinationHeroFallback,
   getDestinationHeroImage,
 } from "@/lib/destinationImages";
@@ -7,10 +8,16 @@ import {
 describe("destinationImages", () => {
   it("builds public webp paths from city slugs", () => {
     expect(getDestinationHeroImage("Miami")).toBe(
-      "/images/city-heroes/miami.webp"
+      "/images/city-heroes-optimized/miami.webp"
     );
     expect(getCityHeroImagePath("new-york")).toBe(
-      "/images/city-heroes/new-york.webp"
+      "/images/city-heroes-optimized/new-york.webp"
+    );
+  });
+
+  it("builds responsive city hero srcsets", () => {
+    expect(getCityHeroSrcSet("Chengdu")).toBe(
+      "/images/city-heroes-optimized/chengdu-960.webp 960w, /images/city-heroes-optimized/chengdu.webp 1600w"
     );
   });
 

@@ -34,11 +34,12 @@ const BrandLogo = ({
       {!compact ? (
         <>
           <img
-            src="/logo-icon.png"
-            width={180}
-            height={180}
+            src="/logo-icon.webp"
+            width={96}
+            height={96}
             alt=""
             aria-hidden
+            decoding="async"
             className={cn(
               "-ml-1 h-[1.94em] w-[1.94em] shrink-0 self-center bg-transparent object-contain md:-ml-1.5",
               iconClassName
@@ -48,10 +49,11 @@ const BrandLogo = ({
         </>
       ) : (
         <img
-          src="/logo-icon.png"
-          width={180}
-          height={180}
+          src="/logo-icon.webp"
+          width={96}
+          height={96}
           alt={siteConfig.name}
+          decoding="async"
           className={cn(
             "h-[1.94em] w-[1.94em] shrink-0 self-center bg-transparent object-contain",
             iconClassName

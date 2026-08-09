@@ -1,7 +1,7 @@
 import { defineConfig, loadEnv, type Plugin } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
-import { writeFileSync } from "fs";
+import { rmSync, writeFileSync } from "fs";
 import { componentTagger } from "lovable-tagger";
 import { localEdgePlugin, localTrackingPlugin } from "./server/edge/vitePlugin";
 
@@ -19,6 +19,17 @@ const htmlEnvPlugin = (env: Record<string, string>): Plugin => ({
         result.replaceAll(`__${key}__`, value),
       html
     );
+  },
+});
+
+/** Keep full-res masters in public/ for re-optimize, but never ship them. */
+const omitUnoptimizedCityHeroesPlugin = (): Plugin => ({
+  name: "omit-unoptimized-city-heroes",
+  closeBundle() {
+    rmSync(path.resolve(__dirname, "dist/images/city-heroes"), {
+      recursive: true,
+      force: true,
+    });
   },
 });
 
@@ -119,6 +130,7 @@ export default defineConfig(({ mode }) => {
       react(),
       htmlEnvPlugin(env),
       webManifestPlugin(env),
+      omitUnoptimizedCityHeroesPlugin(),
       mode === "development" && localTrackingPlugin(),
       useLocalEdge && localEdgePlugin(),
       mode === "development" && componentTagger(),
