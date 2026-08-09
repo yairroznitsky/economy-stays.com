@@ -47,9 +47,25 @@ export interface LandingPageRelatedHotel {
   id: string;
   name: string;
   path: string;
+  type?: string;
   starRating?: number;
   rating?: number;
   reviews?: number;
+}
+
+export interface LandingPageCityStats {
+  hotelCount: number;
+  hotelCountCapped: boolean;
+  avgRating?: number;
+  dominantStarRating?: number;
+  topTypes: string[];
+  airportCode?: string;
+}
+
+export interface LandingPageBrowseIntent {
+  slug: string;
+  label: string;
+  path: string;
 }
 
 export interface LandingPageContent {
@@ -91,6 +107,10 @@ export interface LandingPageConfig {
   hotel?: LandingPageHotel;
   /** Top hotels in the city — city and intent pages only. */
   relatedHotels?: LandingPageRelatedHotel[];
+  /** Inventory snapshot from staging_hotels — city and intent pages only. */
+  cityStats?: LandingPageCityStats;
+  /** Active intent links — base city pages only. */
+  browseIntents?: LandingPageBrowseIntent[];
   content: LandingPageContent;
   searchDefaults: LandingPageSearchDefaults;
   seo: LandingPageSeo;

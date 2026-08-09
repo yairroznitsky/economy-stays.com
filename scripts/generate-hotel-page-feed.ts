@@ -11,9 +11,12 @@ import { loadDotEnv, selectRows } from "./lib/supabaseAdmin.ts";
 
 /**
  * Google Ads page feed for all landing page types:
- * - City pages (/hotels/{city})
- * - City × intent pages (/hotels/{city}/{intent})
- * - Hotel pages (/hotels/{city}/{hotel-slug})
+ * - City pages (/hotels/{city}) — label: type_city
+ * - City × intent pages (/hotels/{city}/{intent}) — label: type_intent
+ * - Property pages (/hotels/{city}/{slug}) — label: type_property; property_*
+ *
+ * Property rows include a property_* label from staging_hotels.type
+ * (defaults to property_hotel when type is missing).
  *
  * Usage:
  *   npx tsx scripts/generate-hotel-page-feed.ts
@@ -37,6 +40,7 @@ type IntentRow = {
 type HotelRow = {
   external_id: number;
   name: string;
+  type: string | null;
   city_name: string | null;
   country_code: string | null;
   star_rating: number | null;
@@ -63,6 +67,9 @@ const country = args.country?.trim().toUpperCase();
 
 const csvField = (value: string): string =>
   /[",\n]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value;
+
+const propertyFeedLabel = (type: string | null | undefined): string =>
+  `property_${slugifyName(type?.trim() || "hotel")}`;
 
 const pushRow = (
   lines: string[],
@@ -115,7 +122,7 @@ const addCityAndIntentRows = async (lines: string[]): Promise<number> => {
 
 const buildHotelFilter = (): string => {
   const parts = [
-    "select=external_id,name,city_name,country_code,star_rating,reviews",
+    "select=external_id,name,type,city_name,country_code,star_rating,reviews",
     "order=reviews.desc.nullslast,external_id.asc",
   ];
   if (country) parts.push(`country_code=eq.${encodeURIComponent(country)}`);
@@ -157,7 +164,8 @@ const addHotelRows = async (lines: string[]): Promise<number> => {
 
   for (const [path, row] of bestByPath) {
     pushRow(lines, path, [
-      "type_hotel",
+      "type_property",
+      propertyFeedLabel(row.type),
       row.country_code ? `country_${row.country_code.toLowerCase()}` : "",
       row.city_name ? `city_${slugifyName(row.city_name)}` : "",
       row.star_rating ? `stars_${row.star_rating}` : "",

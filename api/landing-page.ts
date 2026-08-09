@@ -82,10 +82,32 @@ type PageRow = {
 type RelatedHotelRow = {
   external_id: number;
   name: string;
+  type: string | null;
   city_name: string | null;
   star_rating: number | null;
   rating: number | null;
   reviews: number | null;
+};
+
+type CityStatsRow = {
+  type: string | null;
+  star_rating: number | null;
+  rating: number | null;
+};
+
+type BrowseIntentRow = {
+  slug: string;
+  label: string;
+  priority: number | null;
+};
+
+type LandingCityStats = {
+  hotelCount: number;
+  hotelCountCapped: boolean;
+  avgRating?: number;
+  dominantStarRating?: number;
+  topTypes: string[];
+  airportCode?: string;
 };
 
 type LandingPathRef = {
@@ -103,7 +125,9 @@ const INTENT_SELECT =
 const HOTEL_SELECT =
   "external_id,name,type,address,latitude,longitude,city_name,country_name,country_code,star_rating,rating,reviews";
 const RELATED_HOTEL_SELECT =
-  "external_id,name,city_name,star_rating,rating,reviews";
+  "external_id,name,type,city_name,star_rating,rating,reviews";
+const CITY_STATS_SELECT = "type,star_rating,rating";
+const INTENT_BROWSE_SELECT = "slug,label,priority";
 const PAGE_SELECT = [
   "id",
   "path",
@@ -118,6 +142,7 @@ const MISS_CACHE = "public, s-maxage=300";
 const NO_CACHE = "no-store";
 const HOTEL_PAGE_SIZE = 1000;
 const RELATED_HOTELS_LIMIT = 6;
+const CITY_STATS_SAMPLE_LIMIT = 1000;
 
 const readEnv = (key: string): string | undefined => {
   const value = process.env[key];
@@ -216,10 +241,15 @@ const mapCity = (city: CityRow) => ({
   kayakCitySlug: city.kayak_city_slug ?? undefined,
 });
 
-const genericFaqs = (cityName: string) => [
+const genericFaqs = (
+  cityName: string,
+  inventory?: string | null
+) => [
   {
     q: `How does ${readSiteName()} help me compare hotels in ${cityName}?`,
-    a: "Enter your destination, dates, and guests to see hotel options from established travel partners. You can adjust your search before continuing to a partner site to book.",
+    a: inventory
+      ? `${inventory} Enter your destination, dates, and guests to see hotel options from established travel partners. You can adjust your search before continuing to a partner site to book.`
+      : "Enter your destination, dates, and guests to see hotel options from established travel partners. You can adjust your search before continuing to a partner site to book.",
   },
   {
     q: "Do I complete my booking on this site?",
@@ -246,12 +276,36 @@ const genericBenefits = () => [
   },
 ];
 
+const formatHotelCountLabel = (stats: LandingCityStats): string => {
+  const formatted = stats.hotelCount.toLocaleString("en-US");
+  return stats.hotelCountCapped ? `${formatted}+ stays` : `${formatted} stays`;
+};
+
+const inventorySentence = (
+  cityName: string,
+  stats: LandingCityStats | null | undefined
+): string | null => {
+  if (!stats || stats.hotelCount <= 0) return null;
+  const countLabel = formatHotelCountLabel(stats);
+  const ratingBit =
+    stats.avgRating != null
+      ? ` with an average guest rating around ${stats.avgRating}/10`
+      : "";
+  const starBit =
+    stats.dominantStarRating != null
+      ? ` Many listed stays are ${stats.dominantStarRating}-star properties.`
+      : "";
+  return `Our catalog currently includes ${countLabel} in ${cityName}${ratingBit}.${starBit}`;
+};
+
 const buildTemplateContent = (
   city: { name: string; country: string },
-  intent: { label: string; slug: string } | null
+  intent: { label: string; slug: string } | null,
+  stats?: LandingCityStats | null
 ) => {
   const brand = readSiteName();
   const intentPhrase = intent ? intent.label.toLowerCase() : "hotel";
+  const inventory = inventorySentence(city.name, stats);
 
   const h1 = intent
     ? `${intent.label} in ${city.name}`
@@ -278,12 +332,18 @@ const buildTemplateContent = (
   const introText = intent
     ? [
         `Looking for ${intentPhrase} in ${city.name}? Comparing rates across multiple booking sites can help you find options that fit your plans while keeping your preferred dates and guest count in mind.`,
+        inventory,
         `Use the search above to compare ${intentPhrase} for your travel dates, then continue to a partner site when you are ready to book.`,
-      ].join("\n\n")
+      ]
+        .filter(Boolean)
+        .join("\n\n")
     : [
         `${city.name} is a popular destination for travelers comparing hotel options before they book. Searching across multiple travel sites can help you review locations, amenities, and availability for your dates.`,
+        inventory,
         `Start with the search above to compare hotel rates in ${city.name}, then continue to a partner booking site to complete your reservation.`,
-      ].join("\n\n");
+      ]
+        .filter(Boolean)
+        .join("\n\n");
 
   const ctaText = intent
     ? `Compare ${intentPhrase} in ${city.name}`
@@ -295,7 +355,7 @@ const buildTemplateContent = (
     metaTitle,
     metaDescription,
     introText,
-    faqs: genericFaqs(city.name),
+    faqs: genericFaqs(city.name, inventory),
     benefits: genericBenefits(),
     ctaText,
   };
@@ -518,6 +578,7 @@ const mapRelatedHotel = (row: RelatedHotelRow) => ({
   id: String(row.external_id),
   name: row.name,
   path: buildHotelPath(row.city_name, row.name),
+  type: row.type?.trim() || undefined,
   starRating: row.star_rating ?? undefined,
   rating: row.rating ?? undefined,
   reviews: row.reviews ?? undefined,
@@ -588,6 +649,112 @@ const fetchRelatedHotels = async (
   }
 
   return dedupeRelatedHotels(rows).map(mapRelatedHotel);
+};
+
+const normalizePropertyType = (type: string | null | undefined): string | null => {
+  const trimmed = type?.trim();
+  if (!trimmed) return null;
+  return trimmed.charAt(0).toUpperCase() + trimmed.slice(1).toLowerCase();
+};
+
+const computeCityStats = (
+  rows: CityStatsRow[],
+  airportCode?: string | null
+): LandingCityStats | null => {
+  if (rows.length === 0) return null;
+
+  let ratingSum = 0;
+  let ratingCount = 0;
+  const starCounts = new Map<number, number>();
+  const typeCounts = new Map<string, number>();
+
+  for (const row of rows) {
+    if (row.rating != null && Number.isFinite(row.rating)) {
+      ratingSum += row.rating;
+      ratingCount += 1;
+    }
+    if (row.star_rating != null && row.star_rating > 0) {
+      starCounts.set(
+        row.star_rating,
+        (starCounts.get(row.star_rating) ?? 0) + 1
+      );
+    }
+    const type = normalizePropertyType(row.type);
+    if (type) {
+      typeCounts.set(type, (typeCounts.get(type) ?? 0) + 1);
+    }
+  }
+
+  let dominantStarRating: number | undefined;
+  let dominantStarCount = 0;
+  for (const [stars, count] of starCounts) {
+    if (count > dominantStarCount) {
+      dominantStarRating = stars;
+      dominantStarCount = count;
+    }
+  }
+
+  const topTypes = [...typeCounts.entries()]
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .slice(0, 3)
+    .map(([type]) => type);
+
+  return {
+    hotelCount: rows.length,
+    hotelCountCapped: rows.length >= CITY_STATS_SAMPLE_LIMIT,
+    avgRating:
+      ratingCount > 0
+        ? Math.round((ratingSum / ratingCount) * 10) / 10
+        : undefined,
+    dominantStarRating,
+    topTypes,
+    airportCode: airportCode?.trim() || undefined,
+  };
+};
+
+const fetchCityStats = async (
+  citySlug: string,
+  cityName: string | null | undefined,
+  airportCode?: string | null
+): Promise<LandingCityStats | null> => {
+  let rows: CityStatsRow[] = [];
+  for (const filter of buildRelatedHotelCityFilters(citySlug, cityName)) {
+    if (rows.length > 0) break;
+    try {
+      rows = await selectRows<CityStatsRow>(
+        "staging_hotels",
+        [
+          `select=${CITY_STATS_SELECT}`,
+          filter,
+          "order=reviews.desc.nullslast,external_id.asc",
+          `limit=${CITY_STATS_SAMPLE_LIMIT}`,
+        ].join("&")
+      );
+    } catch {
+      rows = [];
+    }
+  }
+  return computeCityStats(rows, airportCode);
+};
+
+const fetchBrowseIntents = async (citySlug: string) => {
+  try {
+    const rows = await selectRows<BrowseIntentRow>(
+      "landing_page_intents",
+      [
+        `select=${INTENT_BROWSE_SELECT}`,
+        "active=eq.true",
+        "order=priority.asc.nullslast,slug.asc",
+      ].join("&")
+    );
+    return rows.map((row) => ({
+      slug: row.slug,
+      label: row.label,
+      path: buildIntentPath(citySlug, row.slug),
+    }));
+  } catch {
+    return [];
+  }
 };
 
 const lookupPublishedPage = async (path: string): Promise<PageRow | null> => {
@@ -668,16 +835,35 @@ const lookupHotelBySlug = async (
   );
 };
 
-const attachRelatedHotels = async (
+const attachCityPageExtras = async (
   body: Record<string, unknown>,
-  citySlug: string,
-  cityName: string | null | undefined,
+  city: CityRow,
   intent: IntentRow | null
 ): Promise<void> => {
   if (body.hotel) return;
-  const relatedHotels = await fetchRelatedHotels(citySlug, cityName, intent);
+
+  const [relatedHotels, cityStats, browseIntents] = await Promise.all([
+    fetchRelatedHotels(city.slug, city.name, intent),
+    fetchCityStats(city.slug, city.name, city.airport_code),
+    intent ? Promise.resolve([]) : fetchBrowseIntents(city.slug),
+  ]);
+
   if (relatedHotels.length > 0) {
     body.relatedHotels = relatedHotels;
+  }
+  if (cityStats) {
+    body.cityStats = cityStats;
+  }
+  if (browseIntents.length > 0) {
+    body.browseIntents = browseIntents;
+  }
+
+  if (cityStats && String(body.id).startsWith("tpl-")) {
+    body.content = buildTemplateContent(
+      { name: city.name, country: city.country },
+      intent ? { slug: intent.slug, label: intent.label } : null,
+      cityStats
+    );
   }
 };
 
@@ -708,12 +894,7 @@ const handleLandingPageGet = async (
     const published = await lookupPublishedPage(path);
     if (published) {
       const body = buildConfig(published);
-      await attachRelatedHotels(
-        body,
-        published.city.slug,
-        published.city.name,
-        published.intent
-      );
+      await attachCityPageExtras(body, published.city, published.intent);
       return {
         status: 200,
         body,
@@ -732,7 +913,7 @@ const handleLandingPageGet = async (
         };
       }
       const body = buildTemplateConfig(city, null, buildCityPath(city.slug));
-      await attachRelatedHotels(body, city.slug, city.name, null);
+      await attachCityPageExtras(body, city, null);
       return {
         status: 200,
         body,
@@ -747,7 +928,7 @@ const handleLandingPageGet = async (
         intent,
         buildIntentPath(city.slug, intent.slug)
       );
-      await attachRelatedHotels(body, city.slug, city.name, intent);
+      await attachCityPageExtras(body, city, intent);
       return {
         status: 200,
         body,

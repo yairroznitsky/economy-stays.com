@@ -3,6 +3,10 @@
  * Shared by the API handler (on-demand) and content-generation scripts.
  */
 
+import {
+  formatHotelCountLabel,
+  type LandingCityStats,
+} from "./cityStats";
 import { readSiteName } from "./env";
 
 export interface TemplateContent {
@@ -26,23 +30,52 @@ type TemplateIntent = {
   slug: string;
 };
 
+export type TemplateContentOptions = {
+  stats?: LandingCityStats | null;
+};
+
 const truncate = (value: string, max: number): string =>
   value.length <= max ? value : `${value.slice(0, max - 1).trimEnd()}…`;
 
-const genericFaqs = (cityName: string) => [
-  {
-    q: `How does ${readSiteName()} help me compare hotels in ${cityName}?`,
-    a: "Enter your destination, dates, and guests to see hotel options from established travel partners. You can adjust your search before continuing to a partner site to book.",
-  },
-  {
-    q: "Do I complete my booking on this site?",
-    a: "No. We help you compare options across partner travel sites. When you are ready, you continue to the partner site to finish your reservation.",
-  },
-  {
-    q: "Can I change dates and guest counts before I search?",
-    a: "Yes. Update check-in, check-out, adults, children, and rooms in the search form to match your trip before comparing hotel options.",
-  },
-];
+const inventorySentence = (
+  cityName: string,
+  stats: LandingCityStats | null | undefined
+): string | null => {
+  if (!stats || stats.hotelCount <= 0) return null;
+  const countLabel = formatHotelCountLabel(stats);
+  const ratingBit =
+    stats.avgRating != null
+      ? ` with an average guest rating around ${stats.avgRating}/10`
+      : "";
+  const starBit =
+    stats.dominantStarRating != null
+      ? ` Many listed stays are ${stats.dominantStarRating}-star properties.`
+      : "";
+  return `Our catalog currently includes ${countLabel} in ${cityName}${ratingBit}.${starBit}`;
+};
+
+const genericFaqs = (
+  cityName: string,
+  stats?: LandingCityStats | null
+) => {
+  const inventory = inventorySentence(cityName, stats);
+  return [
+    {
+      q: `How does ${readSiteName()} help me compare hotels in ${cityName}?`,
+      a: inventory
+        ? `${inventory} Enter your destination, dates, and guests to see hotel options from established travel partners. You can adjust your search before continuing to a partner site to book.`
+        : "Enter your destination, dates, and guests to see hotel options from established travel partners. You can adjust your search before continuing to a partner site to book.",
+    },
+    {
+      q: "Do I complete my booking on this site?",
+      a: "No. We help you compare options across partner travel sites. When you are ready, you continue to the partner site to finish your reservation.",
+    },
+    {
+      q: "Can I change dates and guest counts before I search?",
+      a: "Yes. Update check-in, check-out, adults, children, and rooms in the search form to match your trip before comparing hotel options.",
+    },
+  ];
+};
 
 const genericBenefits = () => [
   {
@@ -61,15 +94,19 @@ const genericBenefits = () => [
 
 export const buildTemplateContent = (
   city: TemplateCity,
-  intent: TemplateIntent | null
+  intent: TemplateIntent | null,
+  options?: TemplateContentOptions
 ): TemplateContent => {
   const brand = readSiteName();
   const intentPhrase = intent ? intent.label.toLowerCase() : "hotel";
+  const stats = options?.stats ?? null;
+  const inventory = inventorySentence(city.name, stats);
 
   const h1 = intent
     ? `${intent.label} in ${city.name}`
     : `Hotels in ${city.name}`;
 
+  // Keep hero subtitle short — do not inject inventory facts here.
   const subtitle = intent
     ? `Compare ${intentPhrase} rates across travel sites for your ${city.name} trip.`
     : `Search hotel rates in ${city.name}, ${city.country} across leading travel sites and pick the stay that fits your trip.`;
@@ -91,12 +128,18 @@ export const buildTemplateContent = (
   const introText = intent
     ? [
         `Looking for ${intentPhrase} in ${city.name}? Comparing rates across multiple booking sites can help you find options that fit your plans while keeping your preferred dates and guest count in mind.`,
+        inventory,
         `Use the search above to compare ${intentPhrase} for your travel dates, then continue to a partner site when you are ready to book.`,
-      ].join("\n\n")
+      ]
+        .filter(Boolean)
+        .join("\n\n")
     : [
         `${city.name} is a popular destination for travelers comparing hotel options before they book. Searching across multiple travel sites can help you review locations, amenities, and availability for your dates.`,
+        inventory,
         `Start with the search above to compare hotel rates in ${city.name}, then continue to a partner booking site to complete your reservation.`,
-      ].join("\n\n");
+      ]
+        .filter(Boolean)
+        .join("\n\n");
 
   const ctaText = intent
     ? `Compare ${intentPhrase} in ${city.name}`
@@ -108,7 +151,7 @@ export const buildTemplateContent = (
     metaTitle,
     metaDescription,
     introText,
-    faqs: genericFaqs(city.name),
+    faqs: genericFaqs(city.name, stats),
     benefits: genericBenefits(),
     ctaText,
   };

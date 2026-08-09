@@ -36,6 +36,7 @@ describe("dedupeRelatedHotels", () => {
   ): RelatedHotelRow => ({
     external_id: id,
     name,
+    type: "hotel",
     city_name: city,
     star_rating: 4,
     rating: 8.5,

@@ -4,11 +4,12 @@ import { selectRows } from "./supabaseRest";
 export const RELATED_HOTELS_LIMIT = 6;
 
 const RELATED_HOTEL_SELECT =
-  "external_id,name,city_name,star_rating,rating,reviews";
+  "external_id,name,type,city_name,star_rating,rating,reviews";
 
 export type RelatedHotelRow = {
   external_id: number;
   name: string;
+  type: string | null;
   city_name: string | null;
   star_rating: number | null;
   rating: number | null;
@@ -23,6 +24,7 @@ export const mapRelatedHotel = (row: RelatedHotelRow) => ({
   id: String(row.external_id),
   name: row.name,
   path: buildHotelPath(row.city_name, row.name),
+  type: row.type?.trim() || undefined,
   starRating: row.star_rating ?? undefined,
   rating: row.rating ?? undefined,
   reviews: row.reviews ?? undefined,

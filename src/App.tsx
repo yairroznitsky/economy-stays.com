@@ -4,12 +4,14 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useLandingTracker } from "@/hooks/useLandingTracker";
+import { SITELINK_SLUGS } from "./lib/sitelinkPages.ts";
 import Index from "./pages/Index.tsx";
 import About from "./pages/About.tsx";
 import Contact from "./pages/Contact.tsx";
 import Privacy from "./pages/Privacy.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import HotelLanding from "./pages/HotelLanding.tsx";
+import SitelinkPage from "./pages/SitelinkPage.tsx";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +26,13 @@ const AppRoutes = () => {
       <Route path="/about" element={<About />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/privacy" element={<Privacy />} />
+      {SITELINK_SLUGS.map((slug) => (
+        <Route
+          key={slug}
+          path={`/${slug}`}
+          element={<SitelinkPage slug={slug} />}
+        />
+      ))}
       <Route path="/hotels/:citySlug/:intentSlug" element={<HotelLanding />} />
       <Route path="/hotels/:citySlug" element={<HotelLanding />} />
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

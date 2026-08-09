@@ -1,4 +1,6 @@
 import { readSiteName } from "./env";
+import { fetchBrowseIntents } from "./browseIntents";
+import { fetchCityStats } from "./cityStats";
 import {
   buildCityPath,
   buildHotelPath,
@@ -425,16 +427,46 @@ const findHotelInCity = async (
   return best;
 };
 
-const attachRelatedHotels = async (
+const attachCityPageExtras = async (
   body: Record<string, unknown>,
-  citySlug: string,
-  cityName: string | null | undefined,
+  city: CityRow,
   intent: IntentRow | null
 ): Promise<void> => {
   if (body.hotel) return;
-  const relatedHotels = await fetchRelatedHotels(citySlug, cityName, intent);
+
+  const [relatedHotels, cityStats, browseIntents] = await Promise.all([
+    fetchRelatedHotels(city.slug, city.name, intent),
+    fetchCityStats(city.slug, city.name, city.airport_code),
+    intent ? Promise.resolve([]) : fetchBrowseIntents(city.slug),
+  ]);
+
   if (relatedHotels.length > 0) {
     body.relatedHotels = relatedHotels;
+  }
+  if (cityStats) {
+    body.cityStats = cityStats;
+  }
+  if (browseIntents.length > 0) {
+    body.browseIntents = browseIntents;
+  }
+
+  // Enrich on-demand template copy only; leave curated published content as-is.
+  if (cityStats && String(body.id).startsWith("tpl-")) {
+    const content = buildTemplateContent(
+      { name: city.name, country: city.country },
+      intent ? { slug: intent.slug, label: intent.label } : null,
+      { stats: cityStats }
+    );
+    body.content = {
+      h1: content.h1,
+      subtitle: content.subtitle,
+      metaTitle: content.metaTitle,
+      metaDescription: content.metaDescription,
+      introText: content.introText,
+      faqs: content.faqs,
+      benefits: content.benefits,
+      ctaText: content.ctaText,
+    };
   }
 };
 
@@ -463,12 +495,7 @@ export const handleLandingPageGet = async (
     const published = await lookupPublishedPage(path);
     if (published) {
       const body = buildConfig(published);
-      await attachRelatedHotels(
-        body,
-        published.city.slug,
-        published.city.name,
-        published.intent
-      );
+      await attachCityPageExtras(body, published.city, published.intent);
       return {
         status: 200,
         body,
@@ -487,7 +514,7 @@ export const handleLandingPageGet = async (
         };
       }
       const body = buildTemplateConfig(city, null, buildCityPath(city.slug));
-      await attachRelatedHotels(body, city.slug, city.name, null);
+      await attachCityPageExtras(body, city, null);
       return {
         status: 200,
         body,
@@ -502,7 +529,7 @@ export const handleLandingPageGet = async (
         intent,
         buildIntentPath(city.slug, intent.slug)
       );
-      await attachRelatedHotels(body, city.slug, city.name, intent);
+      await attachCityPageExtras(body, city, intent);
       return {
         status: 200,
         body,

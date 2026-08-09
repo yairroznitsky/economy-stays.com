@@ -1,8 +1,10 @@
 import SiteFooter from "@/components/SiteFooter";
 import Benefits from "@/components/landing/Benefits";
+import CityInventoryStrip from "@/components/landing/CityInventoryStrip";
 import CTASection from "@/components/landing/CTASection";
 import DestinationContent from "@/components/landing/DestinationContent";
 import FAQ from "@/components/landing/FAQ";
+import IntentBrowse from "@/components/landing/IntentBrowse";
 import LandingHero from "@/components/landing/LandingHero";
 import LandingPageMeta from "@/components/landing/LandingPageMeta";
 import RelatedHotels from "@/components/landing/RelatedHotels";
@@ -54,12 +56,20 @@ const LandingPage = ({ config }: LandingPageProps) => {
     },
   }), [config]);
 
+  const showCityExtras = !config.hotel;
+
   return (
     <div className="min-h-screen bg-background">
       <LandingPageMeta config={config} />
       <LandingHero config={config} searchFormProps={searchFormProps} />
       <Benefits benefits={config.content.benefits} />
-      {config.relatedHotels?.length && !config.hotel ? (
+      {showCityExtras && config.cityStats ? (
+        <CityInventoryStrip
+          cityName={config.city.name}
+          stats={config.cityStats}
+        />
+      ) : null}
+      {showCityExtras && config.relatedHotels?.length ? (
         <RelatedHotels
           cityName={config.city.name}
           hotels={config.relatedHotels}
@@ -68,6 +78,12 @@ const LandingPage = ({ config }: LandingPageProps) => {
       ) : null}
       <DestinationContent config={config} />
       <FAQ faqs={config.content.faqs} />
+      {showCityExtras && !config.intent && config.browseIntents?.length ? (
+        <IntentBrowse
+          cityName={config.city.name}
+          intents={config.browseIntents}
+        />
+      ) : null}
       <CTASection ctaText={config.content.ctaText} cityName={config.city.name} />
       <SiteFooter />
     </div>
