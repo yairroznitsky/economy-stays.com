@@ -245,8 +245,6 @@ const SearchForm = ({ defaults, trackingContext }: SearchFormProps = {}) => {
   const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
   const [destinationError, setDestinationError] = useState(false);
   const destinationInputRef = useRef<HTMLInputElement>(null);
-  /** Wrapper for destination field + dropdown; used to scroll above mobile keyboard. */
-  const destinationFieldRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const spiderRanRef = useRef(false);
   const searchSubmitInFlightRef = useRef(false);
@@ -446,38 +444,6 @@ const SearchForm = ({ defaults, trackingContext }: SearchFormProps = {}) => {
     />
   );
 
-  const alignDestinationFieldToVisualViewport = useCallback(() => {
-    const el = destinationFieldRef.current;
-    if (!el || typeof window === "undefined") return;
-
-    const vv = window.visualViewport;
-    const padding = 12;
-    if (vv) {
-      const rect = el.getBoundingClientRect();
-      const targetTop = vv.offsetTop + padding;
-      const delta = rect.top - targetTop;
-      if (Math.abs(delta) > 2) {
-        window.scrollTo({
-          top: window.scrollY + delta,
-          behavior: "auto",
-        });
-      }
-    } else {
-      el.scrollIntoView({ block: "start", behavior: "auto", inline: "nearest" });
-    }
-  }, []);
-
-  const scrollDestinationFieldIntoMobileView = useCallback(() => {
-    if (typeof window === "undefined") return;
-    if (!window.matchMedia("(max-width: 767px)").matches) return;
-
-    alignDestinationFieldToVisualViewport();
-    requestAnimationFrame(alignDestinationFieldToVisualViewport);
-    window.setTimeout(alignDestinationFieldToVisualViewport, 50);
-    window.setTimeout(alignDestinationFieldToVisualViewport, 200);
-    window.setTimeout(alignDestinationFieldToVisualViewport, 450);
-  }, [alignDestinationFieldToVisualViewport]);
-
   const suggestionIcon = (type: string) => {
     const normalizedType = type.toLowerCase();
     if (normalizedType === "ap" || normalizedType.includes("airport")) {
@@ -542,11 +508,10 @@ const SearchForm = ({ defaults, trackingContext }: SearchFormProps = {}) => {
       description: t.destinationPickDesc,
     });
     destinationInputRef.current?.focus();
-    scrollDestinationFieldIntoMobileView();
     if (destination.trim().length >= 3 && suggestions.length > 0) {
       setIsDropdownOpen(true);
     }
-  }, [destination, suggestions.length, scrollDestinationFieldIntoMobileView, t]);
+  }, [destination, suggestions.length, t]);
 
   useEffect(() => {
     if (isDestinationLocked) {
@@ -606,31 +571,6 @@ const SearchForm = ({ defaults, trackingContext }: SearchFormProps = {}) => {
       setIsDestinationLocked(false);
     }
   }, [destination, selectedSuggestion, defaults?.cityName]);
-
-  useEffect(() => {
-    const vv = window.visualViewport;
-    if (!vv) return;
-
-    const onViewportChange = () => {
-      if (document.activeElement !== destinationInputRef.current) return;
-      if (!window.matchMedia("(max-width: 767px)").matches) return;
-      alignDestinationFieldToVisualViewport();
-    };
-
-    vv.addEventListener("resize", onViewportChange);
-    vv.addEventListener("scroll", onViewportChange);
-    return () => {
-      vv.removeEventListener("resize", onViewportChange);
-      vv.removeEventListener("scroll", onViewportChange);
-    };
-  }, [alignDestinationFieldToVisualViewport]);
-
-  useEffect(() => {
-    if (!isDropdownOpen || suggestions.length === 0) return;
-    if (!window.matchMedia("(max-width: 767px)").matches) return;
-    const id = window.requestAnimationFrame(() => scrollDestinationFieldIntoMobileView());
-    return () => window.cancelAnimationFrame(id);
-  }, [isDropdownOpen, suggestions.length, scrollDestinationFieldIntoMobileView]);
 
   useEffect(() => {
     if (spiderRanRef.current || !isSpiderMode()) return;
@@ -697,7 +637,6 @@ const SearchForm = ({ defaults, trackingContext }: SearchFormProps = {}) => {
         setSelectedSuggestion(null);
       }
       destinationInputRef.current?.focus();
-      scrollDestinationFieldIntoMobileView();
       return;
     }
 
@@ -721,7 +660,6 @@ const SearchForm = ({ defaults, trackingContext }: SearchFormProps = {}) => {
         setSelectedSuggestion(null);
       }
       destinationInputRef.current?.focus();
-      scrollDestinationFieldIntoMobileView();
       return;
     }
 
@@ -926,7 +864,6 @@ const SearchForm = ({ defaults, trackingContext }: SearchFormProps = {}) => {
       <div className="grid grid-cols-1 gap-2 desktop:grid-cols-[1.5fr_1.5fr_1.35fr_auto] desktop:gap-[0.575rem] desktop:[&>*]:min-w-0">
         {/* Destination */}
         <div
-          ref={destinationFieldRef}
           className={cn(
             "relative",
             searchFieldShell,
@@ -967,7 +904,6 @@ const SearchForm = ({ defaults, trackingContext }: SearchFormProps = {}) => {
               }}
               onFocus={() => {
                 if (isDestinationLocked) return;
-                scrollDestinationFieldIntoMobileView();
                 if (destination.trim().length >= 3 && suggestions.length > 0) {
                   setIsDropdownOpen(true);
                 }
@@ -1008,7 +944,7 @@ const SearchForm = ({ defaults, trackingContext }: SearchFormProps = {}) => {
               aria-invalid={destinationError}
               aria-describedby={destinationError ? "search-destination-error" : undefined}
               className={cn(
-                "min-w-0 flex-1 truncate border-0 bg-transparent p-0 text-left text-base text-foreground shadow-none outline-none",
+                "min-w-0 flex-1 truncate border-0 bg-transparent p-0 text-left text-base text-foreground shadow-none outline-none scroll-mt-24 md:scroll-mt-0",
                 desktopFieldText,
                 "placeholder:text-left placeholder:text-muted-foreground",
                 "focus-visible:ring-0 focus-visible:ring-offset-0"
