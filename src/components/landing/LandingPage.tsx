@@ -71,9 +71,10 @@ const LandingPage = ({ config }: LandingPageProps) => {
       ) : null}
       {showCityExtras && config.relatedHotels?.length ? (
         <RelatedHotels
-          cityName={config.city.name}
+          city={config.city}
           hotels={config.relatedHotels}
           intentLabel={config.intent?.label}
+          tracking={config.tracking}
         />
       ) : null}
       <DestinationContent config={config} />
