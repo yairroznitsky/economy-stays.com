@@ -51,6 +51,8 @@ const writeCookie = (value: string) => {
 };
 
 export class LandingTrackingService {
+  private static loggedLandingIds = new Set<string>();
+
   /** Cheap-stays: CS- + 12 hex. Other brands (e.g. SB-): prefix + 10 alphanumeric. */
   static generateLandingId(): string {
     if (LANDING_ID_PREFIX === "CS-") {
@@ -92,6 +94,9 @@ export class LandingTrackingService {
     landingId: string,
     partnerData?: PartnerLandingData
   ): Promise<void> {
+    if (!landingId || this.loggedLandingIds.has(landingId)) return;
+    this.loggedLandingIds.add(landingId);
+
     const metadata: Record<string, unknown> = {
       referrer: document.referrer,
     };
@@ -111,6 +116,7 @@ export class LandingTrackingService {
         metadata,
       });
     } catch (error) {
+      this.loggedLandingIds.delete(landingId);
       console.warn("[tracking] landings insert failed", error);
     }
   }

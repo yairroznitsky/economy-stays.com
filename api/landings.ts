@@ -46,24 +46,42 @@ const getSupabaseConfig = (): { url: string; key: string } => {
   return { url, key };
 };
 
+const isUniqueViolation = (status: number, body: string): boolean =>
+  (status === 409 || status === 500) &&
+  (body.includes("23505") ||
+    body.includes("duplicate key") ||
+    body.includes("_pkey"));
+
 const insertRow = async (
   table: string,
-  row: Record<string, unknown>
+  row: Record<string, unknown>,
+  options?: { ignoreDuplicatesOn?: string }
 ): Promise<{ error: string | null }> => {
   const { url, key } = getSupabaseConfig();
-  const response = await fetch(`${url}/rest/v1/${encodeURIComponent(table)}`, {
+  const conflict = options?.ignoreDuplicatesOn;
+  const path = conflict
+    ? `${encodeURIComponent(table)}?on_conflict=${encodeURIComponent(conflict)}`
+    : encodeURIComponent(table);
+  const prefer = conflict
+    ? "resolution=ignore-duplicates,return=minimal"
+    : "return=minimal";
+
+  const response = await fetch(`${url}/rest/v1/${path}`, {
     method: "POST",
     headers: {
       apikey: key,
       Authorization: `Bearer ${key}`,
       "Content-Type": "application/json",
-      Prefer: "return=minimal",
+      Prefer: prefer,
     },
     body: JSON.stringify(row),
   });
 
   if (!response.ok) {
     const text = await response.text().catch(() => "");
+    if (isUniqueViolation(response.status, text)) {
+      return { error: null };
+    }
     return { error: text || response.statusText || `HTTP ${response.status}` };
   }
   return { error: null };
@@ -138,11 +156,15 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
         "cheap-stays",
     };
 
-    const { error } = await insertRow("landings", {
-      landing_id: landingId,
-      url_params: urlParams,
-      metadata,
-    });
+    const { error } = await insertRow(
+      "landings",
+      {
+        landing_id: landingId,
+        url_params: urlParams,
+        metadata,
+      },
+      { ignoreDuplicatesOn: "landing_id" }
+    );
 
     if (error) {
       res.status(500).json({ error });

@@ -17,7 +17,8 @@ export const trackingApiUrl = (path: TrackingApiPath): string => {
 
 export const postTrackingJson = async (
   path: TrackingApiPath,
-  body: Record<string, unknown>
+  body: Record<string, unknown>,
+  options?: { keepalive?: boolean }
 ): Promise<void> => {
   if (!siteConfig.enableDbTracking) return;
 
@@ -25,7 +26,8 @@ export const postTrackingJson = async (
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
-    keepalive: true,
+    // Landings fire on page load; keepalive on unload can replay the same POST.
+    keepalive: options?.keepalive ?? path === "/search",
   });
 
   if (!response.ok) {

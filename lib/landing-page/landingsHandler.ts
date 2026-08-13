@@ -42,11 +42,15 @@ export const handleLandingsInsert = async (
       source_app: getSourceApp(),
     };
 
-    const { error } = await insertRow("landings", {
-      landing_id: landingId,
-      url_params: urlParams,
-      metadata,
-    });
+    const { error } = await insertRow(
+      "landings",
+      {
+        landing_id: landingId,
+        url_params: urlParams,
+        metadata,
+      },
+      { ignoreDuplicatesOn: "landing_id" }
+    );
 
     if (error) {
       return { status: 500, body: { error } };
