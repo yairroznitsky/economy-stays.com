@@ -265,6 +265,61 @@ const extraNames: Array<[string, string, string, string, number, number, string]
   ["Saipan", "Northern Mariana Islands", "MP", "SPN", 15.185, 145.7467],
 ];
 
+/** All 50 US state capitals. Duplicates of existing slugs are skipped. */
+const usStateCapitals: Array<[string, string, string, number, number]> = [
+  ["Montgomery", "MGM", 32.3792, -86.3077],
+  ["Juneau", "JNU", 58.3019, -134.4197],
+  ["Phoenix", "PHX", 33.4484, -112.074],
+  ["Little Rock", "LIT", 34.7465, -92.2896],
+  ["Sacramento", "SMF", 38.5816, -121.4944],
+  ["Denver", "DEN", 39.7392, -104.9903],
+  ["Hartford", "BDL", 41.7658, -72.6734],
+  ["Dover", "ILG", 39.1582, -75.5244],
+  ["Tallahassee", "TLH", 30.4383, -84.2807],
+  ["Atlanta", "ATL", 33.749, -84.388],
+  ["Honolulu", "HNL", 21.3069, -157.8583],
+  ["Boise", "BOI", 43.615, -116.2023],
+  ["Springfield", "SPI", 39.7817, -89.6501],
+  ["Indianapolis", "IND", 39.7684, -86.1581],
+  ["Des Moines", "DSM", 41.5868, -93.625],
+  ["Topeka", "FOE", 39.0473, -95.6752],
+  ["Frankfort", "LEX", 38.2009, -84.8733],
+  ["Baton Rouge", "BTR", 30.4515, -91.1871],
+  ["Augusta", "PWM", 44.3106, -69.7795],
+  ["Annapolis", "BWI", 38.9784, -76.4922],
+  ["Boston", "BOS", 42.3601, -71.0589],
+  ["Lansing", "LAN", 42.7325, -84.5555],
+  ["Saint Paul", "MSP", 44.9537, -93.09],
+  ["Jackson", "JAN", 32.2988, -90.1848],
+  ["Jefferson City", "COU", 38.5767, -92.1735],
+  ["Helena", "HLN", 46.5891, -112.0391],
+  ["Lincoln", "LNK", 40.8136, -96.7026],
+  ["Carson City", "RNO", 39.1638, -119.7674],
+  ["Concord", "MHT", 43.2081, -71.5376],
+  ["Trenton", "TTN", 40.2206, -74.7597],
+  ["Santa Fe", "SAF", 35.687, -105.9378],
+  ["Albany", "ALB", 42.6526, -73.7562],
+  ["Raleigh", "RDU", 35.7796, -78.6382],
+  ["Bismarck", "BIS", 46.8083, -100.7837],
+  ["Columbus", "CMH", 39.9612, -82.9988],
+  ["Oklahoma City", "OKC", 35.4676, -97.5164],
+  ["Salem", "SLE", 44.9429, -123.0351],
+  ["Harrisburg", "MDT", 40.2732, -76.8867],
+  ["Providence", "PVD", 41.824, -71.4128],
+  ["Columbia", "CAE", 34.0007, -81.0348],
+  ["Pierre", "PIR", 44.3683, -100.351],
+  ["Nashville", "BNA", 36.1627, -86.7816],
+  ["Austin", "AUS", 30.2672, -97.7431],
+  ["Salt Lake City", "SLC", 40.7608, -111.891],
+  ["Montpelier", "BTV", 44.2601, -72.5754],
+  ["Richmond", "RIC", 37.5407, -77.436],
+  ["Olympia", "OLM", 47.0379, -122.9007],
+  // Distinct from Charleston, SC (already in the list).
+  ["Charleston WV", "CRW", 38.3498, -81.6326],
+  ["Madison", "MSN", 43.0731, -89.4012],
+  ["Cheyenne", "CYS", 41.14, -104.8202],
+];
+
 let priority = 149;
 for (const [name, country, countryCode, airportCode, lat, lng] of extraNames) {
   if (cities.some((city) => slugify(city.name) === slugify(name))) continue;
@@ -279,22 +334,24 @@ for (const [name, country, countryCode, airportCode, lat, lng] of extraNames) {
   });
 }
 
-while (cities.length < 200) {
-  const index = cities.length + 1;
+cities.splice(200);
+
+priority = Math.min(...cities.map((city) => city.priority)) - 1;
+for (const [name, airportCode, lat, lng] of usStateCapitals) {
+  if (cities.some((city) => slugify(city.name) === slugify(name))) continue;
   cities.push({
-    name: `Travel City ${index}`,
+    name,
     country: "United States",
     countryCode: "US",
-    lat: 40 + index * 0.01,
-    lng: -74 - index * 0.01,
-    airportCode: "JFK",
-    priority: 200 - index,
+    lat,
+    lng,
+    airportCode,
+    priority: priority--,
   });
 }
 
 const header = "name,country,country_code,lat,lng,airport_code,priority\n";
 const rows = cities
-  .slice(0, 200)
   .map(
     (city) =>
       `"${city.name}","${city.country}","${city.countryCode}",${city.lat},${city.lng},"${city.airportCode}",${city.priority}`
@@ -302,4 +359,4 @@ const rows = cities
   .join("\n");
 
 writeFileSync("data/cities-top200.csv", `${header}${rows}\n`);
-console.log(`Wrote ${Math.min(cities.length, 200)} cities to data/cities-top200.csv`);
+console.log(`Wrote ${cities.length} cities to data/cities-top200.csv`);

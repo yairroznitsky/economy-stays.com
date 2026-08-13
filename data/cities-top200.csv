@@ -199,3 +199,45 @@ name,country,country_code,lat,lng,airport_code,priority
 "Penang","Malaysia","MY",5.4164,100.3327,"PEN",3
 "Langkawi","Malaysia","MY",6.35,99.8,"LGK",2
 "Cebu","Philippines","PH",10.3157,123.8854,"CEB",1
+"Montgomery","United States","US",32.3792,-86.3077,"MGM",0
+"Juneau","United States","US",58.3019,-134.4197,"JNU",-1
+"Little Rock","United States","US",34.7465,-92.2896,"LIT",-2
+"Sacramento","United States","US",38.5816,-121.4944,"SMF",-3
+"Hartford","United States","US",41.7658,-72.6734,"BDL",-4
+"Dover","United States","US",39.1582,-75.5244,"ILG",-5
+"Tallahassee","United States","US",30.4383,-84.2807,"TLH",-6
+"Boise","United States","US",43.615,-116.2023,"BOI",-7
+"Springfield","United States","US",39.7817,-89.6501,"SPI",-8
+"Indianapolis","United States","US",39.7684,-86.1581,"IND",-9
+"Des Moines","United States","US",41.5868,-93.625,"DSM",-10
+"Topeka","United States","US",39.0473,-95.6752,"FOE",-11
+"Frankfort","United States","US",38.2009,-84.8733,"LEX",-12
+"Baton Rouge","United States","US",30.4515,-91.1871,"BTR",-13
+"Augusta","United States","US",44.3106,-69.7795,"PWM",-14
+"Annapolis","United States","US",38.9784,-76.4922,"BWI",-15
+"Lansing","United States","US",42.7325,-84.5555,"LAN",-16
+"Saint Paul","United States","US",44.9537,-93.09,"MSP",-17
+"Jackson","United States","US",32.2988,-90.1848,"JAN",-18
+"Jefferson City","United States","US",38.5767,-92.1735,"COU",-19
+"Helena","United States","US",46.5891,-112.0391,"HLN",-20
+"Lincoln","United States","US",40.8136,-96.7026,"LNK",-21
+"Carson City","United States","US",39.1638,-119.7674,"RNO",-22
+"Concord","United States","US",43.2081,-71.5376,"MHT",-23
+"Trenton","United States","US",40.2206,-74.7597,"TTN",-24
+"Santa Fe","United States","US",35.687,-105.9378,"SAF",-25
+"Albany","United States","US",42.6526,-73.7562,"ALB",-26
+"Raleigh","United States","US",35.7796,-78.6382,"RDU",-27
+"Bismarck","United States","US",46.8083,-100.7837,"BIS",-28
+"Columbus","United States","US",39.9612,-82.9988,"CMH",-29
+"Oklahoma City","United States","US",35.4676,-97.5164,"OKC",-30
+"Salem","United States","US",44.9429,-123.0351,"SLE",-31
+"Harrisburg","United States","US",40.2732,-76.8867,"MDT",-32
+"Providence","United States","US",41.824,-71.4128,"PVD",-33
+"Columbia","United States","US",34.0007,-81.0348,"CAE",-34
+"Pierre","United States","US",44.3683,-100.351,"PIR",-35
+"Montpelier","United States","US",44.2601,-72.5754,"BTV",-36
+"Richmond","United States","US",37.5407,-77.436,"RIC",-37
+"Olympia","United States","US",47.0379,-122.9007,"OLM",-38
+"Charleston WV","United States","US",38.3498,-81.6326,"CRW",-39
+"Madison","United States","US",43.0731,-89.4012,"MSN",-40
+"Cheyenne","United States","US",41.14,-104.8202,"CYS",-41

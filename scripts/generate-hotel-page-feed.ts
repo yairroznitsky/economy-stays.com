@@ -1,4 +1,4 @@
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { parseArgs } from "node:util";
 import {
@@ -7,6 +7,7 @@ import {
   buildIntentPath,
   slugifyName,
 } from "../lib/landing-page/hotelSlug.ts";
+import { feedPageUrl } from "./lib/feedSiteDomain.ts";
 import { loadDotEnv, selectRows } from "./lib/supabaseAdmin.ts";
 
 /**
@@ -22,6 +23,7 @@ import { loadDotEnv, selectRows } from "./lib/supabaseAdmin.ts";
  *   npx tsx scripts/generate-hotel-page-feed.ts
  *   npx tsx scripts/generate-hotel-page-feed.ts --hotels-only --limit 50000
  *   npx tsx scripts/generate-hotel-page-feed.ts --country US --min-reviews 50
+ *   npx tsx scripts/generate-hotel-page-feed.ts --no-hotels --action Add --slugs-file data/feeds/new-us-capitals.txt --out data/feeds/hotel-page-feed-delta.csv
  */
 
 loadDotEnv();
@@ -48,7 +50,7 @@ type HotelRow = {
 };
 
 const PAGE_SIZE = 1000;
-const siteDomain = process.env.VITE_SITE_DOMAIN ?? "cheap-stays.com";
+const FEED_ACTIONS = new Set(["Add", "Set", "Remove"]);
 
 const { values: args } = parseArgs({
   options: {
@@ -57,6 +59,9 @@ const { values: args } = parseArgs({
     "min-reviews": { type: "string" },
     "hotels-only": { type: "boolean", default: false },
     "no-hotels": { type: "boolean", default: false },
+    action: { type: "string" },
+    "city-slugs": { type: "string" },
+    "slugs-file": { type: "string" },
     out: { type: "string", default: join("data", "feeds", "hotel-page-feed.csv") },
   },
 });
@@ -64,6 +69,36 @@ const { values: args } = parseArgs({
 const limit = Number(args.limit) || 0;
 const minReviews = Number(args["min-reviews"]) || 0;
 const country = args.country?.trim().toUpperCase();
+
+const parseFeedAction = (value: string | undefined): string | null => {
+  if (!value?.trim()) return null;
+  const normalized =
+    value.trim().charAt(0).toUpperCase() + value.trim().slice(1).toLowerCase();
+  if (!FEED_ACTIONS.has(normalized)) {
+    throw new Error(`Invalid --action: ${value} (use Add, Set, or Remove)`);
+  }
+  return normalized;
+};
+
+const parseCitySlugs = (): Set<string> | null => {
+  const slugs = [
+    ...(args["city-slugs"]
+      ?.split(",")
+      .map((slug) => slug.trim())
+      .filter(Boolean) ?? []),
+    ...(args["slugs-file"]
+      ? readFileSync(args["slugs-file"], "utf8")
+          .split(/\r?\n/)
+          .map((line) => line.trim())
+          .filter(Boolean)
+      : []),
+  ];
+  if (slugs.length === 0) return null;
+  return new Set(slugs.map((slug) => slugifyName(slug)));
+};
+
+const feedAction = parseFeedAction(args.action);
+const citySlugs = parseCitySlugs();
 
 const csvField = (value: string): string =>
   /[",\n]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value;
@@ -76,8 +111,12 @@ const pushRow = (
   path: string,
   labels: string[]
 ): void => {
+  const labelsField = csvField(labels.filter(Boolean).join("; "));
+  const pageUrl = feedPageUrl(path);
   lines.push(
-    `https://${siteDomain}${path},${csvField(labels.filter(Boolean).join("; "))}`
+    feedAction
+      ? `${feedAction},${pageUrl},${labelsField}`
+      : `${pageUrl},${labelsField}`
   );
 };
 
@@ -95,6 +134,14 @@ const addCityAndIntentRows = async (lines: string[]): Promise<number> => {
     cities = cities.filter(
       (city) => city.country_code.toUpperCase() === country
     );
+  }
+
+  if (citySlugs) {
+    cities = cities.filter((city) => citySlugs.has(city.slug));
+    if (cities.length === 0) {
+      throw new Error("No cities matched --city-slugs / --slugs-file");
+    }
+    console.log(`Filtered to ${cities.length} city slug(s)`);
   }
 
   let count = 0;
@@ -147,6 +194,11 @@ const addHotelRows = async (lines: string[]): Promise<number> => {
     );
 
     for (const row of rows) {
+      if (citySlugs) {
+        const citySlug = row.city_name ? slugifyName(row.city_name) : "";
+        if (!citySlugs.has(citySlug)) continue;
+      }
+
       const path = buildHotelPath(row.city_name, row.name);
       const existing = bestByPath.get(path);
       if (!existing || (row.reviews ?? 0) > (existing.reviews ?? 0)) {
@@ -176,7 +228,10 @@ const addHotelRows = async (lines: string[]): Promise<number> => {
 };
 
 const main = async () => {
-  const lines = ["Page URL,Custom label"];
+  const header = feedAction
+    ? "Action,Page URL,Custom label"
+    : "Page URL,Custom label";
+  const lines = [header];
   let cityIntentCount = 0;
   let hotelCount = 0;
 

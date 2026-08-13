@@ -1,6 +1,6 @@
 import { parseArgs } from "node:util";
 import { buildLandingPagePath } from "./lib/paths.ts";
-import { loadDotEnv, selectRows, insertRows } from "./lib/supabaseAdmin.ts";
+import { loadDotEnv, selectRows, supabaseFetch } from "./lib/supabaseAdmin.ts";
 
 loadDotEnv();
 
@@ -27,9 +27,54 @@ type LandingPageRow = {
   path: string;
 };
 
+const PAGE_SIZE = 1000;
+
 const parseList = (value: string | undefined): string[] | null => {
   if (!value || value === "all") return null;
   return value.split(",").map((item) => item.trim()).filter(Boolean);
+};
+
+const fetchAllExistingPages = async (): Promise<LandingPageRow[]> => {
+  const rows: LandingPageRow[] = [];
+  let offset = 0;
+  for (;;) {
+    const page = await selectRows<LandingPageRow>(
+      "landing_pages",
+      `select=id,city_id,intent_id,path&limit=${PAGE_SIZE}&offset=${offset}`
+    );
+    rows.push(...page);
+    if (page.length < PAGE_SIZE) break;
+    offset += page.length;
+  }
+  return rows;
+};
+
+const isDuplicateKeyError = (text: string): boolean =>
+  text.includes("23505") || /duplicate key/i.test(text);
+
+const insertRowsSkipDuplicates = async (
+  table: string,
+  rows: Record<string, unknown>[]
+): Promise<{ created: number; skipped: number }> => {
+  let created = 0;
+  let skipped = 0;
+  for (const row of rows) {
+    const response = await supabaseFetch(encodeURIComponent(table), {
+      method: "POST",
+      headers: { Prefer: "return=minimal" },
+      body: JSON.stringify(row),
+    });
+    if (!response.ok) {
+      const text = await response.text();
+      if (isDuplicateKeyError(text)) {
+        skipped += 1;
+        continue;
+      }
+      throw new Error(`Insert ${table} failed: ${text || response.statusText}`);
+    }
+    created += 1;
+  }
+  return { created, skipped };
 };
 
 const main = async () => {
@@ -57,14 +102,12 @@ const main = async () => {
     "select=id,slug,label,active,priority&active=eq.true&order=priority.desc"
   );
 
-  const existingPages = await selectRows<LandingPageRow>(
-    "landing_pages",
-    "select=id,city_id,intent_id,path"
-  );
+  const existingPages = await fetchAllExistingPages();
 
   const existingKeys = new Set(
     existingPages.map((page) => `${page.city_id}:${page.intent_id ?? "base"}`)
   );
+  const existingPaths = new Set(existingPages.map((page) => page.path));
 
   let selectedCities = cities;
   if (cityFilter) {
@@ -79,15 +122,21 @@ const main = async () => {
     : intents;
 
   const rows: Record<string, unknown>[] = [];
+  let skipped = 0;
 
   for (const city of selectedCities) {
     if (includeBase) {
       const key = `${city.id}:base`;
-      if (!existingKeys.has(key)) {
+      const path = buildLandingPagePath(city.slug);
+      if (existingKeys.has(key) || existingPaths.has(path)) {
+        skipped += 1;
+      } else {
+        existingKeys.add(key);
+        existingPaths.add(path);
         rows.push({
           city_id: city.id,
           intent_id: null,
-          path: buildLandingPagePath(city.slug),
+          path,
           status: "draft",
           noindex: true,
         });
@@ -96,11 +145,17 @@ const main = async () => {
 
     for (const intent of selectedIntents) {
       const key = `${city.id}:${intent.id}`;
-      if (existingKeys.has(key)) continue;
+      const path = buildLandingPagePath(city.slug, intent.slug);
+      if (existingKeys.has(key) || existingPaths.has(path)) {
+        skipped += 1;
+        continue;
+      }
+      existingKeys.add(key);
+      existingPaths.add(path);
       rows.push({
         city_id: city.id,
         intent_id: intent.id,
-        path: buildLandingPagePath(city.slug, intent.slug),
+        path,
         status: "draft",
         noindex: true,
       });
@@ -108,12 +163,17 @@ const main = async () => {
   }
 
   if (rows.length === 0) {
-    console.log("No new landing pages to create");
+    console.log(`No new landing pages to create (skipped=${skipped})`);
     return;
   }
 
-  await insertRows("landing_pages", rows);
-  console.log(`Created ${rows.length} landing page rows`);
+  const { created, skipped: insertSkipped } = await insertRowsSkipDuplicates(
+    "landing_pages",
+    rows
+  );
+  console.log(
+    `Created ${created} landing page row(s), skipped ${skipped + insertSkipped}`
+  );
 };
 
 main().catch((error) => {

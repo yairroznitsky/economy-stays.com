@@ -90,7 +90,7 @@ const main = async () => {
       await sleep(250);
     }
 
-    rows.push({
+    const row: Record<string, unknown> = {
       slug,
       name: city.name,
       country: city.country,
@@ -98,11 +98,15 @@ const main = async () => {
       lat: city.lat,
       lng: city.lng,
       airport_code: city.airport_code ?? null,
-      kayak_destination_id: kayakDestinationId ?? null,
-      kayak_city_slug: kayakCitySlug ?? null,
       priority: city.priority,
       active: true,
-    });
+    };
+    // Only write Kayak fields when resolving so a re-import does not blank them.
+    if (values["resolve-kayak"]) {
+      if (kayakDestinationId) row.kayak_destination_id = kayakDestinationId;
+      if (kayakCitySlug) row.kayak_city_slug = kayakCitySlug;
+    }
+    rows.push(row);
   }
 
   await upsertRows("cities", rows, "slug");
