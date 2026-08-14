@@ -6,6 +6,7 @@ import {
   buildHotelPath,
   buildIntentPath,
 } from "../lib/landing-page/hotelSlug.ts";
+import { SITELINK_SLUGS } from "../src/lib/sitelinkPages.ts";
 import { loadDotEnv, selectRows } from "./lib/supabaseAdmin.ts";
 
 /**
@@ -30,6 +31,16 @@ type HotelRow = {
 const siteDomain = process.env.VITE_SITE_DOMAIN ?? "cheap-stays.com";
 const PAGE_SIZE = 1000;
 const URLS_PER_SITEMAP = 45000;
+const STATIC_PATHS = [
+  "/",
+  "/about",
+  "/contact",
+  "/privacy",
+  "/es",
+  "/br",
+  "/llms.txt",
+  ...SITELINK_SLUGS.map((slug) => `/${slug}`),
+];
 
 const { values: args } = parseArgs({
   options: {
@@ -67,6 +78,12 @@ const fetchAll = async <T>(table: string, query: string): Promise<T[]> => {
 
 const main = async () => {
   const files: string[] = [];
+
+  writeFileSync(join("public", "sitemap-static.xml"), buildUrlset(STATIC_PATHS));
+  files.push("sitemap-static.xml");
+  console.log(
+    `Wrote sitemap-static.xml with ${STATIC_PATHS.length} static page(s)`
+  );
 
   try {
     const [cities, intents] = await Promise.all([
@@ -126,7 +143,11 @@ const main = async () => {
     writeFileSync(join("public", "sitemap.xml"), buildIndex(files));
     console.log(`Wrote sitemap.xml index referencing ${files.length} file(s)`);
   } catch (error) {
-    console.warn("Sitemap: Supabase unavailable, keeping existing sitemap files.", error);
+    writeFileSync(join("public", "sitemap.xml"), buildIndex(files));
+    console.warn(
+      "Sitemap: Supabase unavailable, wrote static sitemap only.",
+      error
+    );
   }
 };
 

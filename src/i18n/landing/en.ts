@@ -47,7 +47,7 @@ export const en: LandingTranslations = {
     operatedBy: (siteName, operator) =>
       `${siteName} is operated by ${operator}.`,
     commission: (siteName) =>
-      `${siteName} may receive a commission when you book through partner links.`,
+      `${siteName} may receive a commission when you book through our links.`,
   },
   search: {
     where: "Where",

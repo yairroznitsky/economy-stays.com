@@ -66,7 +66,7 @@ import { trackTikTokSearch } from "@/lib/tiktokPixelTracking";
 import type { HotelDestinationSuggestion } from "@/types/hotels";
 
 export interface SearchFormDefaults {
-  destinationQuery: string;
+  destinationQuery?: string;
   nightsOffsetDays?: number;
   stayNights?: number;
   adults?: number;
@@ -266,7 +266,7 @@ const SearchForm = ({ defaults, trackingContext }: SearchFormProps = {}) => {
     };
 
     const displayDestination =
-      defaults.cityName?.trim() || defaults.destinationQuery;
+      defaults.cityName?.trim() || defaults.destinationQuery || "";
     setDestination(displayDestination);
     setAdults(defaults.adults ?? 2);
     setRooms(defaults.rooms ?? 1);
