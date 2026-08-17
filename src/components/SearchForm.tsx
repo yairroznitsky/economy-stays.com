@@ -52,9 +52,11 @@ import { validateHotelSearch } from "@/lib/skyscannerHotels";
 import { generateClickId, LandingTrackingService } from "@/lib/landingTrackingService";
 import {
   buildHotelClickSearchParams,
+  recordPartnerClick,
   trackPartnerExit,
 } from "@/lib/partnerClickTracking";
-import { getHotelAffiliateRouting } from "@/lib/bookingMode";
+import { getHotelAffiliateRouting, is2PopMode } from "@/lib/bookingMode";
+import { buildCjBookingUrl } from "@/lib/cjBooking";
 import { trackMetaSearch } from "@/lib/metaPixelTracking";
 import {
   isSpiderMode,
@@ -666,6 +668,16 @@ const SearchForm = ({ defaults, trackingContext }: SearchFormProps = {}) => {
     setDestinationError(false);
     searchSubmitInFlightRef.current = true;
     setIsLoading(true);
+
+    // Open a blank tab synchronously (within the user gesture) for 2pop mode so
+    // it is never blocked by popup blockers. We fill in the Kayak URL after the
+    // async work is complete.
+    let twoPopWindow: Window | null = null;
+    let twoPopNavigated = false;
+    if (is2PopMode()) {
+      twoPopWindow = window.open("about:blank", "_blank");
+    }
+
     try {
       const { locale, marketCountry } = getDeviceKayakAutocompleteContext();
       let suggestion = selectedSuggestion;
@@ -749,6 +761,78 @@ const SearchForm = ({ defaults, trackingContext }: SearchFormProps = {}) => {
         trackingExtras.intent_id = trackingContext.intentId;
       }
 
+      if (twoPopWindow !== null) {
+        // 2pop flow: Kayak in new tab + CJ Booking.com in current tab.
+        const kayakClickId = generateClickId();
+        const cjClickId = generateClickId();
+
+        const kayakResponse = await requestHotelRedirectUrl({
+          search,
+          clickId: kayakClickId,
+          landingId,
+          affiliateSource: "kayak",
+          metadata: {
+            ...trackingExtras,
+            destination_id: suggestion.id ?? "",
+            two_pop: "1",
+          },
+        });
+
+        const cjUrl = buildCjBookingUrl({
+          query: search.destination!.trim(),
+          checkin: search.checkIn!,
+          checkout: search.checkOut!,
+          rooms: search.rooms ?? 1,
+          adults: search.adults ?? 2,
+          children: search.children ?? 0,
+          children_ages: search.childrenAges ?? [],
+          click_id: cjClickId,
+          latitude: search.latitude,
+          longitude: search.longitude,
+        });
+
+        // Navigate the pre-opened tab to the Kayak deeplink.
+        twoPopWindow.location.href = kayakResponse.redirectUrl;
+        twoPopNavigated = true;
+
+        try {
+          trackMetaSearch(search);
+          trackTikTokSearch(search);
+        } catch {
+          // Pixel tracking must not block the redirect.
+        }
+
+        // Track the Kayak click (fire-and-forget, no navigation).
+        void recordPartnerClick({
+          partner: "kayak-hotels",
+          redirectUrl: kayakResponse.redirectUrl,
+          placement: "new_tab",
+          clickId: kayakClickId,
+          landingId,
+          iataCode: search.airportCode ?? null,
+          locationId: kayakResponse.entityId,
+          pickupDateNew: search.checkIn ?? null,
+          dropoffDateNew: search.checkOut ?? null,
+          searchParams: buildHotelClickSearchParams(search, { ...trackingExtras, two_pop: "1" }),
+        });
+
+        // Track the CJ click + redirect the current tab.
+        await trackPartnerExit({
+          partner: "booking-hotels-cj",
+          redirectUrl: cjUrl,
+          placement: "redirect",
+          clickId: cjClickId,
+          landingId,
+          iataCode: null,
+          locationId: search.destination,
+          pickupDateNew: search.checkIn ?? null,
+          dropoffDateNew: search.checkOut ?? null,
+          searchParams: buildHotelClickSearchParams(search, { ...trackingExtras, two_pop: "1" }),
+          autoParams: false,
+        });
+        return;
+      }
+
       const response = await requestHotelRedirectUrl({
         search,
         clickId,
@@ -781,6 +865,10 @@ const SearchForm = ({ defaults, trackingContext }: SearchFormProps = {}) => {
         autoParams: false,
       });
     } catch (error) {
+      // If a blank tab was opened for 2pop but we errored out before filling it, close it.
+      if (twoPopWindow && !twoPopNavigated) {
+        try { twoPopWindow.close(); } catch { /* ignore */ }
+      }
       const message =
         error instanceof Error ? error.message : "We couldn't load results right now.";
       if (isDestinationPickRequiredMessage(message)) {

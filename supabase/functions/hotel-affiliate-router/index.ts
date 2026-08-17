@@ -1,7 +1,9 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import {
   buildBookingAffiliateRedirectUrl,
+  buildCjBookingUrl,
   getDefaultBookingAffiliateConfig,
+  getDefaultCjConfig,
   type BookingDeeplinkInput,
 } from "./bookingDeeplink.ts";
 import {
@@ -30,6 +32,8 @@ interface HotelAffiliateRequest {
   locale?: string;
   country?: string;
   affiliate_source?: string;
+  /** Per-request provider override: "cj" | "brands_redirect". Falls back to BOOKING_AFFILIATE_PROVIDER env secret. */
+  booking_affiliate_provider?: string;
   latitude?: number;
   longitude?: number;
 }
@@ -415,10 +419,21 @@ Deno.serve(async (request) => {
 
     if (affiliateSource === "booking") {
       const validated = validateBookingInput(payload);
-      const redirectUrl = buildBookingAffiliateRedirectUrl(
-        validated,
-        getDefaultBookingAffiliateConfig()
-      );
+
+      // Resolve booking affiliate provider: request body > env secret > default (brands_redirect).
+      const requestProvider =
+        payload && typeof payload === "object"
+          ? ((payload as Partial<HotelAffiliateRequest>).booking_affiliate_provider ?? "")
+              .trim()
+              .toLowerCase()
+          : "";
+      const envProvider = (Deno.env.get("BOOKING_AFFILIATE_PROVIDER") ?? "").trim().toLowerCase();
+      const resolvedProvider = requestProvider || envProvider || "brands_redirect";
+
+      const redirectUrl =
+        resolvedProvider === "cj"
+          ? buildCjBookingUrl(validated, getDefaultCjConfig())
+          : buildBookingAffiliateRedirectUrl(validated, getDefaultBookingAffiliateConfig());
 
       return jsonResponse(200, {
         success: true,
@@ -429,6 +444,7 @@ Deno.serve(async (request) => {
           click_id: validated.click_id,
           landing_id: validated.landing_id,
           affiliate_source: "booking",
+          booking_affiliate_provider: resolvedProvider,
           query: validated.query,
         },
       });

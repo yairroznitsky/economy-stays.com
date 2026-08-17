@@ -99,6 +99,40 @@ const insertRentalClick = async (options: {
   }
 };
 
+/**
+ * Logs a click to rental_clicks without performing any navigation.
+ * Use when you need a fire-and-forget record for a tab opened manually
+ * (e.g. the Kayak leg of the 2pop flow).
+ */
+export const recordPartnerClick = async (options: {
+  partner: string;
+  redirectUrl: string;
+  placement: PartnerPlacement;
+  clickId: string;
+  landingId: string | null;
+  iataCode?: string | null;
+  locationId?: string | null;
+  pickupDateNew?: string | null;
+  dropoffDateNew?: string | null;
+  searchParams?: Record<string, string>;
+}): Promise<void> => {
+  await insertRentalClick({
+    clickId: options.clickId,
+    landingId: options.landingId,
+    partner: options.partner,
+    redirectUrl: options.redirectUrl,
+    placement: options.placement,
+    iataCode: options.iataCode ?? null,
+    locationId: options.locationId ?? null,
+    pickupDateNew: options.pickupDateNew ?? null,
+    pickupTimeNew: null,
+    dropoffDateNew: options.dropoffDateNew ?? null,
+    dropoffTimeNew: null,
+    searchParams: options.searchParams ?? {},
+    autoParams: false,
+  });
+};
+
 export const trackPartnerExit = async (
   options: PartnerExitOptions
 ): Promise<void> => {

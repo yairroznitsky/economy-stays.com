@@ -118,3 +118,42 @@ export const getDefaultBookingAffiliateConfig = (): BookingAffiliateConfig => ({
   currency: BOOKING_CURRENCY,
   lang: BOOKING_LANG,
 });
+
+// ─── CJ affiliate ───────────────────────────────────────────────────────────
+
+export interface CjAffiliateConfig {
+  clickDomain: string;
+  pid: string;
+  aid: string;
+}
+
+const normalizeCjDomain = (domain: string): string =>
+  domain
+    .replace(/^https?:\/\//i, "")
+    .replace(/^www\./i, "")
+    .trim();
+
+export const getDefaultCjConfig = (): CjAffiliateConfig => ({
+  clickDomain: Deno.env.get("CJ_CLICK_DOMAIN") ?? "kqzyfj.com",
+  pid: Deno.env.get("CJ_PID") ?? "101841809",
+  aid: Deno.env.get("CJ_AID") ?? "17293132",
+});
+
+/**
+ * Wraps a Booking.com search URL in a CJ affiliate click URL.
+ * https://www.{domain}/click-{pid}-{aid}?url={bookingUrl}&sid={click_id}
+ */
+export const buildCjBookingUrl = (
+  input: BookingDeeplinkInput,
+  config: CjAffiliateConfig = getDefaultCjConfig()
+): string => {
+  const innerUrl = buildBookingSearchResultsUrl(input);
+  const domain = normalizeCjDomain(config.clickDomain);
+
+  const outerParams = new URLSearchParams({
+    url: innerUrl,
+    sid: input.click_id,
+  });
+
+  return `https://www.${domain}/click-${config.pid}-${config.aid}?${outerParams.toString()}`;
+};

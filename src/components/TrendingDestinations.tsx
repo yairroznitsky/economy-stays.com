@@ -9,7 +9,8 @@ import {
   isDestinationPickRequiredMessage,
   isSearchValidationMessage,
 } from "@/lib/hotelSearchErrors";
-import { getHotelAffiliateRouting } from "@/lib/bookingMode";
+import { getHotelAffiliateRouting, is2PopMode } from "@/lib/bookingMode";
+import { buildCjBookingUrl } from "@/lib/cjBooking";
 import {
   buildHotelSearchInputFromSuggestion,
   getDeviceKayakAutocompleteContext,
@@ -19,6 +20,7 @@ import { generateClickId, LandingTrackingService } from "@/lib/landingTrackingSe
 import { trackMetaSearch } from "@/lib/metaPixelTracking";
 import {
   buildHotelClickSearchParams,
+  recordPartnerClick,
   trackPartnerExit,
 } from "@/lib/partnerClickTracking";
 import {
@@ -52,6 +54,15 @@ const TrendingDestinations = ({
 
     trendingSearchInFlightRef.current = true;
     setOpeningDestination(d.title);
+
+    // Open a blank tab synchronously (within the user gesture) for 2pop mode so
+    // it is never blocked by popup blockers. Filled in with the Kayak URL below.
+    let twoPopWindow: Window | null = null;
+    let twoPopNavigated = false;
+    if (is2PopMode()) {
+      twoPopWindow = window.open("about:blank", "_blank");
+    }
+
     const { locale, marketCountry } = getDeviceKayakAutocompleteContext();
 
     try {
@@ -84,8 +95,70 @@ const TrendingDestinations = ({
         }
       );
 
-      const clickId = generateClickId();
       const landingId = await LandingTrackingService.getOrCreateLandingId();
+      const trackingExtras = { surface, source_destination: d.title };
+
+      if (twoPopWindow !== null) {
+        // 2pop flow: Kayak in new tab + CJ Booking.com in current tab.
+        const kayakClickId = generateClickId();
+        const cjClickId = generateClickId();
+
+        const kayakResponse = await requestHotelRedirectUrl({
+          search,
+          clickId: kayakClickId,
+          landingId,
+          affiliateSource: "kayak",
+          metadata: { ...trackingExtras, destination_id: search.destinationId ?? "", two_pop: "1" },
+        });
+
+        const cjUrl = buildCjBookingUrl({
+          query: search.destination!.trim(),
+          checkin: search.checkIn!,
+          checkout: search.checkOut!,
+          rooms: search.rooms ?? 1,
+          adults: search.adults ?? 2,
+          children: search.children ?? 0,
+          children_ages: search.childrenAges ?? [],
+          click_id: cjClickId,
+          latitude: search.latitude,
+          longitude: search.longitude,
+        });
+
+        twoPopWindow.location.href = kayakResponse.redirectUrl;
+        twoPopNavigated = true;
+
+        try { trackMetaSearch(search); } catch { /* non-blocking */ }
+
+        void recordPartnerClick({
+          partner: "kayak-hotels",
+          redirectUrl: kayakResponse.redirectUrl,
+          placement: "new_tab",
+          clickId: kayakClickId,
+          landingId,
+          iataCode: search.airportCode ?? null,
+          locationId: kayakResponse.entityId,
+          pickupDateNew: search.checkIn ?? null,
+          dropoffDateNew: search.checkOut ?? null,
+          searchParams: buildHotelClickSearchParams(search, { ...trackingExtras, two_pop: "1" }),
+        });
+
+        await trackPartnerExit({
+          partner: "booking-hotels-cj",
+          redirectUrl: cjUrl,
+          placement: "redirect",
+          clickId: cjClickId,
+          landingId,
+          iataCode: null,
+          locationId: search.destination,
+          pickupDateNew: search.checkIn ?? null,
+          dropoffDateNew: search.checkOut ?? null,
+          searchParams: buildHotelClickSearchParams(search, { ...trackingExtras, two_pop: "1" }),
+          autoParams: false,
+        });
+        return;
+      }
+
+      const clickId = generateClickId();
       const { affiliateSource, partner } = getHotelAffiliateRouting();
 
       const response = await requestHotelRedirectUrl({
@@ -94,8 +167,7 @@ const TrendingDestinations = ({
         landingId,
         affiliateSource,
         metadata: {
-          surface,
-          source_destination: d.title,
+          ...trackingExtras,
           destination_id: search.destinationId ?? "",
         },
       });
@@ -116,13 +188,14 @@ const TrendingDestinations = ({
         locationId: response.entityId,
         pickupDateNew: search.checkIn ?? null,
         dropoffDateNew: search.checkOut ?? null,
-        searchParams: buildHotelClickSearchParams(search, {
-          surface,
-          source_destination: d.title,
-        }),
+        searchParams: buildHotelClickSearchParams(search, trackingExtras),
         autoParams: true,
       });
     } catch (error) {
+      // If a blank tab was opened for 2pop but we errored before filling it, close it.
+      if (twoPopWindow && !twoPopNavigated) {
+        try { twoPopWindow.close(); } catch { /* ignore */ }
+      }
       const message =
         error instanceof Error
           ? error.message
