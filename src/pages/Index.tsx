@@ -21,22 +21,25 @@ const IndexContent = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero */}
-      <section className="relative min-h-[88svh] w-full overflow-hidden md:min-h-[720px]">
-        <img
-          src={heroImage}
-          alt={t.heroImageAlt}
-          width={1920}
-          height={1280}
-          fetchPriority="high"
-          decoding="async"
-          className="absolute inset-0 h-full w-full object-cover motion-safe:animate-hero-ken"
-        />
-        <div className="absolute inset-0 bg-gradient-hero" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/30" />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-[12%] bottom-[22%] bg-[radial-gradient(ellipse_at_center,hsl(215_45%_6%/0.42)_0%,transparent_68%)]"
-        />
+      <section className="relative min-h-[88svh] w-full md:min-h-[720px]">
+        {/* Clip only the background/animation, not the whole section, so dropdowns can overflow */}
+        <div className="absolute inset-0 overflow-hidden">
+          <img
+            src={heroImage}
+            alt={t.heroImageAlt}
+            width={1920}
+            height={1280}
+            fetchPriority="high"
+            decoding="async"
+            className="absolute inset-0 h-full w-full object-cover motion-safe:animate-hero-ken"
+          />
+          <div className="absolute inset-0 bg-gradient-hero" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/30" />
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 top-[12%] bottom-[22%] bg-[radial-gradient(ellipse_at_center,hsl(215_45%_6%/0.42)_0%,transparent_68%)]"
+          />
+        </div>
 
         <Header />
 
