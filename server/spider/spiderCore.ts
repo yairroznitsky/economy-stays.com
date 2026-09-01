@@ -1,6 +1,9 @@
 /**
- * Self-contained spider redirect logic for Vercel serverless.
- * Do not import from ../server, ../src, or ../supabase — Vercel NFT often fails to bundle those.
+ * Shared spider redirect logic for LOCAL VITE DEV ONLY.
+ *
+ * Vercel production uses api/spider/[token].ts, which is fully self-contained
+ * (Vercel serverless functions cannot reliably import sibling source files).
+ * Keep this file in sync with that handler's logic.
  */
 
 import { randomBytes, timingSafeEqual } from "node:crypto";

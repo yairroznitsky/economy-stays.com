@@ -1,1 +1,1 @@
-export { isValidSpiderToken, tokensMatch } from "../../api/spider/spiderHandler";
+export { isValidSpiderToken, tokensMatch } from "./spiderCore";
