@@ -1,5 +1,9 @@
-import { isValidSpiderToken } from "../../server/spider/spiderToken";
-import { runSpiderKayakRedirect } from "../../server/spider/runSpiderKayakRedirect";
+/**
+ * Self-contained Vercel serverless function.
+ * Logic lives in ./spiderHandler.ts (same folder) so NFT can bundle it.
+ */
+
+import { isValidSpiderToken, runSpiderKayakRedirect } from "./spiderHandler";
 
 interface ApiRequest {
   method?: string;

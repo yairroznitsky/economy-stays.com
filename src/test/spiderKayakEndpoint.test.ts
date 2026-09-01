@@ -1,5 +1,4 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { handleKayakAutocomplete } from "../../server/edge/kayakAutocomplete";
 import {
   pickSpiderSuggestion,
   runSpiderKayakRedirect,
@@ -9,11 +8,15 @@ import {
   tokensMatch,
 } from "../../server/spider/spiderToken";
 
-vi.mock("../../server/edge/kayakAutocomplete", () => ({
-  handleKayakAutocomplete: vi.fn(),
-}));
-
-const mockedAutocomplete = vi.mocked(handleKayakAutocomplete);
+const parisKayakPayload = [
+  {
+    displayname: "Paris, France",
+    loctype: "city",
+    ctid: 5085,
+    cityonly: "Paris",
+    country: "France",
+  },
+];
 
 const parisSuggestion = {
   id: "5085",
@@ -24,6 +27,16 @@ const parisSuggestion = {
     city: "Paris",
     country: "France",
   },
+};
+
+const mockKayakFetch = (payload: unknown, ok = true) => {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn().mockResolvedValue({
+      ok,
+      json: async () => payload,
+    })
+  );
 };
 
 describe("spider token", () => {
@@ -74,19 +87,12 @@ describe("pickSpiderSuggestion", () => {
 });
 
 describe("runSpiderKayakRedirect", () => {
-  beforeEach(() => {
-    mockedAutocomplete.mockReset();
+  afterEach(() => {
+    vi.unstubAllGlobals();
   });
 
   it("builds a Kayak affiliate deeplink from autocomplete", async () => {
-    mockedAutocomplete.mockResolvedValue({
-      status: 200,
-      body: {
-        success: true,
-        query: "Paris, France",
-        suggestions: [parisSuggestion],
-      },
-    });
+    mockKayakFetch(parisKayakPayload);
 
     const result = await runSpiderKayakRedirect({
       destinationQuery: "Paris, France",
@@ -115,14 +121,7 @@ describe("runSpiderKayakRedirect", () => {
   });
 
   it("returns an error when autocomplete has no usable suggestions", async () => {
-    mockedAutocomplete.mockResolvedValue({
-      status: 200,
-      body: {
-        success: true,
-        query: "Paris, France",
-        suggestions: [],
-      },
-    });
+    mockKayakFetch([]);
 
     const result = await runSpiderKayakRedirect({
       destinationQuery: "Paris, France",
@@ -137,15 +136,7 @@ describe("runSpiderKayakRedirect", () => {
   });
 
   it("returns an error when autocomplete is unavailable", async () => {
-    mockedAutocomplete.mockResolvedValue({
-      status: 200,
-      body: {
-        success: false,
-        query: "Paris, France",
-        suggestions: [],
-        error: "Autocomplete unavailable",
-      },
-    });
+    mockKayakFetch([], false);
 
     const result = await runSpiderKayakRedirect({
       destinationQuery: "Paris, France",
