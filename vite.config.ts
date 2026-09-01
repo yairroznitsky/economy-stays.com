@@ -3,7 +3,11 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { rmSync, writeFileSync } from "fs";
 import { componentTagger } from "lovable-tagger";
-import { localEdgePlugin, localTrackingPlugin } from "./server/edge/vitePlugin";
+import {
+  localEdgePlugin,
+  localSpiderPlugin,
+  localTrackingPlugin,
+} from "./server/edge/vitePlugin";
 
 const htmlEnvPlugin = (env: Record<string, string>): Plugin => ({
   name: "html-env-transform",
@@ -132,6 +136,7 @@ export default defineConfig(({ mode }) => {
       webManifestPlugin(env),
       omitUnoptimizedCityHeroesPlugin(),
       mode === "development" && localTrackingPlugin(),
+      mode === "development" && localSpiderPlugin(),
       useLocalEdge && localEdgePlugin(),
       mode === "development" && componentTagger(),
     ].filter(Boolean),

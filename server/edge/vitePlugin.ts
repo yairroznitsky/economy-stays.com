@@ -3,11 +3,20 @@ import { loadEnv } from "vite";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { handleLocalEdgeRequest } from "./index";
 import { handleTrackingRequest } from "../tracking/http";
+import { isValidSpiderToken } from "../spider/spiderToken";
+import { runSpiderKayakRedirect } from "../spider/runSpiderKayakRedirect";
 
 const matchEdgePath = (url: string | undefined): string | null => {
   if (!url) return null;
   const pathname = url.split("?")[0];
   const match = pathname.match(/^\/api\/edge\/([^/]+)\/?$/);
+  return match?.[1] ?? null;
+};
+
+const matchSpiderTokenPath = (url: string | undefined): string | null => {
+  if (!url) return null;
+  const pathname = url.split("?")[0];
+  const match = pathname.match(/^\/s\/([^/]+)\/?$/);
   return match?.[1] ?? null;
 };
 
@@ -43,6 +52,69 @@ export const localTrackingPlugin = (): Plugin => ({
               return;
             }
             next(error instanceof Error ? error : new Error(String(error)));
+          });
+      }
+    );
+  },
+});
+
+/** Hidden GET /s/<token> → Kayak hotels deeplink when SPIDER_TOKEN matches. */
+export const localSpiderPlugin = (): Plugin => ({
+  name: "local-spider-redirect",
+  configureServer(server) {
+    hydrateProcessEnv(server.config.mode, server.config.envDir);
+
+    server.middlewares.use(
+      (req: IncomingMessage, res: ServerResponse, next: (err?: Error) => void) => {
+        if (req.method !== "GET") {
+          next();
+          return;
+        }
+
+        const token = matchSpiderTokenPath(req.url);
+        if (!token) {
+          next();
+          return;
+        }
+
+        if (!isValidSpiderToken(token)) {
+          next();
+          return;
+        }
+
+        void runSpiderKayakRedirect()
+          .then((result) => {
+            if (!result.ok) {
+              if (!res.headersSent) {
+                res.statusCode = 502;
+                res.setHeader("Content-Type", "application/json");
+                res.setHeader("Cache-Control", "no-store");
+                res.setHeader("X-Robots-Tag", "noindex");
+                res.end(JSON.stringify({ error: result.error }));
+              }
+              return;
+            }
+
+            if (!res.headersSent) {
+              res.statusCode = 302;
+              res.setHeader("Location", result.redirectUrl);
+              res.setHeader("Cache-Control", "no-store");
+              res.setHeader("X-Robots-Tag", "noindex");
+              res.end();
+            }
+          })
+          .catch((error: unknown) => {
+            if (!res.headersSent) {
+              res.statusCode = 502;
+              res.setHeader("Content-Type", "application/json");
+              res.setHeader("Cache-Control", "no-store");
+              res.setHeader("X-Robots-Tag", "noindex");
+              const message =
+                error instanceof Error ? error.message : "Spider redirect failed";
+              res.end(JSON.stringify({ error: message }));
+            } else {
+              next(error instanceof Error ? error : new Error(String(error)));
+            }
           });
       }
     );

@@ -2,6 +2,7 @@
   "rewrites": [
     { "source": "/landings", "destination": "/api/landings" },
     { "source": "/search", "destination": "/api/search" },
+    { "source": "/s/:token", "destination": "/api/spider/:token" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ],
   "headers": [
