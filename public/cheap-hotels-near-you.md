@@ -1,73 +1,72 @@
 # Cheap Hotels Near You
 
-Compare cheap hotels near your trip. Pick a city yourself, review budget-friendly current listings, and sort by price for your dates.
+Find budget-friendly hotels near your location. We detect your city automatically and show nearby stays — tap to compare on a travel site.
 
 Canonical: https://www.cheap-stays.com/cheap-hotels-near-you
 
-Cheap hotels near you starts with the city you choose — not an automatic location ping. Search the destination you are actually visiting, compare more affordable hotels and rentals, then sort by price on the booking site.
+Cheap hotels near you uses your approximate location to surface budget-friendly stays close to where you are. We detect your city from your IP address on load — no permission prompt in the normal case. If IP lookup fails, your browser may ask once for location as a fallback. You can also search any city in the form above.
 
-## Cheap hotels near your trip — you pick the place
+## How we find stays near you
 
-“Near you” in everyday search often means the phone’s location. This page works differently on purpose: you type the city or tap a destination so the comparison matches the trip you are taking, not a guess about where the browser sits.
+When you land on this page, we read your approximate city from your IP address — the same signal your browser uses for region-based content. No GPS prompt in the normal case. The city is used to surface budget-friendly hotel cards and to prefill the search form so you can compare immediately.
 
-That is better for planning a weekend somewhere else, a work trip, or a stay near an airport you will fly into. It is also clearer for privacy — we do not ask for geolocation here.
+If IP lookup cannot place you, your browser may ask for location once as a backup. Deny it and the search form still works — type any destination and compare.
 
-## Why we do not auto-detect your location
+## What budget-friendly means on this page
 
-Location prompts fail, get blocked, or point at the wrong place (a VPN, an office, a layover). Asking you for the city is slower by one field and much more accurate for hotel search.
+There are no prices in the hotel cards. We filter the catalog to properties with a lower star rating, which is a proxy for budget tier — not a guarantee of a low nightly rate. Rates change with dates, demand, and season.
 
-If you are standing in a neighborhood and want something walkable, type that city or area in the form, then use the map to tighten the pin.
+Tap a card to open that specific property on Kayak. Sort by price there to see which options fit your budget for the dates you pick.
 
-## Comparing budget stays in a destination
+## Searching by city instead
 
-After you choose a place, compare hotels and rentals listed for your dates. Sort by price on the booking site to lean toward cheaper options. “Cheap” is relative: the lower end in one city may look like mid-range in another.
+The hotel cards show stays near your detected location, but the search form above works for any destination. Type a city, set your dates, and compare hotels and rentals across the full catalog.
 
-City cheap-hotels pages below are shortcuts for popular markets. Use them if you already know you want a budget-oriented landing for Paris, London, or similar destinations.
+City cheap-hotels pages below are useful if you already know the destination and want a budget-oriented landing with more context.
 
 ## City center vs nearby areas
 
-Staying slightly outside the core can look easier on the budget if transit still works for your plans. It can also cost more time. Compare a few map pins rather than assuming farther is always cheaper.
+Staying slightly outside the core can look easier on the budget if transit still works for your plans. Compare a few map pins rather than assuming farther is always cheaper.
 
 Airports, old towns, and event venues each have their own rate patterns. Search the area you will actually use at night, not only the famous name.
 
-## From this page to a booking
+## From a nearby card to a booking
 
-Set dates (tomorrow is only a starter), compare, and continue to the booking site to read the room and the total. Cheap Stays does not book the hotel. We may earn a commission if you complete a stay; it does not change the rate you are offered.
+Tap a hotel card and you will be taken to that specific property on a booking partner. Read the room type, rate, and cancellation policy there — those details live on the booking site, not here. Cheap Stays does not process reservations. We may earn a commission if you complete a stay; it does not change the rate you are offered.
 
-If you need a room tonight instead of a planned trip, switch to the last-minute guide — that search starts on tonight’s dates.
+If nothing nearby fits, change your dates in the form above, or search any city there.
 
-## How to compare cheap hotels near your destination
+## How to compare cheap hotels near you
 
-1. Type the city or area of your trip — this page does not use device location.
-2. Set your dates and compare hotels and rentals that are listed.
-3. Sort by price on the booking site and check the map for the area you need.
-4. Book on that site if the stay, total, and policies still fit.
+1. Land on the page — your approximate city is detected from IP and nearby budget-friendly hotels appear.
+2. If IP lookup fails, allow the one-time location prompt for closer results, or type a city in the form.
+3. Set tonight's dates (or change them) and tap a hotel card to compare on a booking site.
 
 ## Frequently asked questions
 
 ### Does this page use my location?
 
-No. Choose a city from the list or type a destination in the search form.
+Approximately, yes. We read your city from your IP address on load — usually with no GPS prompt. If IP lookup fails, your browser may ask for location once as a backup.
 
-### How do I look for lower rates close to my trip?
+### When does the browser ask for location?
 
-Search the city or area you’re staying in, then sort by price on the results page.
+Only if IP lookup cannot place you. Allow it for closer nearby hotels, or deny it and search any city in the form above.
 
-### Are these always the most affordable stays?
+### Are these the cheapest hotels available?
 
-They’re a starting point for budget browsing. What looks affordable depends on your dates and destination.
+They are a budget-tier starting point. We filter by star rating, not by price — actual rates depend on your dates and the booking site. Sort by price there to find the most affordable options.
 
-### Can I search a neighborhood, not a whole city?
+### Can I search a different city?
 
-Yes. Type the neighborhood or area, pick a suggestion, then use the map to refine.
+Yes. Type any destination in the search form above. The nearby cards use your location; the form works for any city.
 
 ### What if I am booking from another country?
 
-Search the destination of the stay, not where you are sitting. The comparison follows the city you enter.
+The nearby hotel cards use your current location. To search a different destination, type it in the form above.
 
 ### Do you store my location?
 
-This sitelink page does not request geolocation. Use the privacy policy for how the site handles data generally.
+Your IP city is read once to load nearby hotels and is not stored by Cheap Stays. If the browser location fallback runs, those coordinates are used only for the hotel query and are not stored.
 
 ---
 

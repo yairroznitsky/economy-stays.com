@@ -3,7 +3,7 @@ import { handleLandingsInsert } from "./landingsHandler";
 import { handleLandingPageGet } from "./landingPageHandler";
 import { handleSearchInsert } from "./searchHandler";
 
-export type TrackingRoute = "landings" | "search" | "landing-page";
+export type TrackingRoute = "landings" | "search" | "landing-page" | "nearby";
 
 const matchTrackingPath = (url: string | undefined): TrackingRoute | null => {
   if (!url) return null;
@@ -11,6 +11,7 @@ const matchTrackingPath = (url: string | undefined): TrackingRoute | null => {
   if (pathname === "/api/landings" || pathname === "/landings") return "landings";
   if (pathname === "/api/search" || pathname === "/search") return "search";
   if (pathname === "/api/landing-page") return "landing-page";
+  if (pathname === "/api/nearby") return "nearby";
   return null;
 };
 
@@ -58,6 +59,34 @@ export const handleTrackingRequest = async (
     const result = await handleLandingPageGet(query.get("path") ?? undefined);
     res.setHeader("Cache-Control", result.cacheControl);
     sendJson(res, result.status, result.body);
+    return true;
+  }
+
+  if (route === "nearby") {
+    if (req.method !== "GET") {
+      sendJson(res, 405, { error: "Method not allowed" });
+      return true;
+    }
+    // Dev server: return source "none" unless ?lat= & ?lng= are provided with Supabase creds.
+    // Locally there are no Vercel geo headers, so IP detection is skipped.
+    const qs = new URLSearchParams(req.url?.split("?")[1] ?? "");
+    const qLat = parseFloat(qs.get("lat") ?? "");
+    const qLng = parseFloat(qs.get("lng") ?? "");
+    if (!Number.isFinite(qLat) || !Number.isFinite(qLng)) {
+      res.setHeader("Cache-Control", "private, no-store");
+      sendJson(res, 200, { source: "none", hotels: [] });
+      return true;
+    }
+    // With explicit coords, proxy to api/nearby logic via dynamic import
+    try {
+      const { handleNearbyGet } = await import("./nearbyHandler");
+      const result = await handleNearbyGet(qLat, qLng);
+      res.setHeader("Cache-Control", "private, no-store");
+      sendJson(res, 200, result);
+    } catch {
+      res.setHeader("Cache-Control", "private, no-store");
+      sendJson(res, 200, { source: "none", hotels: [] });
+    }
     return true;
   }
 

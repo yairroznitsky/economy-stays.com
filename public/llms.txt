@@ -21,7 +21,7 @@
   - Markdown for AI crawlers: https://www.cheap-stays.com/hotels-under-100.md
 - [60% Off Hotel Deals](https://www.cheap-stays.com/60-off-hotel-deals): Compare hotel deals and promotional rates from travel sites. Offer size varies by property and dates — review the details before you book.
   - Markdown for AI crawlers: https://www.cheap-stays.com/60-off-hotel-deals.md
-- [Cheap Hotels Near You](https://www.cheap-stays.com/cheap-hotels-near-you): Compare cheap hotels near your trip. Pick a city yourself, review budget-friendly current listings, and sort by price for your dates.
+- [Cheap Hotels Near You](https://www.cheap-stays.com/cheap-hotels-near-you): Find budget-friendly hotels near your location. We detect your city automatically and show nearby stays — tap to compare on a travel site.
   - Markdown for AI crawlers: https://www.cheap-stays.com/cheap-hotels-near-you.md
 - [Weekend Hotel Deals](https://www.cheap-stays.com/weekend-hotel-deals): Compare weekend hotel deals with Friday–Sunday dates ready. Search any city for a two-night stay and review listed rates before you book.
   - Markdown for AI crawlers: https://www.cheap-stays.com/weekend-hotel-deals.md

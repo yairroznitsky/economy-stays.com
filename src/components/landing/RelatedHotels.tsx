@@ -1,35 +1,18 @@
 import { useRef, useState } from "react";
 import { ExternalLink, Star } from "lucide-react";
-import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { getLuxuryRoomImage, getLuxuryRoomImageAlt } from "@/lib/luxuryRoomImages";
-import {
-  requestHotelDestinationAutocomplete,
-  requestHotelRedirectUrl,
-} from "@/lib/hotelAffiliateApi";
-import {
-  isDestinationPickRequiredMessage,
-  isSearchValidationMessage,
-} from "@/lib/hotelSearchErrors";
 import { useLandingI18n } from "@/i18n/landing";
+import { getDefaultHotelStayDateStrings } from "@/lib/kayakDestinationSearch";
 import {
-  buildHotelSearchInputFromSuggestion,
-  getDefaultHotelStayDateStrings,
-  getDeviceKayakAutocompleteContext,
-} from "@/lib/kayakDestinationSearch";
-import { getHotelAffiliateRouting } from "@/lib/bookingMode";
-import { generateClickId, LandingTrackingService } from "@/lib/landingTrackingService";
-import {
-  buildHotelClickSearchParams,
-  trackPartnerExit,
-} from "@/lib/partnerClickTracking";
-import { trackMetaSearch } from "@/lib/metaPixelTracking";
+  runHotelCompareRedirect,
+  handleHotelCompareError,
+} from "@/lib/hotelCompareRedirect";
 import type {
   LandingPageCity,
   LandingPageRelatedHotel,
   LandingPageTracking,
 } from "@/types/landingPage";
-import type { HotelDestinationSuggestion } from "@/types/hotels";
 
 type RelatedHotelsProps = {
   city: LandingPageCity;
@@ -38,25 +21,8 @@ type RelatedHotelsProps = {
   tracking: LandingPageTracking;
 };
 
-const DEFAULT_ADULTS = 2;
-const DEFAULT_CHILDREN = 0;
-const DEFAULT_ROOMS = 1;
-
 const formatReviews = (count: number): string =>
   count >= 1000 ? `${(count / 1000).toFixed(1).replace(/\.0$/, "")}k` : String(count);
-
-const hotelAutocompleteQuery = (hotelName: string, city: LandingPageCity) =>
-  [hotelName, city.name, city.country].filter(Boolean).join(", ");
-
-const pickHotelSuggestion = (
-  suggestions: HotelDestinationSuggestion[]
-): HotelDestinationSuggestion | null => {
-  if (suggestions.length === 0) return null;
-  const hotelMatch = suggestions.find((suggestion) =>
-    suggestion.type.toLowerCase().includes("hotel")
-  );
-  return hotelMatch ?? suggestions[0] ?? null;
-};
 
 const RelatedHotels = ({ city, hotels, intentLabel, tracking }: RelatedHotelsProps) => {
   const { t } = useLandingI18n();
@@ -74,97 +40,29 @@ const RelatedHotels = ({ city, hotels, intentLabel, tracking }: RelatedHotelsPro
 
     compareInFlightRef.current = true;
     setOpeningHotelId(hotel.id);
-    const { locale, marketCountry } = getDeviceKayakAutocompleteContext();
+
     const { checkIn, checkOut } = getDefaultHotelStayDateStrings();
 
-    try {
-      const suggestions = await requestHotelDestinationAutocomplete({
-        query: hotelAutocompleteQuery(hotel.name, city),
-        locale,
-        country: marketCountry,
-      });
-      const suggestion = pickHotelSuggestion(suggestions);
-      if (!suggestion) {
-        toast.error(t.destinationNotFound(hotel.name));
-        return;
-      }
+    const trackingExtras: Record<string, string> = {
+      surface: "related_hotels",
+      source_hotel: hotel.name,
+      source_hotel_id: hotel.id,
+    };
+    if (tracking.landingPageId) trackingExtras.landing_page_id = tracking.landingPageId;
+    if (tracking.cityId) trackingExtras.city_id = tracking.cityId;
+    if (tracking.intentId) trackingExtras.intent_id = tracking.intentId;
 
-      const search = buildHotelSearchInputFromSuggestion(suggestion, {
+    try {
+      await runHotelCompareRedirect({
+        hotelName: hotel.name,
+        cityName: city.name,
+        countryName: city.country,
         checkIn,
         checkOut,
-        adults: DEFAULT_ADULTS,
-        children: DEFAULT_CHILDREN,
-        rooms: DEFAULT_ROOMS,
-        locale,
-        marketCountry,
-        fallbackCountryName: city.country,
-      });
-
-      const clickId = generateClickId();
-      const landingId = await LandingTrackingService.getOrCreateLandingId();
-      const { affiliateSource, partner } = getHotelAffiliateRouting();
-
-      const trackingExtras: Record<string, string> = {
-        surface: "related_hotels",
-        source_hotel: hotel.name,
-        source_hotel_id: hotel.id,
-      };
-      if (tracking.landingPageId) {
-        trackingExtras.landing_page_id = tracking.landingPageId;
-      }
-      if (tracking.cityId) {
-        trackingExtras.city_id = tracking.cityId;
-      }
-      if (tracking.intentId) {
-        trackingExtras.intent_id = tracking.intentId;
-      }
-
-      const response = await requestHotelRedirectUrl({
-        search,
-        clickId,
-        landingId,
-        affiliateSource,
-        metadata: {
-          ...trackingExtras,
-          destination_id: search.destinationId ?? "",
-        },
-      });
-
-      try {
-        trackMetaSearch(search);
-      } catch {
-        // Pixel tracking must not block the redirect.
-      }
-
-      await trackPartnerExit({
-        partner,
-        redirectUrl: response.redirectUrl,
-        placement: "redirect",
-        clickId,
-        landingId,
-        iataCode: search.airportCode ?? null,
-        locationId: response.entityId,
-        pickupDateNew: search.checkIn ?? null,
-        dropoffDateNew: search.checkOut ?? null,
-        searchParams: buildHotelClickSearchParams(search, trackingExtras),
-        autoParams: true,
+        trackingExtras,
       });
     } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : "Rates aren't available for this stay right now.";
-      if (isDestinationPickRequiredMessage(message)) {
-        toast.error(t.destinationPickTitle, {
-          description: t.destinationPickDesc,
-        });
-      } else if (isSearchValidationMessage(message)) {
-        toast.error(t.reviewSearch, { description: message });
-      } else {
-        toast.error(t.ratesUnavailable, {
-          description: message || t.ratesUnavailableDesc,
-        });
-      }
+      handleHotelCompareError(error, t, hotel.name);
     } finally {
       compareInFlightRef.current = false;
       setOpeningHotelId(null);

@@ -80,6 +80,13 @@ export interface SearchFormDefaults {
   lockDestination?: boolean;
   latitude?: number;
   longitude?: number;
+  /**
+   * Increment this to re-apply defaults after the initial mount (e.g. when
+   * geo location resolves or the user changes the date chip). Destination is
+   * only re-applied if the user has not manually edited the destination field.
+   * Callers that omit this field get the existing one-shot behaviour.
+   */
+  defaultsVersion?: number;
 }
 
 export interface SearchFormTrackingContext {
@@ -254,14 +261,41 @@ const SearchForm = ({ defaults, trackingContext }: SearchFormProps = {}) => {
   const [datesOpen, setDatesOpen] = useState(false);
   const [draftRange, setDraftRange] = useState<DateRange | undefined>(range);
   const [calendarMonth, setCalendarMonth] = useState<Date>(range?.from ?? today);
-  const defaultsAppliedRef = useRef(false);
+  // Tracks the last applied defaultsVersion (or -1 before first apply).
+  const appliedVersionRef = useRef(-1);
+  // True once the user has manually typed in the destination field.
+  const userEditedDestinationRef = useRef(false);
   const defaultCoordinatesRef = useRef<{ latitude?: number; longitude?: number }>(
     {}
   );
 
   useEffect(() => {
-    if (!defaults || defaultsAppliedRef.current) return;
-    defaultsAppliedRef.current = true;
+    if (!defaults) return;
+    const version = defaults.defaultsVersion ?? 0;
+    if (appliedVersionRef.current === version) return;
+
+    const isFirstApply = appliedVersionRef.current === -1;
+    appliedVersionRef.current = version;
+
+    // Always apply dates when version changes (e.g. date chip clicks).
+    const offsetDays = defaults.nightsOffsetDays ?? 1;
+    const stayNights = defaults.stayNights ?? 1;
+    const checkIn = new Date();
+    checkIn.setDate(checkIn.getDate() + offsetDays);
+    const checkOut = new Date(checkIn);
+    checkOut.setDate(checkOut.getDate() + stayNights);
+    setRange({ from: checkIn, to: checkOut });
+
+    // Apply guests only on first apply (backward-compatible).
+    if (isFirstApply) {
+      setAdults(defaults.adults ?? 2);
+      setRooms(defaults.rooms ?? 1);
+    }
+
+    // Destination: only on first apply or if the user has not manually typed.
+    const shouldApplyDestination = isFirstApply || !userEditedDestinationRef.current;
+    if (!shouldApplyDestination) return;
+
     defaultCoordinatesRef.current = {
       latitude: defaults.latitude,
       longitude: defaults.longitude,
@@ -270,16 +304,6 @@ const SearchForm = ({ defaults, trackingContext }: SearchFormProps = {}) => {
     const displayDestination =
       defaults.cityName?.trim() || defaults.destinationQuery || "";
     setDestination(displayDestination);
-    setAdults(defaults.adults ?? 2);
-    setRooms(defaults.rooms ?? 1);
-
-    const offsetDays = defaults.nightsOffsetDays ?? 1;
-    const stayNights = defaults.stayNights ?? 1;
-    const checkIn = new Date();
-    checkIn.setDate(checkIn.getDate() + offsetDays);
-    const checkOut = new Date(checkIn);
-    checkOut.setDate(checkOut.getDate() + stayNights);
-    setRange({ from: checkIn, to: checkOut });
 
     setSuggestions([]);
     setIsDropdownOpen(false);
@@ -978,6 +1002,7 @@ const SearchForm = ({ defaults, trackingContext }: SearchFormProps = {}) => {
               type="text"
               value={destination}
               onChange={(e) => {
+                userEditedDestinationRef.current = true;
                 setDestination(e.target.value);
                 if (destinationError) setDestinationError(false);
               }}
@@ -1052,7 +1077,7 @@ const SearchForm = ({ defaults, trackingContext }: SearchFormProps = {}) => {
             <p className="mt-2 text-xs text-muted-foreground">{t.search.loadingSuggestions}</p>
           )}
           {isDropdownOpen && destination.trim().length >= 3 && suggestions.length > 0 && (
-            <div className="absolute top-full left-0 z-50 mt-2 w-full rounded-xl border border-border bg-popover p-1 shadow-elevated">
+            <div className="absolute top-full left-0 z-[100] mt-2 w-full rounded-xl border border-border bg-popover p-1 shadow-elevated">
               <ul
                 role="listbox"
                 className="max-h-60 overflow-auto desktop:max-h-72"
