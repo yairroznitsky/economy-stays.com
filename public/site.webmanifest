@@ -1,6 +1,6 @@
 {
-  "name": "Cheap Stays",
-  "short_name": "CheapStays",
+  "name": "Economy Stays",
+  "short_name": "EconomyStays",
   "description": "Compare hotel and rental prices worldwide.",
   "icons": [
     {
@@ -22,7 +22,7 @@
       "purpose": "any"
     }
   ],
-  "theme_color": "#244A3D",
+  "theme_color": "#003580",
   "background_color": "#F9F7F4",
   "display": "standalone"
 }

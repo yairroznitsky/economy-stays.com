@@ -8,8 +8,8 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Booking palette: blue #003580 + yellow #FEBB02 */
-    --background: 210 25% 98%;
+    /* EconomyBookings-inspired: cobalt blue + orange-amber CTA */
+    --background: 0 0% 100%;
     --foreground: 215 55% 12%;
 
     --card: 0 0% 100%;
@@ -18,9 +18,9 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 215 55% 12%;
 
-    --primary: 215 100% 25%;
+    --primary: 226 68% 50%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 215 80% 36%;
+    --primary-glow: 226 58% 62%;
 
     --secondary: 210 22% 94%;
     --secondary-foreground: 215 55% 12%;
@@ -28,7 +28,7 @@ All colors MUST be HSL.
     --muted: 210 18% 94%;
     --muted-foreground: 215 12% 42%;
 
-    --accent: 44 99% 50%;
+    --accent: 36 100% 50%;
     --accent-foreground: 215 55% 12%;
 
     --destructive: 0 84.2% 60.2%;
@@ -36,19 +36,19 @@ All colors MUST be HSL.
 
     --border: 210 18% 88%;
     --input: 210 18% 88%;
-    --ring: 215 100% 25%;
+    --ring: 226 68% 50%;
 
     --radius: 0.75rem;
 
     --gradient-hero: linear-gradient(
       180deg,
-      hsl(215 40% 8% / 0.18) 0%,
-      hsl(215 45% 8% / 0.22) 42%,
-      hsl(215 55% 6% / 0.55) 72%,
-      hsl(215 70% 5% / 0.78) 100%
+      hsl(226 65% 30% / 0.30) 0%,
+      hsl(226 62% 22% / 0.45) 42%,
+      hsl(226 60% 14% / 0.65) 72%,
+      hsl(226 60% 10% / 0.82) 100%
     );
     --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
-    --gradient-accent: linear-gradient(135deg, hsl(44 99% 50%), hsl(40 95% 58%));
+    --gradient-accent: linear-gradient(135deg, hsl(36 100% 50%), hsl(32 95% 58%));
 
     --shadow-soft: 0 4px 20px -4px hsl(215 55% 12% / 0.08);
     --shadow-elevated: 0 20px 60px -15px hsl(215 55% 12% / 0.18);
@@ -83,9 +83,9 @@ All colors MUST be HSL.
     --popover: 215 28% 11%;
     --popover-foreground: 210 20% 95%;
 
-    --primary: 215 70% 48%;
+    --primary: 226 62% 58%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 215 65% 58%;
+    --primary-glow: 226 58% 68%;
 
     --secondary: 215 22% 16%;
     --secondary-foreground: 210 20% 95%;
@@ -93,7 +93,7 @@ All colors MUST be HSL.
     --muted: 215 22% 16%;
     --muted-foreground: 210 12% 65%;
 
-    --accent: 44 99% 50%;
+    --accent: 36 100% 50%;
     --accent-foreground: 215 55% 12%;
 
     --destructive: 0 62.8% 30.6%;
@@ -101,7 +101,7 @@ All colors MUST be HSL.
 
     --border: 215 18% 20%;
     --input: 215 18% 20%;
-    --ring: 215 70% 48%;
+    --ring: 226 62% 58%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;

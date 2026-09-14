@@ -2,9 +2,9 @@
 
 Compare last-minute hotel deals for tonight. Search any city, review what’s listed right now, and continue to book only if a stay looks right.
 
-Canonical: https://www.cheap-stays.com/last-minute-hotel-deals
+Canonical: https://www.economy-stays.com/last-minute-hotel-deals
 
-Last-minute hotel deals are simply stays you can compare close to arrival. Cheap Stays prefills tonight so you can search a city and review hotels, apartments, and rentals listed now — then continue to book only if a stay looks right.
+Last-minute hotel deals are simply stays you can compare close to arrival. Economy Stays prefills tonight so you can search a city and review hotels, apartments, and rentals listed now — then continue to book only if a stay looks right.
 
 ## What last-minute hotel deals mean here
 
@@ -16,7 +16,7 @@ That is useful when plans shift, a flight lands late, or you would rather not wa
 
 Enter a destination in the search above. Tonight is already selected as check-in, with a one-night stay — a typical last-minute pattern. Adjust the calendar if you are arriving tomorrow or staying longer, then compare hotels, apartments, and rentals side by side.
 
-When a listing looks like a fit, continue to the travel site to confirm the room type, cancellation rules, and the total. Policies live there, not on Cheap Stays.
+When a listing looks like a fit, continue to the travel site to confirm the room type, cancellation rules, and the total. Policies live there, not on Economy Stays.
 
 ## Why tonight is preselected
 
@@ -28,13 +28,13 @@ Short-notice availability moves. A room that appears at lunch may be gone in the
 
 If you already know the destination, jump to a last-minute city page below — Paris, London, Tokyo, and other popular markets. Those landings keep the same comparison idea with a city already in mind, which is often faster than starting from a blank search.
 
-Still deciding where to go? Use a destination card to open current listings for tonight in a well-known city, or type anywhere in the form. Cheap Stays does not rank a “best” last-minute city; we help you look.
+Still deciding where to go? Use a destination card to open current listings for tonight in a well-known city, or type anywhere in the form. Economy Stays does not rank a “best” last-minute city; we help you look.
 
 ## What to review before you book
 
 On the booking site, check arrival time, check-in hours, and whether the rate can be cancelled. Last-minute stays are sometimes non-refundable. Location matters more when you are tired: scan the map for the airport, station, or neighborhood you actually need.
 
-Cheap Stays may earn a commission if you book. That does not change the price you pay. We do not operate hotels or process the reservation.
+Economy Stays may earn a commission if you book. That does not change the price you pay. We do not operate hotels or process the reservation.
 
 ## How to compare last-minute hotel deals
 
@@ -55,7 +55,7 @@ Yes. Open the dates and pick whatever check-in and check-out you need before you
 
 ### Who do I book with?
 
-A travel site such as Kayak. Cheap Stays helps you search and compare; the booking happens on their site.
+A travel site such as Kayak. Economy Stays helps you search and compare; the booking happens on their site.
 
 ### Do last-minute hotel deals stay available all evening?
 
@@ -65,10 +65,10 @@ Not necessarily. Listings can disappear or change. If a stay looks right, review
 
 Yes. The search can include hotels, apartments, and vacation rentals, depending on what’s listed for your city and dates.
 
-### Does Cheap Stays hold rooms for last-minute travelers?
+### Does Economy Stays hold rooms for last-minute travelers?
 
 No. We do not hold inventory. You see what is currently listed for the search you run.
 
 ---
 
-Cheap Stays is an independent comparison search. You finish booking on a travel site such as Kayak. Rates and availability change.
+Economy Stays is an independent comparison search. You finish booking on a travel site such as Kayak. Rates and availability change.

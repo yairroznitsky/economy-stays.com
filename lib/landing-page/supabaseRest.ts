@@ -3,7 +3,7 @@ import { readEnv } from "./env";
 export const getSourceApp = (): string =>
   readEnv("SITE_SLUG")?.trim() ||
   readEnv("VITE_SITE_SLUG")?.trim() ||
-  "cheap-stays";
+  "economy-stays";
 
 const getSupabaseConfig = (): { url: string; key: string } => {
   const url = readEnv("SUPABASE_URL") ?? readEnv("VITE_SUPABASE_URL");

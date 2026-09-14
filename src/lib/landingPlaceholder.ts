@@ -16,7 +16,7 @@ const isLikelyIntentSlug = (slug: string): boolean =>
 
 const genericFaqs = (cityName: string) => [
   {
-    q: `How does Cheap Stays help me compare hotels in ${cityName}?`,
+    q: `How does Economy Stays help me compare hotels in ${cityName}?`,
     a: "Enter your destination, dates, and guests to see hotel options from established travel partners. You can adjust your search before continuing to a partner site to book.",
   },
   {

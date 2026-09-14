@@ -1,10 +1,11 @@
 {
-  "name": "cheap-stays",
+  "name": "economy-stays",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "setup:env": "node scripts/copy-supabase-env.mjs",
     "generate:cities-csv": "tsx scripts/generate-cities-csv.ts",
     "import:cities": "tsx scripts/import-cities.ts",
     "seed:intents": "tsx scripts/seed-intents.ts",

@@ -49,8 +49,8 @@ export const SITELINK_PAGES: readonly SitelinkPageConfig[] = [
     datePreset: "tonight",
     dateHint: "Tonight is selected — change the dates anytime.",
     intro:
-      "Last-minute hotel deals are simply stays you can compare close to arrival. Cheap Stays prefills tonight so you can search a city and review hotels, apartments, and rentals listed now — then continue to book only if a stay looks right.",
-    metaTitle: "Last-Minute Hotel Deals: Compare Tonight | Cheap Stays",
+      "Last-minute hotel deals are simply stays you can compare close to arrival. Economy Stays prefills tonight so you can search a city and review hotels, apartments, and rentals listed now — then continue to book only if a stay looks right.",
+    metaTitle: "Last-Minute Hotel Deals: Compare Tonight | Economy Stays",
     metaDescription:
       "Compare last-minute hotel deals for tonight. Search any city, review what’s listed right now, and continue to book only if a stay looks right.",
     focusKeyword: "last-minute hotel deals",
@@ -76,7 +76,7 @@ export const SITELINK_PAGES: readonly SitelinkPageConfig[] = [
         heading: "How to compare a same-day hotel stay",
         paragraphs: [
           "Enter a destination in the search above. Tonight is already selected as check-in, with a one-night stay — a typical last-minute pattern. Adjust the calendar if you are arriving tomorrow or staying longer, then compare hotels, apartments, and rentals side by side.",
-          "When a listing looks like a fit, continue to the travel site to confirm the room type, cancellation rules, and the total. Policies live there, not on Cheap Stays.",
+          "When a listing looks like a fit, continue to the travel site to confirm the room type, cancellation rules, and the total. Policies live there, not on Economy Stays.",
         ],
       },
       {
@@ -90,14 +90,14 @@ export const SITELINK_PAGES: readonly SitelinkPageConfig[] = [
         heading: "City pages for last-minute hotel searches",
         paragraphs: [
           "If you already know the destination, jump to a last-minute city page below — Paris, London, Tokyo, and other popular markets. Those landings keep the same comparison idea with a city already in mind, which is often faster than starting from a blank search.",
-          "Still deciding where to go? Use a destination card to open current listings for tonight in a well-known city, or type anywhere in the form. Cheap Stays does not rank a “best” last-minute city; we help you look.",
+          "Still deciding where to go? Use a destination card to open current listings for tonight in a well-known city, or type anywhere in the form. Economy Stays does not rank a “best” last-minute city; we help you look.",
         ],
       },
       {
         heading: "What to review before you book",
         paragraphs: [
           "On the booking site, check arrival time, check-in hours, and whether the rate can be cancelled. Last-minute stays are sometimes non-refundable. Location matters more when you are tired: scan the map for the airport, station, or neighborhood you actually need.",
-          "Cheap Stays may earn a commission if you book. That does not change the price you pay. We do not operate hotels or process the reservation.",
+          "Economy Stays may earn a commission if you book. That does not change the price you pay. We do not operate hotels or process the reservation.",
         ],
       },
     ],
@@ -135,7 +135,7 @@ export const SITELINK_PAGES: readonly SitelinkPageConfig[] = [
       },
       {
         q: "Who do I book with?",
-        a: "A travel site such as Kayak. Cheap Stays helps you search and compare; the booking happens on their site.",
+        a: "A travel site such as Kayak. Economy Stays helps you search and compare; the booking happens on their site.",
       },
       {
         q: "Do last-minute hotel deals stay available all evening?",
@@ -146,7 +146,7 @@ export const SITELINK_PAGES: readonly SitelinkPageConfig[] = [
         a: "Yes. The search can include hotels, apartments, and vacation rentals, depending on what’s listed for your city and dates.",
       },
       {
-        q: "Does Cheap Stays hold rooms for last-minute travelers?",
+        q: "Does Economy Stays hold rooms for last-minute travelers?",
         a: "No. We do not hold inventory. You see what is currently listed for the search you run.",
       },
     ],
@@ -160,7 +160,7 @@ export const SITELINK_PAGES: readonly SitelinkPageConfig[] = [
     dateHint: "Tonight is selected — change the dates anytime.",
     intro:
       "Unsold room deals, on this site, means comparing hotels that still show availability close to check-in. We do not warehouse leftover rooms. Search tonight — or any night — and review what travel sites still list for your city.",
-    metaTitle: "Unsold Hotel Room Deals for Tonight | Cheap Stays",
+    metaTitle: "Unsold Hotel Room Deals for Tonight | Economy Stays",
     metaDescription:
       "Compare unsold hotel room deals and late availability. Search tonight’s dates, see what is still listed, and review terms before you book.",
     focusKeyword: "unsold hotel room deals",
@@ -174,9 +174,9 @@ export const SITELINK_PAGES: readonly SitelinkPageConfig[] = [
     browseSubtitle: "Open a city page, then search tonight or any dates you prefer.",
     sections: [
       {
-        heading: "What unsold rooms means on Cheap Stays",
+        heading: "What unsold rooms means on Economy Stays",
         paragraphs: [
-          "Hotels sometimes keep rooms listed as the day of arrival gets close. Those listings can look like “leftover” inventory, but they still belong to the property and the booking site — not to us. Cheap Stays is a comparison search: we help you see what is currently offered for your dates.",
+          "Hotels sometimes keep rooms listed as the day of arrival gets close. Those listings can look like “leftover” inventory, but they still belong to the property and the booking site — not to us. Economy Stays is a comparison search: we help you see what is currently offered for your dates.",
           "If a city is busy, late availability can be thin. If a city is quiet, you may see more choice. Neither outcome is something we guarantee; it is simply what the search shows when you search.",
         ],
       },
@@ -255,7 +255,7 @@ export const SITELINK_PAGES: readonly SitelinkPageConfig[] = [
       },
       {
         q: "Who confirms the room is still available?",
-        a: "The travel site at checkout. Cheap Stays does not reserve or confirm rooms.",
+        a: "The travel site at checkout. Economy Stays does not reserve or confirm rooms.",
       },
     ],
   },
@@ -268,7 +268,7 @@ export const SITELINK_PAGES: readonly SitelinkPageConfig[] = [
     dateHint: "Tomorrow is selected — change the dates anytime.",
     intro:
       "This page is for travelers who want to compare more affordable hotels and rentals. We do not filter to a fixed nightly cap. Search a city, then sort by price on the booking site to lean toward budget-friendly stays for your dates.",
-    metaTitle: "Budget Hotels: Compare Affordable Stays | Cheap Stays",
+    metaTitle: "Budget Hotels: Compare Affordable Stays | Economy Stays",
     metaDescription:
       "Compare budget hotels and affordable stays by city. Rates vary with dates and destination — sort the results by price to see lower options.",
     focusKeyword: "budget hotels",
@@ -285,7 +285,7 @@ export const SITELINK_PAGES: readonly SitelinkPageConfig[] = [
       {
         heading: "Searching for budget hotels without a hard cap",
         paragraphs: [
-          "The sitelink title talks about a round number because that is how many people think about a simple stay. On the page itself, Cheap Stays cannot enforce a price ceiling. Travel sites list a range of hotels and rentals; some will feel budget-friendly for your city and some will not.",
+          "The sitelink title talks about a round number because that is how many people think about a simple stay. On the page itself, Economy Stays cannot enforce a price ceiling. Travel sites list a range of hotels and rentals; some will feel budget-friendly for your city and some will not.",
           "The practical move is to search, then sort or filter by price on the results. That is where lower nightly rates — when they exist for your dates — become easier to see.",
         ],
       },
@@ -307,14 +307,14 @@ export const SITELINK_PAGES: readonly SitelinkPageConfig[] = [
         heading: "City guides for cheaper hotel searches",
         paragraphs: [
           "Paris, London, Bangkok, and other popular cities have cheap-hotels landings linked below. Those pages keep the budget-search intent while you still choose dates and compare stays.",
-          "If your trip is not in that list, type the city in the form. Cheap Stays works as a worldwide comparison search, not a closed catalog of a few markets.",
+          "If your trip is not in that list, type the city in the form. Economy Stays works as a worldwide comparison search, not a closed catalog of a few markets.",
         ],
       },
       {
         heading: "What we will not claim",
         paragraphs: [
           "We will not promise that every result sits under a fixed amount, or that we have the lowest rate on the internet. We show current listings for your search and let you continue to book where the offer is real.",
-          "Cheap Stays does not add a booking fee. If you complete a stay, we may earn a commission. Your price is set by the hotel and the site you book on.",
+          "Economy Stays does not add a booking fee. If you complete a stay, we may earn a commission. Your price is set by the hotel and the site you book on.",
         ],
       },
     ],
@@ -352,7 +352,7 @@ export const SITELINK_PAGES: readonly SitelinkPageConfig[] = [
       },
       {
         q: "Do you add extra fees?",
-        a: "Cheap Stays doesn’t add a booking fee. What you pay is set by the hotel and the booking site.",
+        a: "Economy Stays doesn’t add a booking fee. What you pay is set by the hotel and the booking site.",
       },
       {
         q: "Should I search weekdays to save?",
@@ -376,8 +376,8 @@ export const SITELINK_PAGES: readonly SitelinkPageConfig[] = [
     datePreset: "tomorrow",
     dateHint: "Tomorrow is selected — change the dates anytime.",
     intro:
-      "Hotel deals on Cheap Stays means comparing rates hotels currently list — including properties that show a promotional price. We do not set markdowns or promise a fixed percentage off. Search a city, then read the offer details on the booking site.",
-    metaTitle: "Hotel Deals & Promotional Rates Compared | Cheap Stays",
+      "Hotel deals on Economy Stays means comparing rates hotels currently list — including properties that show a promotional price. We do not set markdowns or promise a fixed percentage off. Search a city, then read the offer details on the booking site.",
+    metaTitle: "Hotel Deals & Promotional Rates Compared | Economy Stays",
     metaDescription:
       "Compare hotel deals and promotional rates from travel sites. Offer size varies by property and dates — review the details before you book.",
     focusKeyword: "hotel deals",
@@ -393,7 +393,7 @@ export const SITELINK_PAGES: readonly SitelinkPageConfig[] = [
       {
         heading: "Hotel deals vs a fixed markdown",
         paragraphs: [
-          "Ads and sitelinks often use a striking discount line because travelers scan for a deal. On this page, the honest version is: some hotels show a promotional rate next to a usual one, and some do not. Cheap Stays does not choose the markdown and does not guarantee a percentage off.",
+          "Ads and sitelinks often use a striking discount line because travelers scan for a deal. On this page, the honest version is: some hotels show a promotional rate next to a usual one, and some do not. Economy Stays does not choose the markdown and does not guarantee a percentage off.",
           "When a hotel lists a deal, you can see it after you search a destination and open the offer. The conditions — dates, room type, cancellation — are on that site, with the hotel.",
         ],
       },
@@ -408,7 +408,7 @@ export const SITELINK_PAGES: readonly SitelinkPageConfig[] = [
         heading: "Read the deal where you book",
         paragraphs: [
           "Headline savings are easy to misunderstand. Check whether the rate is prepaid, whether breakfast is included, and whether you can cancel. A marked-down stay with no flexibility can still be a good fit — if you know that before you pay.",
-          "Cheap Stays does not invent crossed-out prices. Anything that looks like a discount should be confirmed on the booking site.",
+          "Economy Stays does not invent crossed-out prices. Anything that looks like a discount should be confirmed on the booking site.",
         ],
       },
       {
@@ -468,7 +468,7 @@ export const SITELINK_PAGES: readonly SitelinkPageConfig[] = [
       },
       {
         q: "Can I combine a deal with other coupons?",
-        a: "That depends on the booking site. Cheap Stays does not issue coupons or stack codes.",
+        a: "That depends on the booking site. Economy Stays does not issue coupons or stack codes.",
       },
       {
         q: "Why did a deal disappear when I clicked through?",
@@ -485,7 +485,7 @@ export const SITELINK_PAGES: readonly SitelinkPageConfig[] = [
     dateHint: "Tonight is selected — change the dates anytime.",
     intro:
       "Cheap hotels near you uses your approximate location to surface budget-friendly stays close to where you are. We detect your city from your IP address on load — no permission prompt. If IP lookup fails, your browser may ask once for location as a fallback. You can also search any city in the form above.",
-    metaTitle: "Cheap Hotels Near You: Budget Stays Nearby | Cheap Stays",
+    metaTitle: "Cheap Hotels Near You: Budget Stays Nearby | Economy Stays",
     metaDescription:
       "Find budget-friendly hotels near your location. We detect your city automatically and show nearby stays — tap to compare on a travel site.",
     focusKeyword: "cheap hotels near you",
@@ -497,6 +497,7 @@ export const SITELINK_PAGES: readonly SitelinkPageConfig[] = [
       "Filtered to lower-tier properties by star rating. No price claim — sort by price on the booking site.",
     browseTitle: "Browse budget-friendly city pages",
     browseSubtitle: "Open a city landing made for more affordable stay searches.",
+    browseIntentSlug: "cheap-hotels",
     sections: [
       {
         heading: "How we find stays near you",
@@ -529,7 +530,7 @@ export const SITELINK_PAGES: readonly SitelinkPageConfig[] = [
       {
         heading: "From a nearby card to a booking",
         paragraphs: [
-          "Tap a hotel card and you will be taken to that specific property on a booking partner. Read the room type, rate, and cancellation policy there — those details live on the booking site, not here. Cheap Stays does not process reservations. We may earn a commission if you complete a stay; it does not change the rate you are offered.",
+          "Tap a hotel card and you will be taken to that specific property on a booking partner. Read the room type, rate, and cancellation policy there — those details live on the booking site, not here. Economy Stays does not process reservations. We may earn a commission if you complete a stay; it does not change the rate you are offered.",
           "If nothing nearby fits, change your dates in the form above, or search any city there.",
         ],
       },
@@ -579,7 +580,7 @@ export const SITELINK_PAGES: readonly SitelinkPageConfig[] = [
       },
       {
         q: "Do you store my location?",
-        a: "Your IP city is read once to load nearby hotels and is not stored by Cheap Stays. If the browser location fallback runs, those coordinates are used only for the hotel query and are not stored.",
+        a: "Your IP city is read once to load nearby hotels and is not stored by Economy Stays. If the browser location fallback runs, those coordinates are used only for the hotel query and are not stored.",
       },
     ],
   },
@@ -591,8 +592,8 @@ export const SITELINK_PAGES: readonly SitelinkPageConfig[] = [
     datePreset: "weekend",
     dateHint: "This weekend is selected — change the dates anytime.",
     intro:
-      "Weekend hotel deals here means comparing a Friday-to-Sunday stay. Cheap Stays prefills the coming weekend so you can search a city for a two-night getaway, then continue to the booking site if a hotel or rental looks right.",
-    metaTitle: "Weekend Hotel Deals: Friday–Sunday Stays | Cheap Stays",
+      "Weekend hotel deals here means comparing a Friday-to-Sunday stay. Economy Stays prefills the coming weekend so you can search a city for a two-night getaway, then continue to the booking site if a hotel or rental looks right.",
+    metaTitle: "Weekend Hotel Deals: Friday–Sunday Stays | Economy Stays",
     metaDescription:
       "Compare weekend hotel deals with Friday–Sunday dates ready. Search any city for a two-night stay and review listed rates before you book.",
     focusKeyword: "weekend hotel deals",
@@ -623,7 +624,7 @@ export const SITELINK_PAGES: readonly SitelinkPageConfig[] = [
         heading: "City getaways to compare",
         paragraphs: [
           "Destination cards open current listings for the same Friday–Sunday in cities people often weekend in — Paris, Barcelona, London, and others. City landings below are useful when you want a destination guide first.",
-          "There is no ranked “best weekend city” on Cheap Stays. Train time, events, and what you like to do matter more than a generic list. Search the place you would actually enjoy for two nights.",
+          "There is no ranked “best weekend city” on Economy Stays. Train time, events, and what you like to do matter more than a generic list. Search the place you would actually enjoy for two nights.",
         ],
       },
       {
@@ -636,7 +637,7 @@ export const SITELINK_PAGES: readonly SitelinkPageConfig[] = [
       {
         heading: "From comparison to a booked weekend",
         paragraphs: [
-          "When a stay looks right, continue to the booking site to confirm the room and the policy. Cheap Stays does not take the booking. We may earn a commission if you complete a reservation.",
+          "When a stay looks right, continue to the booking site to confirm the room and the policy. Economy Stays does not take the booking. We may earn a commission if you complete a reservation.",
           "If you hoped for a giant automatic markdown, this page isn’t a sitewide weekend coupon — promotions appear only when a hotel is actually listing one.",
         ],
       },
@@ -683,7 +684,7 @@ export const SITELINK_PAGES: readonly SitelinkPageConfig[] = [
       },
       {
         q: "Do you offer a weekend-only coupon?",
-        a: "No. This page prefills weekend dates. Any promotional rate comes from the listing, not a Cheap Stays coupon.",
+        a: "No. This page prefills weekend dates. Any promotional rate comes from the listing, not a Economy Stays coupon.",
       },
       {
         q: "What if Friday is sold out?",

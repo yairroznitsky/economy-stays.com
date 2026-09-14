@@ -9,13 +9,51 @@ import {
   localTrackingPlugin,
 } from "./server/edge/vitePlugin";
 
+const PLACEHOLDER_ENV = /your-|placeholder|changeme/i;
+
+const devEnvCheckPlugin = (env: Record<string, string>): Plugin => ({
+  name: "dev-env-check",
+  configureServer(server) {
+    const warnings: string[] = [];
+    const serviceKey =
+      env.SUPABASE_SERVICE_ROLE_KEY?.trim() ||
+      process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
+    const anonKey =
+      env.VITE_SUPABASE_ANON_KEY?.trim() ||
+      process.env.VITE_SUPABASE_ANON_KEY?.trim();
+
+    if (!serviceKey || PLACEHOLDER_ENV.test(serviceKey)) {
+      warnings.push(
+        "SUPABASE_SERVICE_ROLE_KEY is missing or still a placeholder — /api/landings and /api/search will fail."
+      );
+    }
+    if (!anonKey || PLACEHOLDER_ENV.test(anonKey)) {
+      warnings.push(
+        "VITE_SUPABASE_ANON_KEY is missing or still a placeholder — landing pages and Supabase reads will fail."
+      );
+    }
+
+    if (warnings.length > 0) {
+      server.config.logger.warn(
+        [
+          "",
+          "Economy Stays: fix your .env before local API routes will work:",
+          ...warnings.map((line) => `  - ${line}`),
+          "  Run: npm run setup:env  (copies keys from ../Cheap-Stays/.env)",
+          "",
+        ].join("\n")
+      );
+    }
+  },
+});
+
 const htmlEnvPlugin = (env: Record<string, string>): Plugin => ({
   name: "html-env-transform",
   transformIndexHtml(html) {
     const values = {
-      VITE_SITE_NAME: env.VITE_SITE_NAME || "Cheap Stays",
+      VITE_SITE_NAME: env.VITE_SITE_NAME || "Economy Stays",
       VITE_SITE_OPERATOR: env.VITE_SITE_OPERATOR || "Media Smarter",
-      VITE_SITE_DOMAIN: env.VITE_SITE_DOMAIN || "cheap-stays.com",
+      VITE_SITE_DOMAIN: env.VITE_SITE_DOMAIN || "economy-stays.com",
     };
 
     return Object.entries(values).reduce(
@@ -39,8 +77,8 @@ const omitUnoptimizedCityHeroesPlugin = (): Plugin => ({
 
 const webManifestPlugin = (env: Record<string, string>): Plugin => {
   const buildManifest = () => ({
-    name: env.VITE_SITE_NAME || "Cheap Stays",
-    short_name: env.VITE_SITE_SHORT_NAME || "CheapStays",
+    name: env.VITE_SITE_NAME || "Economy Stays",
+    short_name: env.VITE_SITE_SHORT_NAME || "EconomyStays",
     description: "Compare hotel and rental prices worldwide.",
     icons: [
       {
@@ -132,6 +170,7 @@ export default defineConfig(({ mode }) => {
     },
     plugins: [
       react(),
+      mode === "development" && devEnvCheckPlugin(env),
       htmlEnvPlugin(env),
       webManifestPlugin(env),
       omitUnoptimizedCityHeroesPlugin(),

@@ -4,4 +4,4 @@ export const readEnv = (key: string): string | undefined => {
 };
 
 export const readSiteName = (): string =>
-  readEnv("VITE_SITE_NAME")?.trim() || "Cheap Stays";
+  readEnv("VITE_SITE_NAME")?.trim() || "Economy Stays";

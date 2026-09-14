@@ -1286,7 +1286,7 @@ const SearchForm = ({ defaults, trackingContext }: SearchFormProps = {}) => {
           type="submit"
           size="lg"
           disabled={isLoading}
-          className="h-12 rounded-xl bg-primary px-8 text-xl font-semibold shadow-elevated transition-smooth hover:bg-primary/90 active:scale-[0.99] desktop:h-[4.5625rem] desktop:w-max desktop:max-w-full desktop:shrink-0 desktop:px-5 desktop:py-0 desktop:text-[1.5rem] desktop:leading-none"
+          className="h-12 rounded-xl bg-accent px-8 text-xl font-semibold text-accent-foreground shadow-elevated transition-smooth hover:bg-accent/90 active:scale-[0.99] desktop:h-[4.5625rem] desktop:w-max desktop:max-w-full desktop:shrink-0 desktop:px-5 desktop:py-0 desktop:text-[1.5rem] desktop:leading-none"
         >
           {isLoading ? t.search.comparingRates : t.search.comparePrices}
         </Button>

@@ -2,13 +2,13 @@
 
 Compare hotel deals and promotional rates from travel sites. Offer size varies by property and dates — review the details before you book.
 
-Canonical: https://www.cheap-stays.com/60-off-hotel-deals
+Canonical: https://www.economy-stays.com/60-off-hotel-deals
 
-Hotel deals on Cheap Stays means comparing rates hotels currently list — including properties that show a promotional price. We do not set markdowns or promise a fixed percentage off. Search a city, then read the offer details on the booking site.
+Hotel deals on Economy Stays means comparing rates hotels currently list — including properties that show a promotional price. We do not set markdowns or promise a fixed percentage off. Search a city, then read the offer details on the booking site.
 
 ## Hotel deals vs a fixed markdown
 
-Ads and sitelinks often use a striking discount line because travelers scan for a deal. On this page, the honest version is: some hotels show a promotional rate next to a usual one, and some do not. Cheap Stays does not choose the markdown and does not guarantee a percentage off.
+Ads and sitelinks often use a striking discount line because travelers scan for a deal. On this page, the honest version is: some hotels show a promotional rate next to a usual one, and some do not. Economy Stays does not choose the markdown and does not guarantee a percentage off.
 
 When a hotel lists a deal, you can see it after you search a destination and open the offer. The conditions — dates, room type, cancellation — are on that site, with the hotel.
 
@@ -22,7 +22,7 @@ A promotion for next month may not apply this weekend. If you can flex dates, tr
 
 Headline savings are easy to misunderstand. Check whether the rate is prepaid, whether breakfast is included, and whether you can cancel. A marked-down stay with no flexibility can still be a good fit — if you know that before you pay.
 
-Cheap Stays does not invent crossed-out prices. Anything that looks like a discount should be confirmed on the booking site.
+Economy Stays does not invent crossed-out prices. Anything that looks like a discount should be confirmed on the booking site.
 
 ## Timing a hotel-deal search
 
@@ -63,7 +63,7 @@ Often they do not. A promotion may be limited to certain rooms or dates. The off
 
 ### Can I combine a deal with other coupons?
 
-That depends on the booking site. Cheap Stays does not issue coupons or stack codes.
+That depends on the booking site. Economy Stays does not issue coupons or stack codes.
 
 ### Why did a deal disappear when I clicked through?
 
@@ -71,4 +71,4 @@ Promotional inventory can be limited. If it is gone, compare other listings or t
 
 ---
 
-Cheap Stays is an independent comparison search. You finish booking on a travel site such as Kayak. Rates and availability change.
+Economy Stays is an independent comparison search. You finish booking on a travel site such as Kayak. Rates and availability change.

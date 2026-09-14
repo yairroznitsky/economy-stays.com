@@ -2,13 +2,13 @@
 
 Compare unsold hotel room deals and late availability. Search tonight’s dates, see what is still listed, and review terms before you book.
 
-Canonical: https://www.cheap-stays.com/unsold-room-deals
+Canonical: https://www.economy-stays.com/unsold-room-deals
 
 Unsold room deals, on this site, means comparing hotels that still show availability close to check-in. We do not warehouse leftover rooms. Search tonight — or any night — and review what travel sites still list for your city.
 
-## What unsold rooms means on Cheap Stays
+## What unsold rooms means on Economy Stays
 
-Hotels sometimes keep rooms listed as the day of arrival gets close. Those listings can look like “leftover” inventory, but they still belong to the property and the booking site — not to us. Cheap Stays is a comparison search: we help you see what is currently offered for your dates.
+Hotels sometimes keep rooms listed as the day of arrival gets close. Those listings can look like “leftover” inventory, but they still belong to the property and the booking site — not to us. Economy Stays is a comparison search: we help you see what is currently offered for your dates.
 
 If a city is busy, late availability can be thin. If a city is quiet, you may see more choice. Neither outcome is something we guarantee; it is simply what the search shows when you search.
 
@@ -67,8 +67,8 @@ You can search any dates. This page starts on tonight because that is when lefto
 
 ### Who confirms the room is still available?
 
-The travel site at checkout. Cheap Stays does not reserve or confirm rooms.
+The travel site at checkout. Economy Stays does not reserve or confirm rooms.
 
 ---
 
-Cheap Stays is an independent comparison search. You finish booking on a travel site such as Kayak. Rates and availability change.
+Economy Stays is an independent comparison search. You finish booking on a travel site such as Kayak. Rates and availability change.

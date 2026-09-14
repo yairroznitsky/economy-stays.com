@@ -12,7 +12,7 @@ const ADS_PARAM_KEYS = [
 export type AdsParamKey = (typeof ADS_PARAM_KEYS)[number];
 export type AdsParams = Partial<Record<AdsParamKey, string>>;
 
-const STORAGE_KEY = "cheap_stays_ads_params";
+const STORAGE_KEY = "economy_stays_ads_params";
 
 export const parseAdsParams = (
   search = typeof window !== "undefined" ? window.location.search : ""

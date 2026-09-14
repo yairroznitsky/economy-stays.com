@@ -28,7 +28,7 @@ type HotelRow = {
   reviews: number | null;
 };
 
-const siteDomain = process.env.VITE_SITE_DOMAIN ?? "cheap-stays.com";
+const siteDomain = process.env.VITE_SITE_DOMAIN ?? "economy-stays.com";
 const PAGE_SIZE = 1000;
 const URLS_PER_SITEMAP = 45000;
 const STATIC_PATHS = [

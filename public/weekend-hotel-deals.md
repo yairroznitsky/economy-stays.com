@@ -2,9 +2,9 @@
 
 Compare weekend hotel deals with Friday–Sunday dates ready. Search any city for a two-night stay and review listed rates before you book.
 
-Canonical: https://www.cheap-stays.com/weekend-hotel-deals
+Canonical: https://www.economy-stays.com/weekend-hotel-deals
 
-Weekend hotel deals here means comparing a Friday-to-Sunday stay. Cheap Stays prefills the coming weekend so you can search a city for a two-night getaway, then continue to the booking site if a hotel or rental looks right.
+Weekend hotel deals here means comparing a Friday-to-Sunday stay. Economy Stays prefills the coming weekend so you can search a city for a two-night getaway, then continue to the booking site if a hotel or rental looks right.
 
 ## Planning a Friday-to-Sunday hotel stay
 
@@ -22,7 +22,7 @@ If you are looking at tonight instead of Friday, the last-minute page is a bette
 
 Destination cards open current listings for the same Friday–Sunday in cities people often weekend in — Paris, Barcelona, London, and others. City landings below are useful when you want a destination guide first.
 
-There is no ranked “best weekend city” on Cheap Stays. Train time, events, and what you like to do matter more than a generic list. Search the place you would actually enjoy for two nights.
+There is no ranked “best weekend city” on Economy Stays. Train time, events, and what you like to do matter more than a generic list. Search the place you would actually enjoy for two nights.
 
 ## Hotels, apartments, and short rentals
 
@@ -32,7 +32,7 @@ Check Saturday checkout quirks, late check-in if you leave after work, and cance
 
 ## From comparison to a booked weekend
 
-When a stay looks right, continue to the booking site to confirm the room and the policy. Cheap Stays does not take the booking. We may earn a commission if you complete a reservation.
+When a stay looks right, continue to the booking site to confirm the room and the policy. Economy Stays does not take the booking. We may earn a commission if you complete a reservation.
 
 If you hoped for a giant automatic markdown, this page isn’t a sitewide weekend coupon — promotions appear only when a hotel is actually listing one.
 
@@ -63,7 +63,7 @@ Yes. Change check-in to Thursday (or any night) in the form, then compare again.
 
 ### Do you offer a weekend-only coupon?
 
-No. This page prefills weekend dates. Any promotional rate comes from the listing, not a Cheap Stays coupon.
+No. This page prefills weekend dates. Any promotional rate comes from the listing, not a Economy Stays coupon.
 
 ### What if Friday is sold out?
 
@@ -71,4 +71,4 @@ Try Saturday check-in, a nearby area, or another city. Availability is whatever 
 
 ---
 
-Cheap Stays is an independent comparison search. You finish booking on a travel site such as Kayak. Rates and availability change.
+Economy Stays is an independent comparison search. You finish booking on a travel site such as Kayak. Rates and availability change.

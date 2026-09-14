@@ -150,7 +150,7 @@ const readEnv = (key: string): string | undefined => {
 };
 
 const readSiteName = (): string =>
-  readEnv("VITE_SITE_NAME")?.trim() || "Cheap Stays";
+  readEnv("VITE_SITE_NAME")?.trim() || "Economy Stays";
 
 const getSupabaseConfig = (): { url: string; key: string } => {
   const url = readEnv("SUPABASE_URL") ?? readEnv("VITE_SUPABASE_URL");

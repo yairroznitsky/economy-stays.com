@@ -68,7 +68,7 @@ const buildPrompt = (city: CityRow, intent: IntentRow | null): string => {
 const CONTENT_JSON_EXAMPLE = `{
   "h1": "Compare Hotels in Paris",
   "subtitle": "Search rates across travel sites and pick the stay that fits your trip.",
-  "metaTitle": "Hotels in Paris | Compare Rates | Cheap Stays",
+  "metaTitle": "Hotels in Paris | Compare Rates | Economy Stays",
   "metaDescription": "Compare hotel rates in Paris across leading travel sites. Search by dates and guests to find a stay that fits your trip.",
   "introText": "Two short paragraphs about comparing hotel options in the city. No prices or invented landmarks.",
   "faqs": [

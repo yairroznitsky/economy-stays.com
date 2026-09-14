@@ -1,32 +1,32 @@
-# Cheap Stays
+# Economy Stays
 
 > A calmer way to compare stays. Search hotels, apartments, and vacation rentals in one place and book through travel sites you already know.
 
 ## Pages
 
-- [Home](https://www.cheap-stays.com/): Hotel and stay search
-- [Español](https://www.cheap-stays.com/es): Spanish home page
-- [Português (Brasil)](https://www.cheap-stays.com/br): Brazilian Portuguese home page
-- [About](https://www.cheap-stays.com/about): About Cheap Stays
-- [Contact](https://www.cheap-stays.com/contact): Contact and support
-- [Privacy](https://www.cheap-stays.com/privacy): Privacy policy
+- [Home](https://www.economy-stays.com/): Hotel and stay search
+- [Español](https://www.economy-stays.com/es): Spanish home page
+- [Português (Brasil)](https://www.economy-stays.com/br): Brazilian Portuguese home page
+- [About](https://www.economy-stays.com/about): About Economy Stays
+- [Contact](https://www.economy-stays.com/contact): Contact and support
+- [Privacy](https://www.economy-stays.com/privacy): Privacy policy
 
 ## Sitelink guides
 
-- [Last Minute Hotel Deals](https://www.cheap-stays.com/last-minute-hotel-deals): Compare last-minute hotel deals for tonight. Search any city, review what’s listed right now, and continue to book only if a stay looks right.
-  - Markdown for AI crawlers: https://www.cheap-stays.com/last-minute-hotel-deals.md
-- [Unsold Room Deals](https://www.cheap-stays.com/unsold-room-deals): Compare unsold hotel room deals and late availability. Search tonight’s dates, see what is still listed, and review terms before you book.
-  - Markdown for AI crawlers: https://www.cheap-stays.com/unsold-room-deals.md
-- [Hotels Under $100](https://www.cheap-stays.com/hotels-under-100): Compare budget hotels and affordable stays by city. Rates vary with dates and destination — sort the results by price to see lower options.
-  - Markdown for AI crawlers: https://www.cheap-stays.com/hotels-under-100.md
-- [60% Off Hotel Deals](https://www.cheap-stays.com/60-off-hotel-deals): Compare hotel deals and promotional rates from travel sites. Offer size varies by property and dates — review the details before you book.
-  - Markdown for AI crawlers: https://www.cheap-stays.com/60-off-hotel-deals.md
-- [Cheap Hotels Near You](https://www.cheap-stays.com/cheap-hotels-near-you): Find budget-friendly hotels near your location. We detect your city automatically and show nearby stays — tap to compare on a travel site.
-  - Markdown for AI crawlers: https://www.cheap-stays.com/cheap-hotels-near-you.md
-- [Weekend Hotel Deals](https://www.cheap-stays.com/weekend-hotel-deals): Compare weekend hotel deals with Friday–Sunday dates ready. Search any city for a two-night stay and review listed rates before you book.
-  - Markdown for AI crawlers: https://www.cheap-stays.com/weekend-hotel-deals.md
+- [Last Minute Hotel Deals](https://www.economy-stays.com/last-minute-hotel-deals): Compare last-minute hotel deals for tonight. Search any city, review what’s listed right now, and continue to book only if a stay looks right.
+  - Markdown for AI crawlers: https://www.economy-stays.com/last-minute-hotel-deals.md
+- [Unsold Room Deals](https://www.economy-stays.com/unsold-room-deals): Compare unsold hotel room deals and late availability. Search tonight’s dates, see what is still listed, and review terms before you book.
+  - Markdown for AI crawlers: https://www.economy-stays.com/unsold-room-deals.md
+- [Hotels Under $100](https://www.economy-stays.com/hotels-under-100): Compare budget hotels and affordable stays by city. Rates vary with dates and destination — sort the results by price to see lower options.
+  - Markdown for AI crawlers: https://www.economy-stays.com/hotels-under-100.md
+- [60% Off Hotel Deals](https://www.economy-stays.com/60-off-hotel-deals): Compare hotel deals and promotional rates from travel sites. Offer size varies by property and dates — review the details before you book.
+  - Markdown for AI crawlers: https://www.economy-stays.com/60-off-hotel-deals.md
+- [Cheap Hotels Near You](https://www.economy-stays.com/cheap-hotels-near-you): Find budget-friendly hotels near your location. We detect your city automatically and show nearby stays — tap to compare on a travel site.
+  - Markdown for AI crawlers: https://www.economy-stays.com/cheap-hotels-near-you.md
+- [Weekend Hotel Deals](https://www.economy-stays.com/weekend-hotel-deals): Compare weekend hotel deals with Friday–Sunday dates ready. Search any city for a two-night stay and review listed rates before you book.
+  - Markdown for AI crawlers: https://www.economy-stays.com/weekend-hotel-deals.md
 
 ## Optional
 
-- [Sitemap](https://www.cheap-stays.com/sitemap.xml): Index of city, hotel, and sitelink pages
-- [Robots](https://www.cheap-stays.com/robots.txt): Crawler guidance
+- [Sitemap](https://www.economy-stays.com/sitemap.xml): Index of city, hotel, and sitelink pages
+- [Robots](https://www.economy-stays.com/robots.txt): Crawler guidance

@@ -34,10 +34,10 @@ const IndexContent = () => {
             className="absolute inset-0 h-full w-full object-cover motion-safe:animate-hero-ken"
           />
           <div className="absolute inset-0 bg-gradient-hero" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/30" />
+          <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 via-primary/15 to-primary/30" />
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-x-0 top-[12%] bottom-[22%] bg-[radial-gradient(ellipse_at_center,hsl(215_45%_6%/0.42)_0%,transparent_68%)]"
+            className="pointer-events-none absolute inset-x-0 top-[12%] bottom-[22%] bg-[radial-gradient(ellipse_at_center,hsl(226_65%_20%/0.35)_0%,transparent_68%)]"
           />
         </div>
 
@@ -62,7 +62,7 @@ const IndexContent = () => {
       </section>
 
       {/* Features */}
-      <section id="how" className="border-b border-border bg-background py-20">
+      <section id="how" className="border-b border-border bg-secondary py-20">
         <div className="container">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="font-display text-3xl font-bold text-foreground md:text-4xl">
@@ -76,7 +76,7 @@ const IndexContent = () => {
               return (
                 <div
                   key={f.title}
-                  className="rounded-2xl border border-border bg-card p-7 shadow-soft"
+                  className="rounded-2xl bg-card p-7"
                 >
                   <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground">
                     <Icon className="h-6 w-6" />

@@ -9,7 +9,7 @@ export type TrackingApiPath = "/landings" | "/search";
 
 export const trackingApiUrl = (path: TrackingApiPath): string => {
   if (trackingApiBase) {
-    // e.g. https://api.cheap-stays.com/landings (Vercel rewrites → /api/landings)
+    // e.g. https://api.economy-stays.com/landings (Vercel rewrites → /api/landings)
     return `${trackingApiBase}${path}`;
   }
   return `/api${path}`;

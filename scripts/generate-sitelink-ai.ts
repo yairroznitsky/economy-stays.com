@@ -10,7 +10,7 @@ import {
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const origin = canonicalOriginFromDomain(
-  process.env.VITE_SITE_DOMAIN ?? "cheap-stays.com"
+  process.env.VITE_SITE_DOMAIN ?? "economy-stays.com"
 );
 
 mkdirSync(join(root, "public"), { recursive: true });

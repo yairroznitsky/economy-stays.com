@@ -2,9 +2,9 @@
 
 Find budget-friendly hotels near your location. We detect your city automatically and show nearby stays — tap to compare on a travel site.
 
-Canonical: https://www.cheap-stays.com/cheap-hotels-near-you
+Canonical: https://www.economy-stays.com/cheap-hotels-near-you
 
-Cheap hotels near you uses your approximate location to surface budget-friendly stays close to where you are. We detect your city from your IP address on load — no permission prompt in the normal case. If IP lookup fails, your browser may ask once for location as a fallback. You can also search any city in the form above.
+Cheap hotels near you uses your approximate location to surface budget-friendly stays close to where you are. We detect your city from your IP address on load — no permission prompt. If IP lookup fails, your browser may ask once for location as a fallback. You can also search any city in the form above.
 
 ## How we find stays near you
 
@@ -32,7 +32,7 @@ Airports, old towns, and event venues each have their own rate patterns. Search 
 
 ## From a nearby card to a booking
 
-Tap a hotel card and you will be taken to that specific property on a booking partner. Read the room type, rate, and cancellation policy there — those details live on the booking site, not here. Cheap Stays does not process reservations. We may earn a commission if you complete a stay; it does not change the rate you are offered.
+Tap a hotel card and you will be taken to that specific property on a booking partner. Read the room type, rate, and cancellation policy there — those details live on the booking site, not here. Economy Stays does not process reservations. We may earn a commission if you complete a stay; it does not change the rate you are offered.
 
 If nothing nearby fits, change your dates in the form above, or search any city there.
 
@@ -66,8 +66,8 @@ The nearby hotel cards use your current location. To search a different destinat
 
 ### Do you store my location?
 
-Your IP city is read once to load nearby hotels and is not stored by Cheap Stays. If the browser location fallback runs, those coordinates are used only for the hotel query and are not stored.
+Your IP city is read once to load nearby hotels and is not stored by Economy Stays. If the browser location fallback runs, those coordinates are used only for the hotel query and are not stored.
 
 ---
 
-Cheap Stays is an independent comparison search. You finish booking on a travel site such as Kayak. Rates and availability change.
+Economy Stays is an independent comparison search. You finish booking on a travel site such as Kayak. Rates and availability change.

@@ -32,7 +32,7 @@ export const buildSitelinkJsonLd = (
   const organization: JsonLd = {
     "@type": "Organization",
     "@id": orgId,
-    name: "Cheap Stays",
+    name: "Economy Stays",
     url: `${origin}/`,
     description:
       "Independent hotel and vacation rental search. Compare stays and continue to a travel site to book.",
@@ -42,7 +42,7 @@ export const buildSitelinkJsonLd = (
     "@type": "WebSite",
     "@id": websiteId,
     url: `${origin}/`,
-    name: "Cheap Stays",
+    name: "Economy Stays",
     publisher: { "@id": orgId },
     inLanguage: "en",
   };
@@ -172,7 +172,7 @@ ${faqs}
 
 ---
 
-Cheap Stays is an independent comparison search. You finish booking on a travel site such as Kayak. Rates and availability change.
+Economy Stays is an independent comparison search. You finish booking on a travel site such as Kayak. Rates and availability change.
 `;
 };
 
@@ -183,7 +183,7 @@ export const buildLlmsTxt = (origin: string): string => {
     return `- [${page.title}](${url}): ${page.metaDescription}\n  - Markdown for AI crawlers: ${md}`;
   }).join("\n");
 
-  return `# Cheap Stays
+  return `# Economy Stays
 
 > A calmer way to compare stays. Search hotels, apartments, and vacation rentals in one place and book through travel sites you already know.
 
@@ -192,7 +192,7 @@ export const buildLlmsTxt = (origin: string): string => {
 - [Home](${origin}/): Hotel and stay search
 - [Español](${origin}/es): Spanish home page
 - [Português (Brasil)](${origin}/br): Brazilian Portuguese home page
-- [About](${origin}/about): About Cheap Stays
+- [About](${origin}/about): About Economy Stays
 - [Contact](${origin}/contact): Contact and support
 - [Privacy](${origin}/privacy): Privacy policy
 

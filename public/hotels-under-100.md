@@ -2,13 +2,13 @@
 
 Compare budget hotels and affordable stays by city. Rates vary with dates and destination — sort the results by price to see lower options.
 
-Canonical: https://www.cheap-stays.com/hotels-under-100
+Canonical: https://www.economy-stays.com/hotels-under-100
 
 This page is for travelers who want to compare more affordable hotels and rentals. We do not filter to a fixed nightly cap. Search a city, then sort by price on the booking site to lean toward budget-friendly stays for your dates.
 
 ## Searching for budget hotels without a hard cap
 
-The sitelink title talks about a round number because that is how many people think about a simple stay. On the page itself, Cheap Stays cannot enforce a price ceiling. Travel sites list a range of hotels and rentals; some will feel budget-friendly for your city and some will not.
+The sitelink title talks about a round number because that is how many people think about a simple stay. On the page itself, Economy Stays cannot enforce a price ceiling. Travel sites list a range of hotels and rentals; some will feel budget-friendly for your city and some will not.
 
 The practical move is to search, then sort or filter by price on the results. That is where lower nightly rates — when they exist for your dates — become easier to see.
 
@@ -28,13 +28,13 @@ Read what is included. A low headline rate can exclude breakfast, or carry a str
 
 Paris, London, Bangkok, and other popular cities have cheap-hotels landings linked below. Those pages keep the budget-search intent while you still choose dates and compare stays.
 
-If your trip is not in that list, type the city in the form. Cheap Stays works as a worldwide comparison search, not a closed catalog of a few markets.
+If your trip is not in that list, type the city in the form. Economy Stays works as a worldwide comparison search, not a closed catalog of a few markets.
 
 ## What we will not claim
 
 We will not promise that every result sits under a fixed amount, or that we have the lowest rate on the internet. We show current listings for your search and let you continue to book where the offer is real.
 
-Cheap Stays does not add a booking fee. If you complete a stay, we may earn a commission. Your price is set by the hotel and the site you book on.
+Economy Stays does not add a booking fee. If you complete a stay, we may earn a commission. Your price is set by the hotel and the site you book on.
 
 ## How to compare budget hotel stays
 
@@ -55,7 +55,7 @@ Demand, season, and the kind of stay all play a part. A simple room in one city 
 
 ### Do you add extra fees?
 
-Cheap Stays doesn’t add a booking fee. What you pay is set by the hotel and the booking site.
+Economy Stays doesn’t add a booking fee. What you pay is set by the hotel and the booking site.
 
 ### Should I search weekdays to save?
 
@@ -71,4 +71,4 @@ No. “Budget” is about the rate and the stay you choose — not a label we as
 
 ---
 
-Cheap Stays is an independent comparison search. You finish booking on a travel site such as Kayak. Rates and availability change.
+Economy Stays is an independent comparison search. You finish booking on a travel site such as Kayak. Rates and availability change.
