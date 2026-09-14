@@ -704,7 +704,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   }
 
   const result = await runSpiderKayakRedirect();
-  if (!result.ok) {
+  if (result.ok === false) {
     res.status(502).json({ error: result.error });
     return;
   }

@@ -12,7 +12,7 @@ interface ApiRequest {
 interface ApiResponse {
   status: (code: number) => ApiResponse;
   json: (body: unknown) => void;
-  end: () => void;
+  end: (body?: string) => void;
   setHeader: (name: string, value: string) => void;
 }
 
