@@ -140,7 +140,7 @@ const SitelinkPageContent = ({ slug }: SitelinkPageProps) => {
     document.documentElement.lang = "en";
     upsertMeta("name", "description", page.metaDescription);
     upsertMeta("name", "robots", "index,follow,max-image-preview:large,max-snippet:-1");
-    upsertMeta("name", "author", siteConfig.operator);
+    // no author meta — avoids operator fingerprinting across sites
     upsertMeta("property", "og:title", page.metaTitle);
     upsertMeta("property", "og:description", page.metaDescription);
     upsertMeta("property", "og:url", canonical);
@@ -168,7 +168,7 @@ const SitelinkPageContent = ({ slug }: SitelinkPageProps) => {
       <SitelinkJsonLd page={page} origin={origin} />
       <section
         className={cn(
-          "relative min-h-[88svh] w-full md:min-h-[720px]",
+          "relative h-[70vh] min-h-[520px] max-h-[780px] w-full",
           isNearYouPage && "z-20 overflow-visible"
         )}
       >
@@ -181,19 +181,14 @@ const SitelinkPageContent = ({ slug }: SitelinkPageProps) => {
             height={1280}
             fetchPriority="high"
             decoding="async"
-            className="absolute inset-0 h-full min-h-full w-full min-w-full object-cover object-center motion-safe:animate-hero-ken"
+            className="absolute inset-0 h-full min-h-full w-full min-w-full object-cover object-center"
           />
           <div className="absolute inset-0 bg-gradient-hero" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/30" />
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-x-0 top-[12%] bottom-[22%] bg-[radial-gradient(ellipse_at_center,hsl(215_45%_6%/0.42)_0%,transparent_68%)]"
-          />
         </div>
 
         <Header />
 
-        <div className="container relative z-10 flex min-h-[88svh] flex-col items-center pt-24 pb-10 text-center md:min-h-[720px] md:pt-28 md:pb-14">
+        <div className="container relative z-10 flex h-full flex-col items-center pt-24 pb-10 text-center md:pt-28 md:pb-14">
           <div className="flex w-full flex-1 flex-col items-center justify-center opacity-0 motion-safe:animate-hero-rise motion-reduce:opacity-100">
             <p className="text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-accent md:text-xs">
               {siteConfig.name}
@@ -212,7 +207,7 @@ const SitelinkPageContent = ({ slug }: SitelinkPageProps) => {
           </div>
           <div
             className={cn(
-              "mt-6 w-full max-w-5xl shrink-0 opacity-0 motion-safe:animate-hero-rise motion-safe:[animation-delay:140ms] motion-reduce:opacity-100 desktop:mt-8 desktop:max-w-[73.6rem]",
+              "mt-6 w-full max-w-5xl shrink-0 opacity-0 motion-safe:animate-hero-rise motion-safe:[animation-delay:140ms] motion-reduce:opacity-100 wide:mt-8 wide:max-w-[73.6rem]",
               isNearYouPage && "relative z-50"
             )}
           >
@@ -243,13 +238,6 @@ const SitelinkPageContent = ({ slug }: SitelinkPageProps) => {
           <SitelinkBreadcrumbs page={page} />
           <SitelinkArticle page={page} />
           <Benefits benefits={page.benefits} />
-          <TrendingDestinations
-            title={page.destinationsTitle}
-            subtitle={page.destinationsSubtitle}
-            checkIn={stayDates.checkIn}
-            checkOut={stayDates.checkOut}
-            surface={`sitelink_${page.slug}_destinations`}
-          />
           <section className="border-b border-border bg-muted/20 py-12 md:py-14">
             <div className="container">
               <div className="mx-auto max-w-3xl">

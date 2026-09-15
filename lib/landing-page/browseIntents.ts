@@ -26,6 +26,7 @@ const safeSelectIntents = async (
 };
 
 export const fetchBrowseIntents = async (
+  countryCode: string,
   citySlug: string
 ): Promise<LandingBrowseIntent[]> => {
   const rows = await safeSelectIntents(
@@ -39,6 +40,6 @@ export const fetchBrowseIntents = async (
   return rows.map((row) => ({
     slug: row.slug,
     label: row.label,
-    path: buildIntentPath(citySlug, row.slug),
+    path: buildIntentPath(countryCode, citySlug, row.slug),
   }));
 };

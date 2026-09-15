@@ -8,8 +8,8 @@ export type TrackingRoute = "landings" | "search" | "landing-page" | "nearby";
 const matchTrackingPath = (url: string | undefined): TrackingRoute | null => {
   if (!url) return null;
   const pathname = url.split("?")[0];
-  if (pathname === "/api/landings" || pathname === "/landings") return "landings";
-  if (pathname === "/api/search" || pathname === "/search") return "search";
+  if (pathname === "/api/sessions" || pathname === "/api/landings" || pathname === "/landings") return "landings";
+  if (pathname === "/api/exits" || pathname === "/api/search" || pathname === "/search") return "search";
   if (pathname === "/api/landing-page") return "landing-page";
   if (pathname === "/api/nearby") return "nearby";
   return null;

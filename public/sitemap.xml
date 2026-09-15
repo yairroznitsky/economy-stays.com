@@ -3,4 +3,16 @@
   <sitemap>
     <loc>https://economy-stays.com/sitemap-static.xml</loc>
   </sitemap>
+  <sitemap>
+    <loc>https://economy-stays.com/sitemap-cities.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://economy-stays.com/sitemap-hotels-1.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://economy-stays.com/sitemap-hotels-2.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://economy-stays.com/sitemap-hotels-3.xml</loc>
+  </sitemap>
 </sitemapindex>

@@ -1,36 +1,36 @@
 import type { LandingTranslations } from "./types";
 
 export const ptBR: LandingTranslations = {
-  heroEyebrow: "Busca independente de hospedagem",
-  heroTitle: "Uma forma mais tranquila de comparar estadias",
+  heroEyebrow: "A confiança de viajantes em todo o mundo",
+  heroTitle: "Uma busca. Todos os hotéis. Sua estadia perfeita.",
   heroSubtitle:
-    "Pesquise hotéis, apartamentos e aluguéis em um só lugar — e reserve com parceiros de confiança.",
+    "Explore hotéis, apartamentos e aluguéis por estrelas, avaliações e tipo — e reserve com parceiros de confiança.",
   heroImageAlt:
     "Resort no penhasco com piscina infinita com vista para o oceano ao pôr do sol",
-  featuresTitle: (siteName) => `Por que viajantes usam ${siteName}`,
+  featuresTitle: (siteName) => `Por que viajantes escolhem ${siteName}`,
   featuresSubtitle:
-    "Uma busca mostra tarifas de parceiros confiáveis para você escolher com segurança.",
+    "Uma busca conecta você a opções de parceiros confiáveis, organizadas por estrelas, avaliações e suas datas.",
   features: [
     {
-      title: "Comparação clara de preços",
-      desc: "Veja hotéis, apartamentos e aluguéis lado a lado e escolha a melhor opção para suas datas.",
+      title: "Explore antes de reservar",
+      desc: "Filtre por categoria, tipo de acomodação e pontuação de hóspedes para encontrar o hotel que realmente combina com sua viagem.",
     },
     {
-      title: "Cobertura mundial",
-      desc: "Fins de semana, praia ou estadias longas — opções em cidades e litorais do mundo todo.",
+      title: "Hotéis em todo o mundo",
+      desc: "Fins de semana, praias ou estadias longas — mostramos opções em milhares de destinos.",
     },
     {
-      title: "Parceiros consolidados",
-      desc: "Políticas flexíveis em muitas listagens, com parceiros de viagem que você já conhece.",
+      title: "Reserve com parceiros de confiança",
+      desc: "Continue em sites de reserva consolidados quando estiver pronto — sem cadastro obrigatório nem acréscimo nas tarifas.",
     },
   ],
   destinationsTitle: "Destinos populares",
-  destinationsSubtitle: "Explore cidades que viajantes estão pesquisando esta semana.",
+  destinationsSubtitle: "Explore hotéis nas cidades mais visitadas do mundo.",
   compareRates: "Comparar tarifas",
   checkingRates: "Consultando tarifas…",
-  ctaTitle: "Pronto para planejar sua viagem?",
+  ctaTitle: "Pronto para encontrar sua estadia?",
   ctaSubtitle:
-    "Use a busca acima para comparar estadias e continuar com seu parceiro de reserva preferido.",
+    "Use a busca acima para explorar hotéis e continuar com seu parceiro de reserva preferido.",
   destinationNotFound: (city) =>
     `Não encontramos ${city}. Tente buscar manualmente acima.`,
   reviewSearch: "Revise sua busca",

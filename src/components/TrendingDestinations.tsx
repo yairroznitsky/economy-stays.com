@@ -235,7 +235,7 @@ const TrendingDestinations = ({
               disabled={openingDestination !== null}
               aria-busy={openingDestination === d.title}
               onClick={() => void openDestination(d)}
-              className="group flex h-full min-w-0 flex-col overflow-hidden rounded-2xl border border-border bg-card p-0 text-left shadow-soft transition-smooth hover:-translate-y-1 hover:border-primary/40 hover:shadow-elevated disabled:pointer-events-none disabled:opacity-60"
+              className="group flex h-full min-w-0 flex-col overflow-hidden rounded-xl border border-border bg-card p-0 text-left shadow-soft transition hover:-translate-y-1 hover:border-primary/40 hover:shadow-elevated disabled:pointer-events-none disabled:opacity-60"
             >
               <div className="relative aspect-[4/3] w-full overflow-hidden bg-muted">
                 <img

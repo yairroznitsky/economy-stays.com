@@ -1,18 +1,17 @@
 import { siteConfig } from "@/lib/siteConfig";
 
-/** Base URL for tracking APIs. Empty = same origin (/api/landings, /api/search). */
+/** Base URL for tracking APIs. Empty = same origin (/api/sessions, /api/exits). */
 export const trackingApiBase = (
   import.meta.env.VITE_TRACKING_API_BASE?.trim() ?? ""
 ).replace(/\/$/, "");
 
-export type TrackingApiPath = "/landings" | "/search";
+export type TrackingApiPath = "/api/sessions" | "/api/exits";
 
 export const trackingApiUrl = (path: TrackingApiPath): string => {
   if (trackingApiBase) {
-    // e.g. https://api.economy-stays.com/landings (Vercel rewrites → /api/landings)
     return `${trackingApiBase}${path}`;
   }
-  return `/api${path}`;
+  return path;
 };
 
 export const postTrackingJson = async (
@@ -26,8 +25,7 @@ export const postTrackingJson = async (
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
-    // Landings fire on page load; keepalive on unload can replay the same POST.
-    keepalive: options?.keepalive ?? path === "/search",
+    keepalive: options?.keepalive ?? path === "/api/exits",
   });
 
   if (!response.ok) {

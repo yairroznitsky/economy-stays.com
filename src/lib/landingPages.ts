@@ -17,11 +17,13 @@ export const normalizeLandingPath = (pathname: string): string => {
 
 export const buildLandingPath = (
   citySlug: string,
-  intentSlug?: string
+  themeSlug?: string,
+  countryCode?: string
 ): string => {
+  const cc = (countryCode ?? "xx").trim().toLowerCase();
   const city = citySlug.trim().toLowerCase();
-  if (!intentSlug) return `/hotels/${city}`;
-  return `/hotels/${city}/${intentSlug.trim().toLowerCase()}`;
+  if (!themeSlug) return `/stay/${cc}/${city}`;
+  return `/stay/${cc}/${city}/${themeSlug.trim().toLowerCase()}`;
 };
 
 const fetchConfig = async (path: string): Promise<LandingPageConfig | null> => {

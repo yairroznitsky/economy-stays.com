@@ -2,19 +2,20 @@ import { buildLandingPath, normalizeLandingPath } from "@/lib/landingPages";
 
 describe("landingPages paths", () => {
   it("normalizes trailing slashes and casing", () => {
-    expect(normalizeLandingPath("/Hotels/Paris/")).toBe("/hotels/paris");
+    expect(normalizeLandingPath("/Stay/FR/Paris/")).toBe("/stay/fr/paris");
   });
 
-  it("builds base and intent paths", () => {
-    expect(buildLandingPath("Paris")).toBe("/hotels/paris");
-    expect(buildLandingPath("Paris", "Cheap-Hotels")).toBe(
-      "/hotels/paris/cheap-hotels"
+  it("builds base and theme paths with country code", () => {
+    expect(buildLandingPath("paris", undefined, "fr")).toBe("/stay/fr/paris");
+    expect(buildLandingPath("paris", "boutique-hotels", "fr")).toBe(
+      "/stay/fr/paris/boutique-hotels"
     );
   });
 
-  it("builds hotel-style paths under a city", () => {
-    expect(buildLandingPath("New-York", "Waldorf-Astoria")).toBe(
-      "/hotels/new-york/waldorf-astoria"
+  it("falls back to xx country code when none provided", () => {
+    expect(buildLandingPath("paris")).toBe("/stay/xx/paris");
+    expect(buildLandingPath("new-york", "top-rated")).toBe(
+      "/stay/xx/new-york/top-rated"
     );
   });
 });

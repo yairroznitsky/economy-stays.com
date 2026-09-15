@@ -208,12 +208,12 @@ const HighlightQuery = ({ text, query }: { text: string; query: string }) => {
   );
 };
 
-const desktopFieldPad = "desktop:px-[1.15rem] desktop:py-[0.8625rem]";
-const desktopFieldLabel = "desktop:text-[0.8625rem]";
-const desktopFieldText = "desktop:text-[1.15rem]";
-const desktopFieldIcon = "desktop:h-[1.15rem] desktop:w-[1.15rem]";
+const desktopFieldPad = "wide:px-[1.15rem] wide:py-[0.8625rem]";
+const desktopFieldLabel = "wide:text-[0.8625rem]";
+const desktopFieldText = "wide:text-[1.15rem]";
+const desktopFieldIcon = "wide:h-[1.15rem] wide:w-[1.15rem]";
 const searchFieldShell =
-  "rounded-xl border bg-background px-4 py-3 text-left transition-smooth hover:border-primary/40 desktop:h-[4.5625rem]";
+  "rounded-xl border bg-background px-4 py-3 text-left transition-smooth hover:border-primary/40 wide:h-[4.5625rem]";
 const searchFieldValueRow = "mt-1 flex min-w-0 items-center justify-start gap-2 text-left";
 const searchFieldValueText =
   "min-w-0 flex-1 truncate whitespace-nowrap text-left text-base text-foreground";
@@ -971,9 +971,9 @@ const SearchForm = ({ defaults, trackingContext }: SearchFormProps = {}) => {
       ref={formRef}
       onSubmit={handleSubmit}
       noValidate
-      className="w-full rounded-2xl border border-white/40 bg-card p-3 text-left shadow-elevated desktop:p-[1.15rem]"
+      className="w-full rounded-2xl border border-white/40 bg-card p-3 text-left shadow-elevated wide:p-[1.15rem]"
     >
-      <div className="grid grid-cols-1 gap-2 desktop:grid-cols-[1.5fr_1.5fr_1.35fr_auto] desktop:gap-[0.575rem] desktop:[&>*]:min-w-0">
+      <div className="grid grid-cols-1 gap-2 wide:grid-cols-[1.5fr_1.5fr_1.35fr_auto] wide:gap-[0.575rem] wide:[&>*]:min-w-0">
         {/* Destination */}
         <div
           className={cn(
@@ -981,7 +981,7 @@ const SearchForm = ({ defaults, trackingContext }: SearchFormProps = {}) => {
             searchFieldShell,
             desktopFieldPad,
             destinationError
-              ? "border-destructive ring-1 ring-destructive/30 desktop:h-auto"
+              ? "border-destructive ring-1 ring-destructive/30 wide:h-auto"
               : "border-border"
           )}
         >
@@ -1080,7 +1080,7 @@ const SearchForm = ({ defaults, trackingContext }: SearchFormProps = {}) => {
             <div className="absolute top-full left-0 z-[100] mt-2 w-full rounded-xl border border-border bg-popover p-1 shadow-elevated">
               <ul
                 role="listbox"
-                className="max-h-60 overflow-auto desktop:max-h-72"
+                className="max-h-60 overflow-auto wide:max-h-72"
               >
                 {suggestions.map((suggestion, index) => (
                   <li key={`${suggestion.type}-${suggestion.id}-${index}`}>
@@ -1286,7 +1286,7 @@ const SearchForm = ({ defaults, trackingContext }: SearchFormProps = {}) => {
           type="submit"
           size="lg"
           disabled={isLoading}
-          className="h-12 rounded-xl bg-accent px-8 text-xl font-semibold text-accent-foreground shadow-elevated transition-smooth hover:bg-accent/90 active:scale-[0.99] desktop:h-[4.5625rem] desktop:w-max desktop:max-w-full desktop:shrink-0 desktop:px-5 desktop:py-0 desktop:text-[1.5rem] desktop:leading-none"
+          className="h-12 rounded-xl bg-accent px-8 text-xl font-semibold text-accent-foreground shadow-elevated transition-smooth hover:bg-accent/90 active:scale-[0.99] wide:h-[4.5625rem] wide:w-max wide:max-w-full wide:shrink-0 wide:px-5 wide:py-0 wide:text-[1.5rem] wide:leading-none"
         >
           {isLoading ? t.search.comparingRates : t.search.comparePrices}
         </Button>

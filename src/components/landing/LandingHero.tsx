@@ -27,7 +27,7 @@ const LandingHero = ({ config, searchFormProps }: LandingHeroProps) => {
     : `Hotels in ${config.city.name}, ${config.city.country}`;
 
   return (
-    <section className="relative min-h-[88svh] w-full overflow-hidden md:min-h-[720px]">
+    <section className="relative h-[70vh] min-h-[520px] max-h-[780px] w-full overflow-hidden">
       <img
         src={heroImage}
         srcSet={usingFallback ? undefined : getCityHeroSrcSet(config.city.slug)}
@@ -37,7 +37,7 @@ const LandingHero = ({ config, searchFormProps }: LandingHeroProps) => {
         height={1067}
         fetchPriority="high"
         decoding="async"
-        className="absolute inset-0 h-full w-full object-cover motion-safe:animate-hero-ken"
+        className="absolute inset-0 h-full w-full object-cover"
         onError={() => {
           if (heroImage !== fallbackHero) {
             setHeroImage(fallbackHero);
@@ -45,15 +45,10 @@ const LandingHero = ({ config, searchFormProps }: LandingHeroProps) => {
         }}
       />
       <div className="absolute inset-0 bg-gradient-hero" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/30" />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-[12%] bottom-[22%] bg-[radial-gradient(ellipse_at_center,hsl(215_45%_6%/0.42)_0%,transparent_68%)]"
-      />
 
       <Header />
 
-      <div className="container relative z-10 flex min-h-[88svh] flex-col items-center justify-start pt-24 pb-10 text-center md:min-h-[720px] md:justify-center md:pt-28 md:pb-14">
+      <div className="container relative z-10 flex h-full flex-col items-center justify-start pt-24 pb-10 text-center md:justify-center md:pt-28 md:pb-14">
         <div className="flex w-full flex-col items-center opacity-0 motion-safe:animate-hero-rise motion-reduce:opacity-100">
           <p className="mt-2 text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-accent md:mt-0 md:text-xs">
             {config.city.name}, {config.city.country}
@@ -74,7 +69,7 @@ const LandingHero = ({ config, searchFormProps }: LandingHeroProps) => {
           </p>
           {isHotel ? <HotelFactsStrip hotel={config.hotel!} /> : null}
           {config.intent ? <IntentBadges intent={config.intent} /> : null}
-          <div className="mt-5 w-full max-w-5xl desktop:mt-6 desktop:max-w-[73.6rem]">
+          <div className="mt-5 w-full max-w-5xl wide:mt-6 wide:max-w-[73.6rem]">
             <SearchForm {...searchFormProps} />
           </div>
         </div>

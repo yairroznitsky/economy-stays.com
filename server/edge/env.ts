@@ -3,7 +3,7 @@ export const readEnv = (key: string): string | undefined => {
   return typeof value === "string" && value.length > 0 ? value : undefined;
 };
 
-const DEFAULT_KAYAK_AFFILIATE_ID = "kan_317716_594040";
+const DEFAULT_KAYAK_AFFILIATE_ID = "kan_317689_594114";
 
 export const getKayakAffiliateConfig = () => ({
   affiliateId: readEnv("KAYAK_AFFILIATE_ID") ?? DEFAULT_KAYAK_AFFILIATE_ID,

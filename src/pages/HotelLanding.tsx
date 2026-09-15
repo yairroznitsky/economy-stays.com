@@ -11,13 +11,18 @@ import {
 import NotFound from "./NotFound";
 
 const HotelLanding = () => {
-  const { citySlug, intentSlug } = useParams<{
+  const { countryCode, citySlug, themeSlug, intentSlug } = useParams<{
+    countryCode?: string;
     citySlug: string;
-    intentSlug?: string;
+    themeSlug?: string;
+    intentSlug?: string;  // legacy /hotels/ routes
   }>();
   const location = useLocation();
 
-  const canonicalPath = buildLandingPath(citySlug ?? "", intentSlug);
+  // Support both /stay/:cc/:city/:theme and legacy /hotels/:city/:intent
+  const canonicalPath = countryCode
+    ? buildLandingPath(citySlug ?? "", themeSlug, countryCode)
+    : buildLandingPath(citySlug ?? "", intentSlug, "xx");
   const normalizedPath = normalizeLandingPath(location.pathname);
 
   const { data, isFetched } = useQuery({

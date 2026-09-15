@@ -24,7 +24,7 @@ export const siteConfig = {
   operator: readEnv(import.meta.env.VITE_SITE_OPERATOR, "Benzerweb LTD"),
   supportEmail: readEnv(import.meta.env.VITE_SITE_SUPPORT_EMAIL, "support@economy-stays.com"),
   trackingBrand: readEnv(import.meta.env.VITE_TRACKING_BRAND, slug.replace(/-/g, "_")),
-  landingIdPrefix: readEnv(import.meta.env.VITE_LANDING_ID_PREFIX, "ES-"),
+  landingIdPrefix: readEnv(import.meta.env.VITE_LANDING_ID_PREFIX, "ES2-"),
   metaPixelId: readEnv(import.meta.env.VITE_META_PIXEL_ID, ""),
   tiktokPixelId: readEnv(import.meta.env.VITE_TIKTOK_PIXEL_ID, ""),
   googleAdsId: readEnv(import.meta.env.VITE_GOOGLE_ADS_ID, ""),

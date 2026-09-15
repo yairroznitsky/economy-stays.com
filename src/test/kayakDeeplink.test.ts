@@ -7,7 +7,7 @@ import {
 } from "@/lib/kayakDeeplink";
 
 const KAYAK_CONFIG: KayakAffiliateConfig = {
-  affiliateId: "kan_317716_594040",
+  affiliateId: "kan_317689_594114",
   deeplinkBase: "https://www.kayak.com/in",
   utmMedium: "affiliate",
 };
@@ -36,7 +36,7 @@ describe("buildKayakDeeplink", () => {
     const parsed = new URL(url);
 
     expect(parsed.origin + parsed.pathname).toBe("https://www.kayak.com/in");
-    expect(parsed.searchParams.get("a")).toBe("kan_317716_594040");
+    expect(parsed.searchParams.get("a")).toBe("kan_317689_594114");
     expect(parsed.searchParams.get("enc_cid")).toBe("test-click-abc");
     expect(parsed.searchParams.get("enc_lid")).toBe("hotels");
     expect(parsed.searchParams.get("enc_pid")).toBe("deeplinks");

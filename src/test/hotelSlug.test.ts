@@ -25,28 +25,39 @@ describe("slugifyName", () => {
 });
 
 describe("landing path builders", () => {
-  it("builds city, intent, and hotel paths without ids", () => {
-    expect(buildCityPath("paris")).toBe("/hotels/paris");
-    expect(buildIntentPath("paris", "cheap-hotels")).toBe(
-      "/hotels/paris/cheap-hotels"
+  it("builds city and intent paths with country code", () => {
+    expect(buildCityPath("fr", "paris")).toBe("/stay/fr/paris");
+    expect(buildIntentPath("fr", "paris", "boutique-hotels")).toBe(
+      "/stay/fr/paris/boutique-hotels"
     );
+  });
+
+  it("builds hotel paths under /hotels/ (hotel pages keep legacy prefix)", () => {
     expect(buildHotelPath("Dubai", "Waldorf Astoria DIFC")).toBe(
       "/hotels/dubai/waldorf-astoria-difc"
     );
   });
 
-  it("parses city-only and nested paths", () => {
-    expect(parseLandingPath("/hotels/paris")).toEqual({
+  it("parses /stay/ city-only and nested paths", () => {
+    expect(parseLandingPath("/stay/fr/paris")).toEqual({
+      countryCode: "fr",
       citySlug: "paris",
       segmentSlug: undefined,
     });
-    expect(parseLandingPath("/hotels/paris/cheap-hotels")).toEqual({
+    expect(parseLandingPath("/stay/fr/paris/boutique-hotels")).toEqual({
+      countryCode: "fr",
       citySlug: "paris",
-      segmentSlug: "cheap-hotels",
+      segmentSlug: "boutique-hotels",
     });
-    expect(parseLandingPath("/hotels/dubai/waldorf-astoria-difc")).toEqual({
+    expect(parseLandingPath("/stay/ae/dubai")).toEqual({
+      countryCode: "ae",
       citySlug: "dubai",
-      segmentSlug: "waldorf-astoria-difc",
+      segmentSlug: undefined,
     });
+  });
+
+  it("returns null for non-matching paths", () => {
+    expect(parseLandingPath("/hotels/paris")).toBeNull();
+    expect(parseLandingPath("/stay/france/paris")).toBeNull();
   });
 });

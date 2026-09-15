@@ -2,6 +2,9 @@ import { getClientIp, getReferrer, getUserAgent, type RequestLike } from "./requ
 import { getSourceApp, insertRow } from "./supabaseRest";
 
 export interface LandingInsertBody {
+  /** New field name */
+  visit_id?: unknown;
+  /** Legacy field name — accepted for backwards compat during rollover */
   landing_id?: unknown;
   url_params?: unknown;
   metadata?: unknown;
@@ -19,10 +22,16 @@ export const handleLandingsInsert = async (
   req: RequestLike,
   body: LandingInsertBody
 ): Promise<TrackingHandlerResult> => {
+  // Accept both visit_id (new) and landing_id (legacy) for a smooth rollover
   const landingId =
-    typeof body.landing_id === "string" ? body.landing_id.trim() : "";
+    typeof body.visit_id === "string" && body.visit_id.trim()
+      ? body.visit_id.trim()
+      : typeof body.landing_id === "string"
+        ? body.landing_id.trim()
+        : "";
+
   if (!landingId) {
-    return { status: 400, body: { error: "landing_id is required" } };
+    return { status: 400, body: { error: "visit_id is required" } };
   }
 
   const urlParams =
@@ -56,7 +65,7 @@ export const handleLandingsInsert = async (
       return { status: 500, body: { error } };
     }
 
-    return { status: 201, body: { ok: true, landing_id: landingId } };
+    return { status: 201, body: { ok: true, visit_id: landingId } };
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Failed to insert landing";

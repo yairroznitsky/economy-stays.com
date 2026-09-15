@@ -1,7 +1,7 @@
 ﻿import type { SitelinkDatePreset } from "./sitelinkDates";
 import type { LandingPageBenefit, LandingPageFaq } from "../types/landingPage";
 
-/** Google Ads sitelink landing pages — SEO guides at /{slug}. */
+/** Google Ads sitelink landing pages � SEO guides at /{slug}. */
 
 export type SitelinkArticleSection = {
   heading: string;
@@ -12,9 +12,9 @@ export type SitelinkPageConfig = {
   slug: string;
   /** Sitelink link text / H1 */
   title: string;
-  /** Sitelink description line 1 — hero subtitle */
+  /** Sitelink description line 1 � hero subtitle */
   description1: string;
-  /** Sitelink description line 2 — intro heading */
+  /** Sitelink description line 2 � intro heading */
   description2: string;
   datePreset: SitelinkDatePreset;
   dateHint: string;
@@ -31,664 +31,565 @@ export type SitelinkPageConfig = {
   destinationsSubtitle: string;
   browseTitle: string;
   browseSubtitle: string;
-  /** When set, browse links go to /hotels/{city}/{intent}; otherwise city pages. */
+  /** When set, browse links go to /stay/{cc}/{city}/{theme}; otherwise city pages. */
   browseIntentSlug?: string;
   benefits: LandingPageBenefit[];
   faqs: LandingPageFaq[];
 };
 
-const PUBLISHED = "2026-08-14";
-const MODIFIED = "2026-08-14";
+const PUBLISHED = "2026-09-01";
+const MODIFIED = "2026-09-01";
 
 export const SITELINK_PAGES: readonly SitelinkPageConfig[] = [
+  // ??????????????????????????????????????????????????????????????????????
+  // 1. Tonight's stays (was: last-minute-hotel-deals)
+  // ??????????????????????????????????????????????????????????????????????
   {
-    slug: "last-minute-hotel-deals",
-    title: "Last Minute Hotel Deals",
-    description1: "Tonight’s already selected. Search a city and see what’s still listed.",
-    description2: "A last-minute stay, without the scramble",
+    slug: "tonight-stays",
+    title: "Tonight's Hotel Stays",
+    description1: "Tonight is pre-set. Pick a city and see what's available now.",
+    description2: "A place to sleep tonight, sorted in minutes",
     datePreset: "tonight",
-    dateHint: "Tonight is selected — change the dates anytime.",
+    dateHint: "Tonight is pre-filled � swap the dates whenever you like.",
     intro:
-      "Last-minute hotel deals are simply stays you can compare close to arrival. Economy Stays prefills tonight so you can search a city and review hotels, apartments, and rentals listed now — then continue to book only if a stay looks right.",
-    metaTitle: "Last-Minute Hotel Deals: Compare Tonight | Economy Stays",
+      "Searching for a place to stay tonight means looking at real availability, not a fixed offer. Economy Stays pre-fills this evening's check-in so you can type a city straight into the search and browse what's actually listed � hotels, apartments and serviced rentals � before deciding whether to book.",
+    metaTitle: "Tonight's Hotel Stays � Browse What's Available | Economy Stays",
     metaDescription:
-      "Compare last-minute hotel deals for tonight. Search any city, review what’s listed right now, and continue to book only if a stay looks right.",
-    focusKeyword: "last-minute hotel deals",
-    heroImageAlt:
-      "Hotel at dusk overlooking water, suggesting a same-day or last-minute stay",
+      "Browse hotel stays available tonight. Enter a city, see what's listed right now, and head to a booking partner only when you find something that fits.",
+    focusKeyword: "hotel stays tonight",
+    heroImageAlt: "Warm hotel lobby glowing at night through glass windows",
     datePublished: PUBLISHED,
     dateModified: MODIFIED,
-    destinationsTitle: "Tonight, in cities people love",
-    destinationsSubtitle:
-      "Tap a destination to compare what’s listed for tonight — or search any city above.",
-    browseTitle: "Last-minute hotel pages by city",
-    browseSubtitle: "Open a city guide, then search the night you actually need.",
-    browseIntentSlug: "last-minute-hotels",
+    destinationsTitle: "Browse tonight in popular cities",
+    destinationsSubtitle: "Tap a destination to see what's listed for tonight, or search any city above.",
+    browseTitle: "Tonight's stays by destination",
+    browseSubtitle: "Open a city page to see availability already filtered for this evening.",
+    browseIntentSlug: "top-rated",
     sections: [
       {
-        heading: "What last-minute hotel deals mean here",
+        heading: "What it means to search for a stay tonight",
         paragraphs: [
-          "A last-minute hotel search is a date-first comparison: you are looking at stays that start tonight or in the next night or two, not a secret inventory we control. Rooms and rates update throughout the day, so what you see is a snapshot for the city and dates you choose.",
-          "That is useful when plans shift, a flight lands late, or you would rather not wait until you arrive to think about a bed. It is not a promise that every city still has space, or that a rate will hold until you finish booking.",
+          "A same-night search pulls from live listings in the city you enter. Economy Stays doesn't hold a special inventory for evening searches � you see the hotels and apartments that happen to have tonight available, the same ones you'd find by searching elsewhere. Pre-filling tonight just saves you from opening a date picker before you've even chosen a city.",
+          "Availability changes through the day. A property that has space at lunchtime might sell out by evening, and a cancellation can free up rooms that didn't appear this morning. The results are a snapshot, not a reservation.",
         ],
       },
       {
-        heading: "How to compare a same-day hotel stay",
+        heading: "How to look for a place to stay tonight",
         paragraphs: [
-          "Enter a destination in the search above. Tonight is already selected as check-in, with a one-night stay — a typical last-minute pattern. Adjust the calendar if you are arriving tomorrow or staying longer, then compare hotels, apartments, and rentals side by side.",
-          "When a listing looks like a fit, continue to the travel site to confirm the room type, cancellation rules, and the total. Policies live there, not on Economy Stays.",
+          "Type a city or neighbourhood into the search form above. Tonight's check-in and a one-night stay are already set � a sensible default for most same-evening needs. If you're staying two nights, or if you mean tomorrow rather than today, adjust the calendar before you compare.",
+          "Browse the results on your chosen booking partner's site. Check the check-in cut-off time, the cancellation policy, and the total before you commit. Property rules live on the booking site; Economy Stays doesn't hold the reservation.",
         ],
       },
       {
-        heading: "Why tonight is preselected",
+        heading: "Why same-night searches need a bit of flexibility",
         paragraphs: [
-          "Most last-minute travelers are solving for the next check-in, not a trip three weeks out. Prefilling tonight removes a step so you can focus on the city. If you meant a different night, change it — the comparison follows your dates, not a locked offer.",
-          "Short-notice availability moves. A room that appears at lunch may be gone in the evening, or a new listing can show up after a cancellation. Treat the results as current, not reserved.",
+          "Central locations tend to fill earlier in the day, so searching tonight from a midday position gives a wider choice than waiting until after dinner. If the first city you try looks sparse, try a nearby town or consider a property slightly further from the centre � travel time matters less when you only need one night.",
+          "Some properties have late check-in cutoffs; others require you to arrive by a specific hour. Scanning those details on the partner site before you click confirm can save a difficult conversation at reception.",
         ],
       },
       {
-        heading: "City pages for last-minute hotel searches",
+        heading: "City guides for tonight's stays",
         paragraphs: [
-          "If you already know the destination, jump to a last-minute city page below — Paris, London, Tokyo, and other popular markets. Those landings keep the same comparison idea with a city already in mind, which is often faster than starting from a blank search.",
-          "Still deciding where to go? Use a destination card to open current listings for tonight in a well-known city, or type anywhere in the form. Economy Stays does not rank a “best” last-minute city; we help you look.",
-        ],
-      },
-      {
-        heading: "What to review before you book",
-        paragraphs: [
-          "On the booking site, check arrival time, check-in hours, and whether the rate can be cancelled. Last-minute stays are sometimes non-refundable. Location matters more when you are tired: scan the map for the airport, station, or neighborhood you actually need.",
-          "Economy Stays may earn a commission if you book. That does not change the price you pay. We do not operate hotels or process the reservation.",
+          "If you already know your destination, jump straight to a city page � Paris, London, Tokyo, and other major travel markets are listed below. Those pages open with the city's inventory already in view, which is faster than starting from a blank search when you know where you're headed.",
+          "If the destination is still open, use the destination cards to browse availability in a city you've been considering, or type anywhere in the form above. Economy Stays doesn't recommend one city over another; that part is yours to decide.",
         ],
       },
     ],
     howTo: {
-      name: "How to compare last-minute hotel deals",
+      name: "How to find a hotel stay for tonight",
       steps: [
-        "Enter your city in the search. Tonight is already selected; change dates if you need a different night.",
-        "Compare hotels, apartments, and rentals listed for those dates.",
-        "Open a stay that looks right and read the room, rate, and cancellation details on the booking site.",
-        "Complete the booking on that site only if the stay still fits.",
+        "Type your city in the search form. Tonight's check-in is pre-filled; adjust the date if you mean a different evening.",
+        "Browse hotel and apartment listings available for those dates.",
+        "Open a listing that looks suitable and read the check-in time, room details and cancellation terms on the booking site.",
+        "Complete the booking on that site if the stay still fits your plans.",
       ],
     },
     benefits: [
       {
-        title: "Skip the date math",
-        text: "Tonight is already in the form, so you can hunt for a stay instead of filling calendars first.",
+        title: "No date-picking to start",
+        text: "Tonight is already in the form so you can go straight to choosing a city and browsing what's listed.",
       },
       {
-        title: "Go anywhere",
-        text: "Type a city or tap a favorite destination and compare what is listed right now.",
+        title: "Any destination",
+        text: "Search any city worldwide � or tap a popular destination to jump straight to tonight's availability.",
       },
       {
-        title: "Book where you trust",
-        text: "You finish on a known travel site. Their rates, rooms, and cancellation rules apply.",
+        title: "Book where you prefer",
+        text: "You complete the reservation on a trusted booking site. Their prices, policies and room details apply.",
       },
     ],
     faqs: [
       {
-        q: "Is this a special last-minute rate?",
-        a: "It is a last-minute search: tonight is prefilled so you can see what’s listed right now. Rates and rooms can change as availability does.",
+        q: "Is this a special tonight-only rate?",
+        a: "No � tonight is simply the date that's pre-filled. Rates and availability are whatever's listed on partner booking sites for the city and dates you choose.",
       },
       {
-        q: "Can I travel a different night?",
-        a: "Yes. Open the dates and pick whatever check-in and check-out you need before you compare.",
+        q: "Can I search for a different night instead?",
+        a: "Yes. Open the date picker and choose any check-in and check-out that suits your trip.",
       },
       {
-        q: "Who do I book with?",
-        a: "A travel site such as Kayak. Economy Stays helps you search and compare; the booking happens on their site.",
+        q: "Where do I actually book?",
+        a: "On a travel booking partner such as Kayak or Booking.com. Economy Stays helps you browse options; the reservation is completed on their platform.",
       },
       {
-        q: "Do last-minute hotel deals stay available all evening?",
-        a: "Not necessarily. Listings can disappear or change. If a stay looks right, review it on the booking site promptly.",
-      },
-      {
-        q: "Can I compare apartments and rentals too?",
-        a: "Yes. The search can include hotels, apartments, and vacation rentals, depending on what’s listed for your city and dates.",
-      },
-      {
-        q: "Does Economy Stays hold rooms for last-minute travelers?",
-        a: "No. We do not hold inventory. You see what is currently listed for the search you run.",
+        q: "What if the city I want shows no availability?",
+        a: "Try adjusting the dates, searching a nearby town, or looking for properties slightly outside the city centre. Availability is whatever's currently listed on partner sites.",
       },
     ],
   },
+
+  // ??????????????????????????????????????????????????????????????????????
+  // 2. Unsold rooms tonight (was: unsold-room-deals)
+  // ??????????????????????????????????????????????????????????????????????
   {
-    slug: "unsold-room-deals",
-    title: "Unsold Room Deals",
-    description1: "Still deciding tonight? See which rooms are still listed.",
-    description2: "Late availability, when a room is still on the board",
+    slug: "unsold-rooms-tonight",
+    title: "Unsold Hotel Rooms Tonight",
+    description1: "Hotels list unsold rooms through booking sites until arrival. Browse what remains.",
+    description2: "Same-night rooms that haven't sold yet",
     datePreset: "tonight",
-    dateHint: "Tonight is selected — change the dates anytime.",
+    dateHint: "Tonight is set � adjust the date if you're looking ahead.",
     intro:
-      "Unsold room deals, on this site, means comparing hotels that still show availability close to check-in. We do not warehouse leftover rooms. Search tonight — or any night — and review what travel sites still list for your city.",
-    metaTitle: "Unsold Hotel Room Deals for Tonight | Economy Stays",
+      "An unsold hotel room is one that hasn't been booked yet for the night in question. Those rooms appear in standard booking searches alongside rooms available further out � there's no separate unsold inventory. Economy Stays pre-fills tonight so you can browse what a city still has listed, and continue to a booking partner if something suits.",
+    metaTitle: "Unsold Hotel Rooms Tonight � Browse Available Stays | Economy Stays",
     metaDescription:
-      "Compare unsold hotel room deals and late availability. Search tonight’s dates, see what is still listed, and review terms before you book.",
-    focusKeyword: "unsold hotel room deals",
-    heroImageAlt: "Hotel corridor and lobby suggesting rooms still listed close to check-in",
+      "Browse hotel rooms listed for tonight that haven't sold yet. Enter a city to see what's still available and head to a booking partner to reserve.",
+    focusKeyword: "unsold hotel rooms tonight",
+    heroImageAlt: "Hotel corridor with doors slightly open, suggesting vacant rooms",
     datePublished: PUBLISHED,
     dateModified: MODIFIED,
-    destinationsTitle: "See what’s still listed tonight",
-    destinationsSubtitle:
-      "Start with a popular city, or search the place you’re actually heading.",
-    browseTitle: "Explore more cities",
-    browseSubtitle: "Open a city page, then search tonight or any dates you prefer.",
+    destinationsTitle: "Cities with rooms listed tonight",
+    destinationsSubtitle: "Browse availability in a popular destination or search any city above.",
+    browseTitle: "Same-night hotel pages by city",
+    browseSubtitle: "Open a city page already filtered for tonight to see what's still listed.",
+    browseIntentSlug: "with-free-cancellation",
     sections: [
       {
-        heading: "What unsold rooms means on Economy Stays",
+        heading: "How unsold rooms work in practice",
         paragraphs: [
-          "Hotels sometimes keep rooms listed as the day of arrival gets close. Those listings can look like “leftover” inventory, but they still belong to the property and the booking site — not to us. Economy Stays is a comparison search: we help you see what is currently offered for your dates.",
-          "If a city is busy, late availability can be thin. If a city is quiet, you may see more choice. Neither outcome is something we guarantee; it is simply what the search shows when you search.",
+          "Hotels list rooms through online travel agencies and their own sites until check-in time � sometimes even after. An unsold room isn't in a hidden pool; it's simply any room that hasn't been reserved yet for the night. That means searching tonight works the same way as searching any other date: you're seeing rooms that happen to still be listed.",
+          "Properties sometimes adjust their pricing as arrival approaches, though whether that means lower or higher rates depends on the hotel and the market. There's no rule that says an unsold room must be discounted, but in competitive markets some properties do reduce rates rather than have the room go empty.",
         ],
       },
       {
-        heading: "Searching close to check-in",
+        heading: "Why tonight's search is different from planning ahead",
         paragraphs: [
-          "Tonight is selected so you can browse short-notice stays without setting the calendar first. That matches how people look for a room after a delayed trip or a spontaneous overnight. Change the dates if you are arriving later this week.",
-          "Compare a few options rather than the first card you see. Location, check-in time, and cancellation rules often matter more than a headline rate when you are booking the same day.",
+          "When you search tonight, the pool of options is smaller than it was a week ago � some properties and room types have already been taken. But the options that remain are listed at a current rate, which may reflect the hotel's calculation about what it can realistically fill at short notice.",
+          "The trade-off is real: fewer choices, but rates set for same-day rather than months-out inventory. Whether that trade works in your favour depends on the city, the season, and the day of the week.",
         ],
       },
       {
-        heading: "Availability can move in both directions",
+        heading: "What to check before you book a same-night room",
         paragraphs: [
-          "A listing can vanish when someone else books it. A listing can also appear when a stay is listed again. Refreshing a search later in the day is reasonable; treating an earlier screenshot as a hold is not.",
-          "Continue to the booking site to see whether the room type you want is still offered. Checkout is the source of truth for price and availability.",
-        ],
-      },
-      {
-        heading: "How to compare leftover hotel listings",
-        paragraphs: [
-          "Pick a city, keep tonight or set your night, and scan hotels and rentals together. Destination cards below run the same dates in popular markets if you want a faster start.",
-          "City landings are useful when you want a broader guide first, then a search. Use them if you are still choosing a neighborhood or want context before you compare rates.",
-        ],
-      },
-      {
-        heading: "Short-notice travel, minus the myth",
-        paragraphs: [
-          "There is no private unsold-room warehouse behind this page. Marketing language around “last rooms” is common in travel; we would rather be plain: you are looking at what’s still listed close to arrival.",
-          "If nothing useful appears, try a nearby date, a wider area, or another city. Then read the booking terms before you pay — especially for same-day check-in.",
+          "Late check-in can be an issue. Some properties have a cutoff after which the front desk closes or the rate changes. Confirm the check-in window on the booking partner's site before you commit.",
+          "Same-night rooms are sometimes non-refundable. Read the cancellation policy on the booking partner's page � if the room isn't what you expected on arrival, you may have limited options.",
         ],
       },
     ],
     howTo: {
-      name: "How to look for unsold hotel rooms",
+      name: "How to find an unsold hotel room for tonight",
       steps: [
-        "Search your city with tonight selected, or set the night you actually arrive.",
-        "Compare which hotels and rentals are still listed for those dates.",
-        "Open a stay and confirm the room is still offered on the booking site.",
-        "Book on that site if the details still work for your arrival.",
+        "Enter your destination city in the search above. Tonight is pre-filled.",
+        "Browse listings that still show availability for this evening.",
+        "Check the check-in time and cancellation policy on the booking partner's page.",
+        "Complete the booking there if the room and terms suit you.",
       ],
     },
     benefits: [
       {
-        title: "Made for tonight",
-        text: "Dates are set for a stay starting tonight, so you can look at rooms still listed close to arrival.",
+        title: "Tonight pre-filled",
+        text: "Same-night availability is already set so you can focus on the city rather than the calendar.",
       },
       {
-        title: "Whatever is still listed",
-        text: "You’re comparing live listings — not leftover rooms we own or hold.",
+        title: "Live listings",
+        text: "You see what's actually listed right now � not a cached snapshot from earlier in the day.",
       },
       {
-        title: "Choose with a clear view",
-        text: "Scan options side by side, then continue to the booking site only if a stay feels like a fit.",
+        title: "No hidden inventory",
+        text: "Economy Stays connects you to the same booking partners you'd use directly. No separate late-night pool.",
       },
     ],
     faqs: [
       {
-        q: "Do you sell leftover rooms yourselves?",
-        a: "No. We send you to a travel site such as Kayak. A room appears here only if it’s still listed for your dates.",
+        q: "Are unsold rooms cheaper?",
+        a: "Not always. Some hotels reduce rates near check-in; others hold their price or raise it if demand is high. What you see depends on the property and market conditions.",
       },
       {
-        q: "Why start with tonight?",
-        a: "Short-notice searches are most useful close to arrival. Traveling later? Change the dates in the form.",
+        q: "Can I search for unsold rooms on a different night?",
+        a: "Yes � change the dates in the form. The same principle applies: you're browsing rooms that haven't been reserved yet for the dates you choose.",
       },
       {
-        q: "Will every city have something tonight?",
-        a: "Not always. Busy nights can look thin. Try nearby dates or another destination if listings are scarce.",
-      },
-      {
-        q: "Are unsold rooms always cheaper?",
-        a: "Not always. Late listings can be a bargain, full price, or limited in type. Compare and read the offer.",
-      },
-      {
-        q: "Can I book an unsold room for next month?",
-        a: "You can search any dates. This page starts on tonight because that is when leftover-style availability is most relevant.",
-      },
-      {
-        q: "Who confirms the room is still available?",
-        a: "The travel site at checkout. Economy Stays does not reserve or confirm rooms.",
+        q: "What if I find something but can't check in until late?",
+        a: "Check the property's stated check-in hours on the booking partner's page before reserving. Some hotels require arrival by a certain time or charge for late arrival.",
       },
     ],
   },
+
+  // ??????????????????????????????????????????????????????????????????????
+  // 3. Stays under $100 (was: hotels-under-100)
+  // ??????????????????????????????????????????????????????????????????????
   {
-    slug: "hotels-under-100",
-    title: "Hotels Under $100",
-    description1: "Hunt for wallet-friendly stays — then then sort by price.",
-    description2: "Stretch the budget without locking a number",
-    datePreset: "tomorrow",
-    dateHint: "Tomorrow is selected — change the dates anytime.",
-    intro:
-      "This page is for travelers who want to compare more affordable hotels and rentals. We do not filter to a fixed nightly cap. Search a city, then sort by price on the booking site to lean toward budget-friendly stays for your dates.",
-    metaTitle: "Budget Hotels: Compare Affordable Stays | Economy Stays",
-    metaDescription:
-      "Compare budget hotels and affordable stays by city. Rates vary with dates and destination — sort the results by price to see lower options.",
-    focusKeyword: "budget hotels",
-    heroImageAlt: "Simple, comfortable hotel room suggesting an affordable stay",
-    datePublished: PUBLISHED,
-    dateModified: MODIFIED,
-    destinationsTitle: "Start with a city, then sort by price",
-    destinationsSubtitle:
-      "Popular places to begin — then use price filters to lean toward lower rates.",
-    browseTitle: "Browse budget-friendly city pages",
-    browseSubtitle: "Open a city landing made for more affordable stay searches.",
-    browseIntentSlug: "cheap-hotels",
-    sections: [
-      {
-        heading: "Searching for budget hotels without a hard cap",
-        paragraphs: [
-          "The sitelink title talks about a round number because that is how many people think about a simple stay. On the page itself, Economy Stays cannot enforce a price ceiling. Travel sites list a range of hotels and rentals; some will feel budget-friendly for your city and some will not.",
-          "The practical move is to search, then sort or filter by price on the results. That is where lower nightly rates — when they exist for your dates — become easier to see.",
-        ],
-      },
-      {
-        heading: "Why affordable hotel rates move",
-        paragraphs: [
-          "The same property can look inexpensive on a Tuesday in shoulder season and much higher on a holiday weekend. Citywide events, remaining rooms, and stay length all change the picture. Comparing two dates is often more useful than assuming a “budget city” stays budget.",
-          "A modest room in a high-demand destination can cost more than a nicer stay somewhere quieter. Use the city pages below if you want a cheaper-hotel landing for a specific market, then run your own dates.",
-        ],
-      },
-      {
-        heading: "How to lean toward more affordable stays",
-        paragraphs: [
-          "Tomorrow is selected as a default one-night search so you can start quickly. Set the nights you actually need. After you compare, open the booking site and sort by price, and consider slightly outside the very center if that still fits your plans.",
-          "Read what is included. A low headline rate can exclude breakfast, or carry a stricter cancellation rule. The total on checkout is the number that matters.",
-        ],
-      },
-      {
-        heading: "City guides for cheaper hotel searches",
-        paragraphs: [
-          "Paris, London, Bangkok, and other popular cities have cheap-hotels landings linked below. Those pages keep the budget-search intent while you still choose dates and compare stays.",
-          "If your trip is not in that list, type the city in the form. Economy Stays works as a worldwide comparison search, not a closed catalog of a few markets.",
-        ],
-      },
-      {
-        heading: "What we will not claim",
-        paragraphs: [
-          "We will not promise that every result sits under a fixed amount, or that we have the lowest rate on the internet. We show current listings for your search and let you continue to book where the offer is real.",
-          "Economy Stays does not add a booking fee. If you complete a stay, we may earn a commission. Your price is set by the hotel and the site you book on.",
-        ],
-      },
-    ],
-    howTo: {
-      name: "How to compare budget hotel stays",
-      steps: [
-        "Enter your destination and set the dates you need (tomorrow is only a starting point).",
-        "Compare hotels and rentals listed for that search.",
-        "On the booking site, sort by price and open a few of the more affordable options.",
-        "Read the total and cancellation rules, then book on that site if the stay fits.",
-      ],
-    },
-    benefits: [
-      {
-        title: "Built for budget browsing",
-        text: "Pick a city, compare what’s listed, then sort on the booking site to lean toward lower nightly rates.",
-      },
-      {
-        title: "Dates change the picture",
-        text: "Weekends and holidays can look pricier. Nudge the calendar and compare again.",
-      },
-      {
-        title: "The listed rate is the listed rate",
-        text: "We don’t mark up stays or invent a price. You see what’s listed for your search.",
-      },
-    ],
-    faqs: [
-      {
-        q: "Will every stay be a budget rate?",
-        a: "No. We don’t cap results at a fixed price. Search, then sort by price on the booking site to find more affordable options for your dates.",
-      },
-      {
-        q: "Why do some cities cost more?",
-        a: "Demand, season, and the kind of stay all play a part. A simple room in one city can cost more than a nicer stay in another.",
-      },
-      {
-        q: "Do you add extra fees?",
-        a: "Economy Stays doesn’t add a booking fee. What you pay is set by the hotel and the booking site.",
-      },
-      {
-        q: "Should I search weekdays to save?",
-        a: "Sometimes weekday dates look easier on the budget, but it depends on the city. Compare both if your plans are flexible.",
-      },
-      {
-        q: "Are apartments included in budget searches?",
-        a: "They can be, when they’re listed. Compare stay types and check what the rate includes.",
-      },
-      {
-        q: "Do you verify a property is “budget”?",
-        a: "No. “Budget” is about the rate and the stay you choose — not a label we assign to every hotel.",
-      },
-    ],
-  },
-  {
-    slug: "60-off-hotel-deals",
-    title: "60% Off Hotel Deals",
-    description1: "Spot hotel promotions when a hotel is listing a deal.",
-    description2: "Look for marked-down stays — offer size depends on the hotel",
-    datePreset: "tomorrow",
-    dateHint: "Tomorrow is selected — change the dates anytime.",
-    intro:
-      "Hotel deals on Economy Stays means comparing rates hotels currently list — including properties that show a promotional price. We do not set markdowns or promise a fixed percentage off. Search a city, then read the offer details on the booking site.",
-    metaTitle: "Hotel Deals & Promotional Rates Compared | Economy Stays",
-    metaDescription:
-      "Compare hotel deals and promotional rates from travel sites. Offer size varies by property and dates — review the details before you book.",
-    focusKeyword: "hotel deals",
-    heroImageAlt: "Resort pool at sunset suggesting a hotel stay with a promotional rate",
-    datePublished: PUBLISHED,
-    dateModified: MODIFIED,
-    destinationsTitle: "See which cities are listing deals",
-    destinationsSubtitle:
-      "Promotions come and go with dates and hotels. Explore a city, then review the offer.",
-    browseTitle: "Browse stays by city",
-    browseSubtitle: "Open a city page, then search to compare current listed rates.",
-    sections: [
-      {
-        heading: "Hotel deals vs a fixed markdown",
-        paragraphs: [
-          "Ads and sitelinks often use a striking discount line because travelers scan for a deal. On this page, the honest version is: some hotels show a promotional rate next to a usual one, and some do not. Economy Stays does not choose the markdown and does not guarantee a percentage off.",
-          "When a hotel lists a deal, you can see it after you search a destination and open the offer. The conditions — dates, room type, cancellation — are on that site, with the hotel.",
-        ],
-      },
-      {
-        heading: "How promotional hotel rates show up",
-        paragraphs: [
-          "Run a search for your city and dates. Tomorrow is only a default so the form is ready. Compare the stays that come back. If a property is promoting a rate, that can appear in the comparison or on the page you continue to.",
-          "A promotion for next month may not apply this weekend. If you can flex dates, try a second search. If you cannot, read the offer that actually matches your nights.",
-        ],
-      },
-      {
-        heading: "Read the deal where you book",
-        paragraphs: [
-          "Headline savings are easy to misunderstand. Check whether the rate is prepaid, whether breakfast is included, and whether you can cancel. A marked-down stay with no flexibility can still be a good fit — if you know that before you pay.",
-          "Economy Stays does not invent crossed-out prices. Anything that looks like a discount should be confirmed on the booking site.",
-        ],
-      },
-      {
-        heading: "Timing a hotel-deal search",
-        paragraphs: [
-          "Deal density changes with season, events, and how full a hotel is. Searching early can surface advance-purchase rates. Searching closer to arrival can surface a different mix. Neither approach is “the trick”; they are just different snapshots.",
-          "Use the destination cards to sample popular cities, or open a city landing if you want a broader guide before you compare.",
-        ],
-      },
-      {
-        heading: "Related ways to compare stays",
-        paragraphs: [
-          "If you care more about stretching a budget than spotting a promotion, try the budget-hotel guide. If you are going Friday to Sunday, the weekend page prefills those dates. If you need a room tonight, use last-minute or unsold-room searches instead.",
-          "All of these pages compare current listings. None of them is a coupon we stamp on every hotel.",
-        ],
-      },
-    ],
-    howTo: {
-      name: "How to compare hotel deals",
-      steps: [
-        "Search your destination and set real travel dates.",
-        "Compare hotels and rentals that are listed — including any promotional rates they show.",
-        "Open the offer on the booking site and read conditions, dates, and cancellation rules.",
-        "Book on that site only if the deal still matches the stay you want.",
-      ],
-    },
-    benefits: [
-      {
-        title: "Promotions, when they’re listed",
-        text: "If a hotel is showing a deal, it can appear in your comparison after you search a city.",
-      },
-      {
-        title: "Timing matters",
-        text: "An offer for next month may not show this weekend. Shift the dates to see what’s actually on.",
-      },
-      {
-        title: "Read before you book",
-        text: "Conditions and cancellation rules live on the booking site — that’s where the offer is real.",
-      },
-    ],
-    faqs: [
-      {
-        q: "Is every hotel on sale?",
-        a: "No. You’ll see a mix of standard and promotional rates. Check the offer details on the booking site before you book.",
-      },
-      {
-        q: "Do you choose the markdown?",
-        a: "No. Any discount is between the hotel and the booking site. We don’t set or promise a percentage off.",
-      },
-      {
-        q: "How do I find a stronger current rate?",
-        a: "Enter your destination and dates, compare the options, then sort or filter on the booking site.",
-      },
-      {
-        q: "Do deals apply to every room type?",
-        a: "Often they do not. A promotion may be limited to certain rooms or dates. The offer spells that out.",
-      },
-      {
-        q: "Can I combine a deal with other coupons?",
-        a: "That depends on the booking site. Economy Stays does not issue coupons or stack codes.",
-      },
-      {
-        q: "Why did a deal disappear when I clicked through?",
-        a: "Promotional inventory can be limited. If it is gone, compare other listings or try nearby dates.",
-      },
-    ],
-  },
-  {
-    slug: "cheap-hotels-near-you",
-    title: "Cheap Hotels Near You",
-    description1: "Save up to 70% on hotels near you — compare tonight's rates free.",
-    description2: "Your location · Tonight · Compare rates in seconds",
+    slug: "stays-under-100",
+    title: "Hotel Stays Under $100",
+    description1: "Filter by price on the booking site. Tonight or your dates.",
+    description2: "Budget accommodation, searched honestly",
     datePreset: "tonight",
-    dateHint: "Tonight is selected — change the dates anytime.",
+    dateHint: "Tonight is pre-filled � change dates to suit your trip.",
     intro:
-      "Cheap hotels near you uses your approximate location to surface budget-friendly stays close to where you are. We detect your city from your IP address on load — no permission prompt. If IP lookup fails, your browser may ask once for location as a fallback. You can also search any city in the form above.",
-    metaTitle: "Cheap Hotels Near You: Budget Stays Nearby | Economy Stays",
+      "Finding a hotel stay under $100 is a matter of searching the right dates in the right city and then filtering by price on the booking site. Economy Stays connects you to travel partners where you can set your own price ceiling � whether that's $100, $80 or less. The rate you see depends on your destination, travel dates and the partners' current inventory.",
+    metaTitle: "Hotel Stays Under $100 � Search by Budget | Economy Stays",
     metaDescription:
-      "Find budget-friendly hotels near your location. We detect your city automatically and show nearby stays — tap to compare on a travel site.",
-    focusKeyword: "cheap hotels near you",
-    heroImageAlt: "City street with hotels, suggesting affordable stays near a destination",
+      "Browse hotel stays within a budget. Search by city and dates, then filter by price on the booking partner's site to find accommodation under $100.",
+    focusKeyword: "hotel stays under 100",
+    heroImageAlt: "Clean and tidy budget hotel room with warm bedside lighting",
     datePublished: PUBLISHED,
     dateModified: MODIFIED,
-    destinationsTitle: "Budget-friendly stays near you",
-    destinationsSubtitle:
-      "Filtered to lower-tier properties by star rating. No price claim — sort by price on the booking site.",
-    browseTitle: "Browse budget-friendly city pages",
-    browseSubtitle: "Open a city landing made for more affordable stay searches.",
-    browseIntentSlug: "cheap-hotels",
+    destinationsTitle: "Budget-friendly destinations to browse",
+    destinationsSubtitle: "Cities where travellers regularly find accommodation within budget.",
+    browseTitle: "Budget stay pages by city",
+    browseSubtitle: "Open a city guide and filter by price on the booking partner's site.",
+    browseIntentSlug: "under-150",
     sections: [
       {
-        heading: "How we find stays near you",
+        heading: "What determines whether a stay fits your budget",
         paragraphs: [
-          "When you land on this page, we read your approximate city from your IP address — the same signal your browser uses for region-based content. No GPS prompt in the normal case. The city is used to surface budget-friendly hotel cards and to prefill the search form so you can compare immediately.",
-          "If IP lookup cannot place you, your browser may ask for location once as a backup. Deny it and the search form still works — type any destination and compare.",
+          "The nightly rate for any hotel depends on the destination, season, day of the week and how far in advance you're searching. A $100 budget stretches further in cities with high accommodation supply and lower overall cost of living, while major European capitals and popular beach resorts tend to sit higher at peak times.",
+          "Midweek nights, travel in the shoulder season (the months just outside the peak tourist period) and staying slightly outside the city centre are the three most reliable ways to bring a nightly rate into a tighter budget without sacrificing comfort.",
         ],
       },
       {
-        heading: "What budget-friendly means on this page",
+        heading: "How to use price filters effectively",
         paragraphs: [
-          "There are no prices in the hotel cards. We filter the catalog to properties with a lower star rating, which is a proxy for budget tier — not a guarantee of a low nightly rate. Rates change with dates, demand, and season.",
-          "Tap a card to open that specific property on Kayak. Sort by price there to see which options fit your budget for the dates you pick.",
+          "When you reach a booking partner's site from Economy Stays, use their price filter to set your ceiling. Most major travel sites let you cap the nightly rate, which removes options outside your range immediately. Sorting by price lowest-first then lets you compare what remains by location, review score and cancellation flexibility.",
+          "Watch for the all-in total, not just the headline rate. Some properties add taxes, city levies or resort fees at checkout. The final figure is what matters when you're working to a budget.",
         ],
       },
       {
-        heading: "Searching by city instead",
+        heading: "Property types that often sit within tighter budgets",
         paragraphs: [
-          "The hotel cards show stays near your detected location, but the search form above works for any destination. Type a city, set your dates, and compare hotels and rentals across the full catalog.",
-          "City cheap-hotels pages below are useful if you already know the destination and want a budget-oriented landing with more context.",
-        ],
-      },
-      {
-        heading: "City center vs nearby areas",
-        paragraphs: [
-          "Staying slightly outside the core can look easier on the budget if transit still works for your plans. Compare a few map pins rather than assuming farther is always cheaper.",
-          "Airports, old towns, and event venues each have their own rate patterns. Search the area you will actually use at night, not only the famous name.",
-        ],
-      },
-      {
-        heading: "From a nearby card to a booking",
-        paragraphs: [
-          "Tap a hotel card and you will be taken to that specific property on a booking partner. Read the room type, rate, and cancellation policy there — those details live on the booking site, not here. Economy Stays does not process reservations. We may earn a commission if you complete a stay; it does not change the rate you are offered.",
-          "If nothing nearby fits, change your dates in the form above, or search any city there.",
+          "Guesthouses, bed and breakfasts, budget hotel chains and serviced apartments frequently price below or around $100 in mid-sized cities. Hostels with private rooms are also worth considering if you don't need full hotel amenities.",
+          "Economy Stays surfaces options from booking partners who carry a wide range of property types. Tap through to the partner site and use their filters to narrow by type as well as price.",
         ],
       },
     ],
     howTo: {
-      name: "How to compare cheap hotels near you",
+      name: "How to find a hotel stay under $100",
       steps: [
-        "Land on the page — your approximate city is detected from IP and nearby budget-friendly hotels appear.",
-        "If IP lookup fails, allow the one-time location prompt for closer results, or type a city in the form.",
-        "Set tonight's dates (or change them) and tap a hotel card to compare on a booking site.",
+        "Enter your destination and travel dates in the search above.",
+        "Continue to the booking partner's site from the results.",
+        "Use the price filter to set a ceiling (e.g. $100 per night).",
+        "Sort remaining options by review score or location to find the best match.",
       ],
     },
     benefits: [
       {
-        title: "Nearby stays, found automatically",
-        text: "Your city is detected from IP on load — no permission needed. Nearby budget hotels appear immediately.",
+        title: "Search any city",
+        text: "The right budget accommodation depends on the destination. Search any city worldwide to see what's available at your price point.",
       },
       {
-        title: "GPS only if IP fails",
-        text: "Most visitors see nearby hotels with no permission prompt. Location is requested only when IP lookup cannot place you.",
+        title: "Your dates, your price",
+        text: "Set your own travel dates and apply the price filter on the booking partner's site to match your budget exactly.",
       },
       {
-        title: "Familiar booking sites",
-        text: "Cards open on Kayak or your preferred partner. Review the property and rate there before you book.",
+        title: "Wide property range",
+        text: "Booking partners carry hotels, apartments, guesthouses and hostels. Filter by type to find the best fit for your trip.",
       },
     ],
     faqs: [
       {
-        q: "Does this page use my location?",
-        a: "Approximately, yes. We read your city from your IP address on load — usually with no GPS prompt. If IP lookup fails, your browser may ask for location once as a backup.",
+        q: "Can Economy Stays guarantee stays under $100?",
+        a: "No. Rates depend on your destination, dates and the booking partner's current inventory. Use the price filter on the partner's site to find options within your budget.",
       },
       {
-        q: "When does the browser ask for location?",
-        a: "Only if IP lookup cannot place you. Allow it for closer nearby hotels, or deny it and search any city in the form above.",
+        q: "Are taxes included in the price shown?",
+        a: "Usually not at the initial listing stage. Check the total at checkout on the booking partner's site before confirming.",
       },
       {
-        q: "Are these the cheapest hotels available?",
-        a: "They are a budget-tier starting point. We filter by star rating, not by price — actual rates depend on your dates and the booking site. Sort by price there to find the most affordable options.",
+        q: "Does the budget stretch further on certain days?",
+        a: "Often yes. Midweek nights (Sunday through Thursday) and shoulder-season travel tend to surface more options within a tight budget than peak weekends.",
       },
       {
-        q: "Can I search a different city?",
-        a: "Yes. Type any destination in the search form above. The nearby cards use your location; the form works for any city.",
-      },
-      {
-        q: "What if I am booking from another country?",
-        a: "The nearby hotel cards use your current location. To search a different destination, type it in the form above.",
-      },
-      {
-        q: "Do you store my location?",
-        a: "Your IP city is read once to load nearby hotels and is not stored by Economy Stays. If the browser location fallback runs, those coordinates are used only for the hotel query and are not stored.",
+        q: "What if my destination has nothing under $100?",
+        a: "Try adjusting your dates, expanding the search radius to nearby towns, or considering a different property type such as a guesthouse or serviced apartment.",
       },
     ],
   },
+
+  // ??????????????????????????????????????????????????????????????????????
+  // 4. Half-price stays (was: 60-off-hotel-deals)
+  // ??????????????????????????????????????????????????????????????????????
   {
-    slug: "weekend-hotel-deals",
-    title: "Weekend Hotel Deals",
-    description1: "Friday to Sunday is ready. Pick a city and plan a two-night escape.",
-    description2: "Your weekend stay, already on the calendar",
-    datePreset: "weekend",
-    dateHint: "This weekend is selected — change the dates anytime.",
+    slug: "half-price-stays",
+    title: "Half-Price Hotel Stays",
+    description1: "Some hotels price well below their usual rate. Browse and compare.",
+    description2: "Stays worth looking at before you settle on a price",
+    datePreset: "nextWeekend",
+    dateHint: "Next weekend is set � change the dates if you need different nights.",
     intro:
-      "Weekend hotel deals here means comparing a Friday-to-Sunday stay. Economy Stays prefills the coming weekend so you can search a city for a two-night getaway, then continue to the booking site if a hotel or rental looks right.",
-    metaTitle: "Weekend Hotel Deals: Friday–Sunday Stays | Economy Stays",
+      "A half-price hotel stay is a room priced noticeably below the rate the same property typically charges for similar dates. These appear in ordinary search results � there's no special filter for 'half price'. Economy Stays connects you to booking partners where you can compare rates, check recent price history where available, and continue to book if the saving looks genuine.",
+    metaTitle: "Half-Price Hotel Stays � Browse Reduced Rates | Economy Stays",
     metaDescription:
-      "Compare weekend hotel deals with Friday–Sunday dates ready. Search any city for a two-night stay and review listed rates before you book.",
-    focusKeyword: "weekend hotel deals",
-    heroImageAlt: "Weekend getaway hotel with terrace seating for a Friday to Sunday stay",
+      "Browse hotels where rates are well below their usual level. Search your dates, compare prices across booking partners, and continue to reserve when a saving looks real.",
+    focusKeyword: "half price hotel stays",
+    heroImageAlt: "Hotel pool terrace at dusk with empty sun loungers",
     datePublished: PUBLISHED,
     dateModified: MODIFIED,
-    destinationsTitle: "This weekend, somewhere great",
-    destinationsSubtitle:
-      "Compare Friday–Sunday in a popular city, or search any destination above.",
-    browseTitle: "Browse weekend-ready city pages",
-    browseSubtitle: "Open a city landing, then keep these dates or pick another weekend.",
+    destinationsTitle: "Destinations worth comparing rates",
+    destinationsSubtitle: "Browse accommodation across booking partners in popular cities.",
+    browseTitle: "Browse rates by city",
+    browseSubtitle: "Open a city page and compare rates for your travel dates.",
+    browseIntentSlug: "top-rated",
     sections: [
       {
-        heading: "Planning a Friday-to-Sunday hotel stay",
+        heading: "When hotel rates drop significantly",
         paragraphs: [
-          "A classic weekend getaway is two nights: check in Friday, check out Sunday. That pattern is already selected so you can compare hotels, apartments, and rentals without doing calendar math. If today is Friday, this weekend is selected; otherwise it is the next Friday–Sunday.",
-          "Weekend demand is often different from midweek. Starting with those dates means you are comparing the nights most people actually travel for a short trip — not a random Tuesday pair.",
+          "Hotels adjust rates constantly. A property may price below its usual level when it has unsold inventory close to arrival, during a slow period in the local calendar, or when nearby competition increases. None of these show up labelled as 'half price' in search results � you find them by comparing rates across dates and properties.",
+          "Price comparison sites sometimes show a property's recent rate history, which makes it easier to judge whether the current figure is genuinely low or the usual rate reframed as a deal. Economy Stays connects you to partners where those tools exist.",
         ],
       },
       {
-        heading: "Why weekend dates are prefilled",
+        heading: "How to spot a genuinely reduced rate",
         paragraphs: [
-          "Travelers clicking a weekend sitelink usually want a short escape, not a week-long stay. Prefill gets you to the comparison faster. You can still stretch to a long weekend (Thursday or Monday) in the date picker.",
-          "If you are looking at tonight instead of Friday, the last-minute page is a better starting point. If budget is the main filter, use the budget-hotel guide after you set weekend dates.",
+          "Search the same property across a few date combinations. If rates for midweek or shoulder-season dates are meaningfully lower than the same property on a peak weekend, that's genuine variation, not a manufactured deal.",
+          "Cross-reference on the booking partner's site. Many platforms show a 'was' price alongside the current rate, or display a rate history chart. Reading that figure before you filter gives you a baseline to judge the discount against.",
         ],
       },
       {
-        heading: "City getaways to compare",
+        heading: "What to check before booking a reduced-rate stay",
         paragraphs: [
-          "Destination cards open current listings for the same Friday–Sunday in cities people often weekend in — Paris, Barcelona, London, and others. City landings below are useful when you want a destination guide first.",
-          "There is no ranked “best weekend city” on Economy Stays. Train time, events, and what you like to do matter more than a generic list. Search the place you would actually enjoy for two nights.",
-        ],
-      },
-      {
-        heading: "Hotels, apartments, and short rentals",
-        paragraphs: [
-          "A weekend stay might be a hotel near a station, an apartment with a kitchen, or a small rental. Compare stay types for the same dates. Weekend rates can be higher for some hotels and more flexible for others; look at the total, not only the Friday night.",
-          "Check Saturday checkout quirks, late check-in if you leave after work, and cancellation if plans are still loose.",
-        ],
-      },
-      {
-        heading: "From comparison to a booked weekend",
-        paragraphs: [
-          "When a stay looks right, continue to the booking site to confirm the room and the policy. Economy Stays does not take the booking. We may earn a commission if you complete a reservation.",
-          "If you hoped for a giant automatic markdown, this page isn’t a sitewide weekend coupon — promotions appear only when a hotel is actually listing one.",
+          "A lower rate sometimes comes with conditions: a stricter cancellation policy, a non-refundable pre-payment, or a minimum stay requirement. Read the full terms before you confirm. A saving that costs you the flexibility to cancel may not be worth it depending on how certain your plans are.",
+          "Economy Stays passes you through to a booking partner where those terms are clearly stated. We don't hold rates or offer our own discount codes � the rate you see is set by the property and the partner platform.",
         ],
       },
     ],
     howTo: {
-      name: "How to compare weekend hotel deals",
+      name: "How to find a significantly reduced hotel rate",
       steps: [
-        "Keep the prefilled Friday–Sunday dates, or shift to the weekend you are actually traveling.",
-        "Search a city and compare hotels and rentals for those two nights.",
-        "Open a stay on the booking site and check the total, check-in time, and cancellation rules.",
-        "Book on that site if the weekend stay still fits.",
+        "Enter your destination and travel dates in the search above.",
+        "Browse results on the booking partner's site.",
+        "Check the price history or 'was' price where the platform shows it.",
+        "Read the cancellation terms before confirming � reduced rates sometimes come with conditions.",
       ],
     },
     benefits: [
       {
-        title: "The weekend is set",
-        text: "Check-in is the coming Friday and check-out is Sunday — a two-night stay without extra calendar work.",
+        title: "Compare across partners",
+        text: "Booking partners sometimes have different rates for the same property. Browsing through Economy Stays connects you to multiple options.",
       },
       {
-        title: "Going a different weekend?",
-        text: "Change the dates in the form and compare whatever Friday (or Thursday) you have in mind.",
+        title: "Rate context matters",
+        text: "A lower number only makes sense against a baseline. Use the partner site's price history where available to judge the saving honestly.",
       },
       {
-        title: "Stay your way",
-        text: "Hotels, apartments, and rentals from travel sites. Finish on the site you prefer.",
+        title: "Your terms, your choice",
+        text: "Check cancellation flexibility before you book. A saving that locks you in may not be the right call if travel plans can change.",
       },
     ],
     faqs: [
       {
-        q: "Which weekend is selected?",
-        a: "The coming Friday through Sunday. If today is Friday, that’s this weekend; otherwise it’s the next one.",
+        q: "Can Economy Stays show me properties at exactly half price?",
+        a: "No. There's no filter for a specific percentage saving. Compare rates across dates and properties to judge where prices are relatively low for the destination.",
       },
       {
-        q: "Can I stay longer than two nights?",
-        a: "Yes. Open the date picker and stretch the stay before you compare.",
+        q: "Are sale prices genuine?",
+        a: "Some are, some aren't. Use the booking partner's price history tool (where available) to compare the listed rate against recent prices for the same property and date window.",
       },
       {
-        q: "Are weekend rates different?",
-        a: "They often are. Starting with Friday–Sunday means you’re comparing the dates most weekend trips actually use.",
+        q: "Do discounted rates always have stricter terms?",
+        a: "Not always, but it's common. Non-refundable rates typically price lower than flexible ones. Check the cancellation policy before you confirm.",
       },
       {
-        q: "Can I check in Thursday after work?",
-        a: "Yes. Change check-in to Thursday (or any night) in the form, then compare again.",
+        q: "Which cities tend to have the most rate variation?",
+        a: "Cities with high hotel supply and distinct peak and off-peak seasons tend to show more variation. Major capital cities, beach resorts and convention destinations often fluctuate considerably.",
+      },
+    ],
+  },
+
+  // ??????????????????????????????????????????????????????????????????????
+  // 5. Stays near me (was: cheap-hotels-near-you)
+  // ??????????????????????????????????????????????????????????????????????
+  {
+    slug: "stays-near-me",
+    title: "Hotel Stays Near Me",
+    description1: "Allow location access and browse hotels within a few kilometres.",
+    description2: "Accommodation close to where you are right now",
+    datePreset: "tonight",
+    dateHint: "Tonight is set � adjust the dates to match your actual stay.",
+    intro:
+      "Finding a hotel near your current location means allowing the browser to share your position, which Economy Stays uses to suggest the nearest city and fill the destination field. From there, you search normally and browse results from booking partners on a map or in a list � sorted by distance if the partner platform supports it.",
+    metaTitle: "Hotels Near Me � Browse Stays Close to Your Location | Economy Stays",
+    metaDescription:
+      "Browse hotel stays near your current location. Allow location access and Economy Stays fills the destination automatically so you can compare nearby accommodation.",
+    focusKeyword: "hotel stays near me",
+    heroImageAlt: "City street at night with hotel signs visible through light rain",
+    datePublished: PUBLISHED,
+    dateModified: MODIFIED,
+    destinationsTitle: "Popular cities travellers search from",
+    destinationsSubtitle: "Or use the search above with your location to find nearby stays.",
+    browseTitle: "Browse nearby stays by city",
+    browseSubtitle: "Open a city page to browse accommodation with a destination already set.",
+    sections: [
+      {
+        heading: "How location-based hotel search works here",
+        paragraphs: [
+          "When you visit this page, Economy Stays asks permission to access your device's location. If you allow it, the search form fills in the nearest city automatically. You can adjust that city if the suggestion isn't quite right � for example if you're near a city boundary and a different name describes your actual location better.",
+          "Location access is optional. If you'd rather not share your position, type the city or area you want into the search directly. The location feature just removes that one step when convenience matters.",
+        ],
       },
       {
-        q: "Do you offer a weekend-only coupon?",
-        a: "No. This page prefills weekend dates. Any promotional rate comes from the listing, not a Economy Stays coupon.",
+        heading: "What 'near me' means for hotel searches",
+        paragraphs: [
+          "A hotel search centred on your location returns properties in and around the city the booking partner associates with your position. On the partner's site you can often switch to a map view and drag the search area, which is useful when you're between cities or looking for something in a specific neighbourhood rather than the city overall.",
+          "Distance in a hotel search is typically measured from the city centre, not from your exact coordinates. If you need the stay to be within walking distance of where you actually are, use the map view on the booking partner's site to check the property's location directly.",
+        ],
       },
       {
-        q: "What if Friday is sold out?",
-        a: "Try Saturday check-in, a nearby area, or another city. Availability is whatever is listed for your search.",
+        heading: "Choosing the right stay when you're already in a city",
+        paragraphs: [
+          "If you're searching while already in a destination, tonight is pre-filled and one night is the default stay length. That's the most common pattern for a same-day location search. Adjust the duration if you need more than one night.",
+          "On the booking partner's site, sorting by distance from a fixed point (an address, transport hub or attraction) is often more useful than sorting by price when proximity is the main consideration. Check the map before you book.",
+        ],
+      },
+    ],
+    howTo: {
+      name: "How to find a hotel near your current location",
+      steps: [
+        "Allow location access when prompted � Economy Stays fills the city for you.",
+        "Adjust the destination if the suggestion isn't quite right for your position.",
+        "Set your dates and number of guests, then search.",
+        "Use the map view on the booking partner's site to confirm how close each property actually is.",
+      ],
+    },
+    benefits: [
+      {
+        title: "Auto-filled destination",
+        text: "Allow location access once and the search form fills your nearest city � no typing required.",
+      },
+      {
+        title: "Tonight pre-set",
+        text: "Same-day searches are the most common near-me use case, so tonight is already in the check-in field.",
+      },
+      {
+        title: "Map view on the partner site",
+        text: "Head to the booking partner's map to see exactly how close each property is to where you need to be.",
+      },
+    ],
+    faqs: [
+      {
+        q: "Does Economy Stays store my location?",
+        a: "No. Your location is used only to suggest the nearest city in the search form and isn't stored or shared.",
+      },
+      {
+        q: "What if the city suggestion is wrong?",
+        a: "Type the correct city or area into the destination field. The auto-fill is a starting point, not a fixed value.",
+      },
+      {
+        q: "Can I search near a specific address rather than my current location?",
+        a: "Type the city or neighbourhood you want in the search form. For address-level proximity, use the map filter on the booking partner's site.",
+      },
+      {
+        q: "What if there are no hotels near my current location?",
+        a: "Try searching the nearest town with accommodation, or expand the search area on the booking partner's map view.",
+      },
+    ],
+  },
+
+  // ??????????????????????????????????????????????????????????????????????
+  // 6. Weekend away (was: weekend-hotel-deals)
+  // ??????????????????????????????????????????????????????????????????????
+  {
+    slug: "weekend-away",
+    title: "Weekend Away � Hotel Stays",
+    description1: "Friday to Sunday is pre-set. Search a destination and browse.",
+    description2: "Two nights, one search, any destination",
+    datePreset: "nextWeekend",
+    dateHint: "Coming Friday to Sunday is pre-filled � adjust if you need different nights.",
+    intro:
+      "A weekend stay is two or three nights, typically checking in on Friday and out on Sunday. Economy Stays pre-fills the coming weekend so you can jump straight to choosing a destination rather than setting dates first. Browse hotels, aparthotels and serviced apartments on booking partners, then continue to reserve when you find the right place.",
+    metaTitle: "Weekend Hotel Stays � Browse Fri�Sun Accommodation | Economy Stays",
+    metaDescription:
+      "Browse hotel stays for a weekend break. Friday to Sunday is pre-filled � enter a destination to compare accommodation across booking partners.",
+    focusKeyword: "weekend away hotel",
+    heroImageAlt: "Countryside hotel at golden hour with a winding path through gardens",
+    datePublished: PUBLISHED,
+    dateModified: MODIFIED,
+    destinationsTitle: "Popular destinations for a weekend break",
+    destinationsSubtitle: "Browse hotel options in cities and regions worth the trip.",
+    browseTitle: "Weekend stay pages by destination",
+    browseSubtitle: "Open a city or region guide with your dates already set.",
+    browseIntentSlug: "boutique-hotels",
+    sections: [
+      {
+        heading: "Planning a two-night break",
+        paragraphs: [
+          "A weekend break works best when the destination is reachable in a few hours, leaving Friday evening and most of Saturday and Sunday actually in the place rather than in transit. Economy Stays doesn't weight results by travel time, but that's worth factoring in when you're comparing options.",
+          "Friday to Sunday is the default because it fits most working schedules, but the form is flexible. If you prefer to check in Thursday evening and leave Sunday, or if a long weekend gives you an extra day, adjust the calendar before you search.",
+        ],
+      },
+      {
+        heading: "Types of stay that suit a weekend break",
+        paragraphs: [
+          "Boutique hotels and design properties often charge a premium on weekends, but they can make two nights feel like a genuine occasion rather than just a place to sleep. Aparthotels give more space if you want to cook one meal rather than eating out every sitting. Standard hotels in city centres remain the practical choice when you're there to see the city rather than linger in the accommodation.",
+          "Browse on the booking partner's site with their property-type filter active to see how prices compare across different categories for the same city and weekend.",
+        ],
+      },
+      {
+        heading: "Getting more from a weekend search",
+        paragraphs: [
+          "Searching for a weekend break a few weeks in advance tends to surface more options at a wider range of prices than searching the same week. Popular city properties in particular often have limited availability on peak Friday nights if you leave it too late.",
+          "If the destination you want looks expensive for a specific weekend, try shifting the dates by one week � prices can vary significantly across adjacent weekends depending on local events and seasonal patterns.",
+        ],
+      },
+      {
+        heading: "Weekend city pages",
+        paragraphs: [
+          "The city links below open accommodation pages for popular weekend destinations with your dates already attached. That's a faster route than starting from scratch if you've already decided on a city.",
+          "If you're still deciding, use the destination cards or type a city in the form above. Economy Stays doesn't suggest one destination over another � that choice is yours.",
+        ],
+      },
+    ],
+    howTo: {
+      name: "How to plan a weekend hotel stay",
+      steps: [
+        "Enter your destination in the search above. Friday to Sunday is pre-set.",
+        "Adjust the check-in to Thursday if you want an extra night, or change to a different weekend entirely.",
+        "Browse options on the booking partner's site and filter by property type or price.",
+        "Check the total and cancellation terms before confirming your booking.",
+      ],
+    },
+    benefits: [
+      {
+        title: "Weekend dates pre-filled",
+        text: "Friday to Sunday is already set so you can focus on destination and property rather than the calendar.",
+      },
+      {
+        title: "Flexible for any weekend",
+        text: "Change the dates to any Friday�Sunday (or extend to Thursday or Monday) before you compare.",
+      },
+      {
+        title: "Hotels and more",
+        text: "Browse hotels, boutique stays and aparthotels from booking partners � all from the same search.",
+      },
+    ],
+    faqs: [
+      {
+        q: "Which weekend is pre-filled?",
+        a: "The coming Friday to Sunday. If today is Saturday, it moves to the next weekend. Adjust the dates in the form if you need a different one.",
+      },
+      {
+        q: "Can I add a Thursday night?",
+        a: "Yes. Open the date picker and change check-in to Thursday. The comparison updates for those dates.",
+      },
+      {
+        q: "Are weekend rates always higher?",
+        a: "In city centres, often yes � demand is higher on weekends. Countryside and coastal properties sometimes work the other way. Searching midweek dates alongside the weekend gives you a useful baseline for comparison.",
+      },
+      {
+        q: "How far ahead should I book a weekend stay?",
+        a: "Popular city properties can fill up for Friday nights a few weeks out. Boutique hotels in particular tend to have limited inventory. Searching three to four weeks ahead generally gives a wider choice.",
+      },
+      {
+        q: "Does Economy Stays take a cut of the booking?",
+        a: "Economy Stays may receive a commission when you book through a partner link. That doesn't change the price you pay � the rate is set by the property and the booking partner.",
       },
     ],
   },

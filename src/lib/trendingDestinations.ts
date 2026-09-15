@@ -11,11 +11,13 @@ export type TrendingDestination = {
   state?: string;
   /** Autocomplete query: country segment (full name) */
   country: string;
+  /** ISO 3166-1 alpha-2 country code, used to build /stay/{cc}/{city} paths */
+  countryCode: string;
   image: string;
   imageAlt: string;
   /** CSS `object-position` so the crop matches the landmark (e.g. skyline vs sign). */
   imageObjectPosition?: string;
-  /** Landing-page city slug under /hotels/{slug} */
+  /** Landing-page city slug under /stay/{cc}/{slug} */
   slug: string;
 };
 
@@ -28,6 +30,7 @@ export const TRENDING_DESTINATIONS: readonly TrendingDestination[] = [
     city: "Paris",
     state: "Île-de-France",
     country: "France",
+    countryCode: "fr",
     image: getDestinationHeroImage("paris"),
     imageAlt: "The Eiffel Tower at sunset above the Trocadéro fountains in Paris",
   },
@@ -38,6 +41,7 @@ export const TRENDING_DESTINATIONS: readonly TrendingDestination[] = [
     city: "London",
     state: "England",
     country: "United Kingdom",
+    countryCode: "gb",
     image: getDestinationHeroImage("london"),
     imageAlt: "Tower Bridge over the River Thames at dusk in London",
   },
@@ -47,6 +51,7 @@ export const TRENDING_DESTINATIONS: readonly TrendingDestination[] = [
     subtitle: "Japan",
     city: "Tokyo",
     country: "Japan",
+    countryCode: "jp",
     image: getDestinationHeroImage("tokyo"),
     imageAlt: "Tokyo skyline at dusk with the illuminated Tokyo Tower",
   },
@@ -57,6 +62,7 @@ export const TRENDING_DESTINATIONS: readonly TrendingDestination[] = [
     city: "Rome",
     state: "Lazio",
     country: "Italy",
+    countryCode: "it",
     image: getDestinationHeroImage("rome"),
     imageAlt: "The Colosseum at golden-hour sunset in Rome",
   },
@@ -67,6 +73,7 @@ export const TRENDING_DESTINATIONS: readonly TrendingDestination[] = [
     city: "Barcelona",
     state: "Catalonia",
     country: "Spain",
+    countryCode: "es",
     image: getDestinationHeroImage("barcelona"),
     imageAlt: "The Sagrada Família basilica against a clear blue sky in Barcelona",
   },
@@ -76,6 +83,7 @@ export const TRENDING_DESTINATIONS: readonly TrendingDestination[] = [
     subtitle: "United Arab Emirates",
     city: "Dubai",
     country: "United Arab Emirates",
+    countryCode: "ae",
     image: getDestinationHeroImage("dubai"),
     imageAlt: "The Dubai skyline with the Burj Khalifa at sunset",
   },
@@ -86,6 +94,7 @@ export const TRENDING_DESTINATIONS: readonly TrendingDestination[] = [
     city: "Sydney",
     state: "New South Wales",
     country: "Australia",
+    countryCode: "au",
     image: getDestinationHeroImage("sydney"),
     imageAlt: "Sydney Opera House and Harbour Bridge across the blue harbour",
   },
@@ -95,6 +104,7 @@ export const TRENDING_DESTINATIONS: readonly TrendingDestination[] = [
     subtitle: "Thailand",
     city: "Bangkok",
     country: "Thailand",
+    countryCode: "th",
     image: getDestinationHeroImage("bangkok"),
     imageAlt: "Wat Arun temple glowing at sunset beside the river in Bangkok",
   },

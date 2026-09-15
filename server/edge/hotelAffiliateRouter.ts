@@ -1,9 +1,33 @@
-import { buildBookingAffiliateRedirectUrl } from "../../supabase/functions/hotel-affiliate-router/bookingDeeplink";
-import {
-  buildKayakDeeplink,
-  resolveAffiliateSource,
-} from "../../supabase/functions/hotel-affiliate-router/kayakDeeplink";
+import { buildKayakDeeplink } from "./kayakDeeplink";
 import { getBookingAffiliateConfig, getKayakAffiliateConfig, readEnv } from "./env";
+
+const resolveAffiliateSource = (value: unknown): "kayak" | "skyscanner" | "booking" => {
+  if (typeof value === "string") {
+    const normalized = value.trim().toLowerCase();
+    if (normalized === "booking") return "booking";
+    if (normalized === "skyscanner") return "skyscanner";
+    if (normalized === "kayak") return "kayak";
+  }
+  return "kayak";
+};
+
+const buildBookingAffiliateRedirectUrl = (
+  validated: { query: string; checkin: string; checkout: string; rooms: number; adults: number; children: number; children_ages: number[]; click_id: string; latitude?: number; longitude?: number },
+  config: ReturnType<typeof getBookingAffiliateConfig>
+): string => {
+  const base = config.baseUrl;
+  const url = new URL(base);
+  url.searchParams.set("aid", config.tid);
+  url.searchParams.set("ss", validated.query);
+  url.searchParams.set("checkin", validated.checkin);
+  url.searchParams.set("checkout", validated.checkout);
+  url.searchParams.set("no_rooms", String(validated.rooms));
+  url.searchParams.set("group_adults", String(validated.adults));
+  url.searchParams.set("group_children", String(validated.children));
+  url.searchParams.set("currency", config.currency);
+  url.searchParams.set("lang", config.lang);
+  return url.toString();
+};
 
 interface HotelAffiliateRequest {
   query: string;

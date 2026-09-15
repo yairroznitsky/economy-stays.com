@@ -1,26 +1,21 @@
-import { buildBookingSearchResultsUrl } from "@/lib/bookingHotels";
+﻿import { buildBookingSearchResultsUrl } from "@/lib/bookingHotels";
 import { buildCjBookingUrl } from "@/lib/cjBooking";
 import { isFacebookAdsTraffic } from "@/lib/facebookTraffic";
-import { buildKayakDeeplink } from "@/lib/kayakDeeplink";
+import { buildKayakDeeplink, getKayakAffiliateConfig } from "@/lib/kayakDeeplink";
 import {
   getDeviceKayakAutocompleteContext,
   pickBestIataSuggestion,
 } from "@/lib/kayakDestinationSearch";
-import {
-  assertEdgeFunctionsAvailable,
-  invokeEdgeFunction,
-} from "@/lib/edgeFunctionClient";
-import { parseNumericEntityId, parseIataCode, resolveSkyscannerEntityId } from "@/lib/skyscannerHotels";
+import { invokeEdgeFunction } from "@/lib/edgeFunctionClient";
+import { parseNumericEntityId, parseIataCode } from "@/lib/skyscannerHotels";
 import type {
   HotelAffiliateRouteResponse,
-  HotelAffiliateRouterResponse,
   HotelAutocompleteRequest,
   HotelAutocompleteResponse,
   HotelDestinationSuggestion,
   HotelRedirectRequest,
 } from "@/types/hotels";
 
-const AFFILIATE_EDGE_FUNCTION_NAME = "hotel-affiliate-router";
 const KAYAK_AUTOCOMPLETE_FUNCTION_NAME = "kayak-autocomplete";
 const AUTOSUGGEST_CACHE_TTL_MS = 10 * 60 * 1000;
 const KAYAK_AUTOCOMPLETE_MIN_QUERY_LENGTH = 3;
@@ -217,64 +212,14 @@ export const requestHotelRedirectUrl = async (
     return buildBookingRedirect(payload);
   }
 
-  if (affiliateSource === "kayak") {
-    return buildKayakRedirect(payload);
-  }
-
-  assertEdgeFunctionsAvailable();
-  const requestDestinationId = assertValidSkyscannerEntityId(payload.search);
-
-  const { locale, marketCountry } = getDeviceKayakAutocompleteContext();
-
-  const data = await invokeEdgeFunction<HotelAffiliateRouterResponse>(
-    AFFILIATE_EDGE_FUNCTION_NAME,
-    {
-      query: payload.search.destination,
-      destination_id: requestDestinationId,
-      hotel_id: payload.search.hotelId,
-      airport_place_id: payload.search.airportPlaceId,
-      airport_code: payload.search.airportCode,
-      airport_name: payload.search.airportName,
-      city_name: payload.search.cityName,
-      state_name: payload.search.stateName,
-      country_name: payload.search.countryName,
-      checkin: payload.search.checkIn,
-      checkout: payload.search.checkOut,
-      rooms: payload.search.rooms,
-      adults: payload.search.adults,
-      children: payload.search.children,
-      children_ages: payload.search.childrenAges,
-      click_id: payload.clickId,
-      landing_id: payload.landingId,
-      affiliate_source: affiliateSource,
-      latitude: payload.search.latitude,
-      longitude: payload.search.longitude,
-      locale: payload.search.locale ?? locale,
-      country: payload.search.country ?? marketCountry,
-    }
-  );
-
-  if (!data?.success || !data.redirect_url) {
-    const message =
-      data && !data.success && data.error
-        ? data.error
-        : "Unable to generate affiliate redirect URL.";
-    throw new Error(message);
-  }
-
-  return {
-    redirectUrl: data.redirect_url,
-    entityId: resolveRouterEntityId(data.entity_id, requestDestinationId ?? ""),
-    provider: affiliateSource,
-    clickId: data.tracking_payload?.click_id ?? payload.clickId,
-  };
+  // Kayak is the primary provider — deeplink built entirely client-side.
+  // Skyscanner routing via edge function has been removed.
+  return buildKayakRedirect(payload);
 };
 
 export const requestHotelDestinationAutocomplete = async (
   payload: HotelAutocompleteRequest
 ): Promise<HotelDestinationSuggestion[]> => {
-  assertEdgeFunctionsAvailable();
-
   const query = payload.query.trim();
   if (query.length < KAYAK_AUTOCOMPLETE_MIN_QUERY_LENGTH) {
     return [];

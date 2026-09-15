@@ -7,5 +7,5 @@ export const getSitelinkBrowseLinks = (
 ): { name: string; path: string }[] =>
   TRENDING_DESTINATIONS.map((city) => ({
     name: city.title,
-    path: buildLandingPath(city.slug, page.browseIntentSlug),
+    path: buildLandingPath(city.slug, page.browseIntentSlug, city.countryCode),
   }));

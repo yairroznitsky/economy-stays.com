@@ -24,13 +24,14 @@ export const slugToCityName = (slug: string): string =>
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(" ");
 
-export const buildCityPath = (citySlug: string): string =>
-  `/hotels/${citySlug}`;
+export const buildCityPath = (countryCode: string, citySlug: string): string =>
+  `/stay/${countryCode.toLowerCase()}/${citySlug}`;
 
 export const buildIntentPath = (
+  countryCode: string,
   citySlug: string,
   intentSlug: string
-): string => `/hotels/${citySlug}/${intentSlug}`;
+): string => `/stay/${countryCode.toLowerCase()}/${citySlug}/${intentSlug}`;
 
 export const buildHotelPath = (
   cityName: string | null | undefined,
@@ -39,16 +40,17 @@ export const buildHotelPath = (
   `/hotels/${slugifyName(cityName || "city")}/${slugifyName(hotelName)}`;
 
 export interface LandingPathRef {
+  countryCode: string;
   citySlug: string;
   segmentSlug?: string;
 }
 
-const LANDING_PATH_PATTERN = /^\/hotels\/([a-z0-9-]+)(?:\/([a-z0-9-]+))?$/;
+const LANDING_PATH_PATTERN = /^\/stay\/([a-z]{2})\/([a-z0-9-]+)(?:\/([a-z0-9-]+))?$/;
 
 export const parseLandingPath = (path: string): LandingPathRef | null => {
   const match = LANDING_PATH_PATTERN.exec(path);
   if (!match) return null;
-  return { citySlug: match[1], segmentSlug: match[2] };
+  return { countryCode: match[1], citySlug: match[2], segmentSlug: match[3] };
 };
 
 /** @deprecated Use parseLandingPath */

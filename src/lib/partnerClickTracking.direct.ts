@@ -78,9 +78,9 @@ const insertRentalClick = async (options: {
   autoParams: boolean;
 }): Promise<void> => {
   try {
-    await postTrackingJson("/search", {
+    await postTrackingJson("/api/exits", {
       click_id: options.clickId,
-      landing_id: options.landingId,
+      visit_id: options.landingId,
       partner: options.partner,
       iata_code: options.iataCode,
       location_id: options.locationId,

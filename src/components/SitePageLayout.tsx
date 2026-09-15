@@ -1,7 +1,5 @@
-import { Link } from "react-router-dom";
-import BrandLogo from "@/components/BrandLogo";
+import Header from "@/components/Header";
 import SiteFooter from "@/components/SiteFooter";
-import { appendLandingIdQuery } from "@/lib/landingTrackingService";
 
 interface SitePageLayoutProps {
   title: string;
@@ -11,13 +9,12 @@ interface SitePageLayoutProps {
 const SitePageLayout = ({ title, children }: SitePageLayoutProps) => {
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <header className="border-b border-border bg-background">
-        <div className="container flex justify-center py-4 md:py-5">
-          <Link to={appendLandingIdQuery("/")} className="inline-block">
-            <BrandLogo variant="dark" compact={false} textClassName="text-2xl md:text-3xl" />
-          </Link>
-        </div>
-      </header>
+      {/* Sticky header — non-photo pages use it in solid mode immediately */}
+      <div className="relative">
+        {/* Thin cream bar behind the fixed header so the page doesn't jump on load */}
+        <div className="h-16 bg-background border-b border-border" />
+        <Header solid />
+      </div>
 
       <main className="container flex-1 py-12 md:py-16">
         <article className="mx-auto max-w-3xl">

@@ -22,7 +22,7 @@ import { selectRows } from "./supabaseRest";
  * 3. Template hotel pages (slug match against staging_hotels in that city)
  */
 
-const LANDING_PATH_PATTERN = /^\/hotels\/[a-z0-9-]+(\/[a-z0-9-]+)?$/;
+const LANDING_PATH_PATTERN = /^\/stay\/[a-z]{2}\/[a-z0-9-]+(\/[a-z0-9-]+)?$/;
 
 export interface LandingPageHandlerResult {
   status: number;
@@ -430,14 +430,15 @@ const findHotelInCity = async (
 const attachCityPageExtras = async (
   body: Record<string, unknown>,
   city: CityRow,
-  intent: IntentRow | null
+  intent: IntentRow | null,
+  countryCode: string
 ): Promise<void> => {
   if (body.hotel) return;
 
   const [relatedHotels, cityStats, browseIntents] = await Promise.all([
     fetchRelatedHotels(city.slug, city.name, intent),
     fetchCityStats(city.slug, city.name, city.airport_code),
-    intent ? Promise.resolve([]) : fetchBrowseIntents(city.slug),
+    intent ? Promise.resolve([]) : fetchBrowseIntents(countryCode, city.slug),
   ]);
 
   if (relatedHotels.length > 0) {
@@ -477,7 +478,7 @@ export const handleLandingPageGet = async (
   if (!LANDING_PATH_PATTERN.test(path)) {
     return {
       status: 400,
-      body: { error: "path must look like /hotels/{city} or /hotels/{city}/{slug}" },
+      body: { error: "path must look like /stay/{cc}/{city} or /stay/{cc}/{city}/{theme}" },
       cacheControl: NO_CACHE,
     };
   }
@@ -495,7 +496,7 @@ export const handleLandingPageGet = async (
     const published = await lookupPublishedPage(path);
     if (published) {
       const body = buildConfig(published);
-      await attachCityPageExtras(body, published.city, published.intent);
+      await attachCityPageExtras(body, published.city, published.intent, pathRef.countryCode);
       return {
         status: 200,
         body,
@@ -513,8 +514,8 @@ export const handleLandingPageGet = async (
           cacheControl: MISS_CACHE,
         };
       }
-      const body = buildTemplateConfig(city, null, buildCityPath(city.slug));
-      await attachCityPageExtras(body, city, null);
+      const body = buildTemplateConfig(city, null, buildCityPath(pathRef.countryCode, city.slug));
+      await attachCityPageExtras(body, city, null, pathRef.countryCode);
       return {
         status: 200,
         body,
@@ -527,9 +528,9 @@ export const handleLandingPageGet = async (
       const body = buildTemplateConfig(
         city,
         intent,
-        buildIntentPath(city.slug, intent.slug)
+        buildIntentPath(pathRef.countryCode, city.slug, intent.slug)
       );
-      await attachCityPageExtras(body, city, intent);
+      await attachCityPageExtras(body, city, intent, pathRef.countryCode);
       return {
         status: 200,
         body,

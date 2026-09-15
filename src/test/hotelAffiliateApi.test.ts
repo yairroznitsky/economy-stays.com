@@ -35,6 +35,7 @@ describe("requestHotelRedirectUrl", () => {
 
     const parsed = new URL(response.redirectUrl);
     expect(parsed.origin + parsed.pathname).toBe("https://www.kayak.com/in");
+    expect(parsed.searchParams.get("a")).toBe("kan_317689_594114");
     expect(parsed.searchParams.get("enc_cid")).toBe("test-click-abc");
     expect(parsed.searchParams.get("url")).toBe(
       "/hotels/New-York,New-York,United-States-c12345/2026-07-10/2026-07-12/2adults/1rooms"

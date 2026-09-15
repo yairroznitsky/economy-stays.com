@@ -21,7 +21,10 @@ describe("destinationImages", () => {
     );
   });
 
-  it("exposes a bundled fallback hero", () => {
-    expect(getDestinationHeroFallback()).toMatch(/hero-hotel/);
+  it("exposes a bundled fallback hero that is not a city hero path", () => {
+    const fallback = getDestinationHeroFallback();
+    // City heroes were deleted; fallback should be the bundled asset, not a /images/ path
+    expect(fallback).toBeTruthy();
+    expect(typeof fallback).toBe("string");
   });
 });

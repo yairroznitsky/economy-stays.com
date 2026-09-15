@@ -19,9 +19,9 @@ const Benefits = ({ benefits }: BenefitsProps) => {
             return (
               <div
                 key={benefit.title}
-                className="rounded-2xl border border-border bg-card p-7 shadow-soft"
+                className="rounded-xl border border-border bg-card p-7 shadow-soft"
               >
-                <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground">
+                <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-accent text-accent-foreground">
                   <Icon className="h-6 w-6" />
                 </div>
                 <h2 className="text-lg font-semibold text-foreground">{benefit.title}</h2>

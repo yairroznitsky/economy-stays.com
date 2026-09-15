@@ -91,8 +91,8 @@ const RelatedHotels = ({ city, hotels, intentLabel, tracking }: RelatedHotelsPro
                     aria-busy={isOpening}
                     onClick={() => void openHotelCompare(hotel)}
                     className={cn(
-                      "group flex h-full w-full flex-col overflow-hidden rounded-2xl border border-border bg-card p-0 text-left shadow-soft transition",
-                      "hover:-translate-y-0.5 hover:shadow-md disabled:pointer-events-none disabled:opacity-60"
+                      "group flex h-full w-full flex-col overflow-hidden rounded-xl border border-border bg-card p-0 text-left shadow-soft transition",
+                      "hover:-translate-y-0.5 hover:shadow-elevated disabled:pointer-events-none disabled:opacity-60"
                     )}
                   >
                     <div className="relative h-40 overflow-hidden bg-muted">

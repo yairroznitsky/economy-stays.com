@@ -1,7 +1,7 @@
 import { siteConfig } from "@/lib/siteConfig";
 import { postTrackingJson } from "@/lib/trackingApi";
 
-const LANDING_COOKIE = "landing_id";
+const LANDING_COOKIE = "visit_id";
 const COOKIE_MAX_AGE_SEC = 5 * 60;
 const LANDING_ID_PREFIX = siteConfig.landingIdPrefix;
 const ID_CHARS =
@@ -53,9 +53,9 @@ const writeCookie = (value: string) => {
 export class LandingTrackingService {
   private static loggedLandingIds = new Set<string>();
 
-  /** Economy-stays: ES- + 12 hex. Other brands (e.g. SB-): prefix + 10 alphanumeric. */
+  /** Economy Stays 2: ES2- + 12 hex. Other brands: prefix + 10 alphanumeric. */
   static generateLandingId(): string {
-    if (LANDING_ID_PREFIX === "ES-" || LANDING_ID_PREFIX === "CS-") {
+    if (LANDING_ID_PREFIX === "ES2-" || LANDING_ID_PREFIX === "ES-" || LANDING_ID_PREFIX === "CS-") {
       return `${LANDING_ID_PREFIX}${randomHex(6)}`;
     }
     return `${LANDING_ID_PREFIX}${randomChars(10)}`;
@@ -70,7 +70,7 @@ export class LandingTrackingService {
   }
 
   private static getLandingIdFromUrl(): string | null {
-    return new URLSearchParams(window.location.search).get("landing_id");
+    return new URLSearchParams(window.location.search).get("visit_id");
   }
 
   static async getOrCreateLandingId(): Promise<string> {
@@ -110,8 +110,8 @@ export class LandingTrackingService {
     }
 
     try {
-      await postTrackingJson("/landings", {
-        landing_id: landingId,
+      await postTrackingJson("/api/sessions", {
+        visit_id: landingId,
         url_params: window.location.search || "",
         metadata,
       });
@@ -151,6 +151,6 @@ export const appendLandingIdQuery = (href: string): string => {
   if (!landingId) return href;
 
   const url = new URL(href, window.location.origin);
-  url.searchParams.set("landing_id", landingId);
+  url.searchParams.set("visit_id", landingId);
   return `${url.pathname}${url.search}`;
 };

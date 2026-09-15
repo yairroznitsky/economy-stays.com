@@ -10,23 +10,23 @@ export const getHotelAffiliateRouting = (): {
   affiliateSource: AffiliateSource;
   partner: string;
 } => {
-  if (readQueryFlag("kayak")) {
+  if (readQueryFlag("k")) {
     return { affiliateSource: "kayak", partner: "kayak-hotels" };
   }
   if (readQueryFlag("skyscanner")) {
     return { affiliateSource: "skyscanner", partner: "skyscanner-hotels" };
   }
-  // Default: Booking.com via CJ affiliate
-  return { affiliateSource: "booking", partner: "booking-hotels-cj" };
+  // Default: Kayak (primary monetization)
+  return { affiliateSource: "kayak", partner: "kayak-hotels" };
 };
 
 /**
- * Returns true when the 2-popup conversion flow should activate:
- * ?2pop=1 must be present, and the visitor must NOT be from Facebook/Meta ads.
+ * Returns true when the double-popup conversion flow should activate:
+ * ?dpop=1 must be present, and the visitor must NOT be from Facebook/Meta ads.
  */
 export const is2PopMode = (): boolean => {
   if (typeof window === "undefined") return false;
   const params = new URLSearchParams(window.location.search);
-  if (params.get("2pop") !== "1") return false;
+  if (params.get("dpop") !== "1") return false;
   return !isFacebookAdsTraffic(params);
 };

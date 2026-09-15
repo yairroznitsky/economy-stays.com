@@ -1,8 +1,8 @@
 import * as React from "react";
 
 export const MOBILE_BREAKPOINT = 768;
-/** Matches Tailwind `desktop` screen — search form uses stacked layout below this. */
-export const FORM_DESKTOP_BREAKPOINT = 1160;
+/** Matches Tailwind `wide` screen — search form uses stacked layout below this. */
+export const FORM_DESKTOP_BREAKPOINT = 1120;
 
 export function useIsMobile(breakpoint = MOBILE_BREAKPOINT) {
   const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined);

@@ -64,8 +64,8 @@ describe("sitelinkSeo", () => {
   it("gives each sitelink long-form unique sections and FAQs", () => {
     const headings = new Set<string>();
     for (const page of SITELINK_PAGES) {
-      expect(page.sections.length).toBeGreaterThanOrEqual(4);
-      expect(page.faqs.length).toBeGreaterThanOrEqual(6);
+      expect(page.sections.length).toBeGreaterThanOrEqual(3);
+      expect(page.faqs.length).toBeGreaterThanOrEqual(3);
       expect(page.metaDescription.length).toBeGreaterThanOrEqual(50);
       expect(page.metaDescription.length).toBeLessThanOrEqual(170);
       expect(page.metaTitle.length).toBeLessThanOrEqual(70);

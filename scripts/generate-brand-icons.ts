@@ -3,8 +3,8 @@ import path from "path";
 import sharp from "sharp";
 
 const PUBLIC = path.resolve(process.cwd(), "public");
-const BRAND_BLUE = "#003580";
-const BRAND_YELLOW = "#FEBB02";
+const BRAND_BLUE = "#166534";
+const BRAND_YELLOW = "#E8882A";
 
 const buildSvg = (size: number): Buffer => {
   const fontSize = Math.round(size * 0.52);

@@ -6,18 +6,18 @@ describe("bookingMode", () => {
     window.history.replaceState({}, "", "/");
   });
 
-  it("defaults to Kayak affiliate routing", () => {
+  it("defaults to Kayak affiliate routing when no flag is set", () => {
     expect(getHotelAffiliateRouting()).toEqual({
       affiliateSource: "kayak",
       partner: "kayak-hotels",
     });
   });
 
-  it("routes to booking when ?booking=1", () => {
-    window.history.replaceState({}, "", "/?booking=1");
+  it("routes to Kayak when ?k=1", () => {
+    window.history.replaceState({}, "", "/?k=1");
     expect(getHotelAffiliateRouting()).toEqual({
-      affiliateSource: "booking",
-      partner: "booking-hotels",
+      affiliateSource: "kayak",
+      partner: "kayak-hotels",
     });
   });
 
@@ -35,42 +35,42 @@ describe("is2PopMode", () => {
     window.history.replaceState({}, "", "/");
   });
 
-  it("returns false when 2pop param is absent", () => {
+  it("returns false when dpop param is absent", () => {
     expect(is2PopMode()).toBe(false);
   });
 
-  it("returns false when 2pop=0", () => {
-    window.history.replaceState({}, "", "/?2pop=0");
+  it("returns false when dpop=0", () => {
+    window.history.replaceState({}, "", "/?dpop=0");
     expect(is2PopMode()).toBe(false);
   });
 
-  it("returns true when ?2pop=1 and no FB traffic signals", () => {
-    window.history.replaceState({}, "", "/?2pop=1");
+  it("returns true when ?dpop=1 and no FB traffic signals", () => {
+    window.history.replaceState({}, "", "/?dpop=1");
     expect(is2PopMode()).toBe(true);
   });
 
-  it("returns false when ?2pop=1 but fbclid is present", () => {
-    window.history.replaceState({}, "", "/?2pop=1&fbclid=abc123");
+  it("returns false when ?dpop=1 but fbclid is present", () => {
+    window.history.replaceState({}, "", "/?dpop=1&fbclid=abc123");
     expect(is2PopMode()).toBe(false);
   });
 
-  it("returns false when ?2pop=1 but utm_source=facebook", () => {
-    window.history.replaceState({}, "", "/?2pop=1&utm_source=facebook");
+  it("returns false when ?dpop=1 but utm_source=facebook", () => {
+    window.history.replaceState({}, "", "/?dpop=1&utm_source=facebook");
     expect(is2PopMode()).toBe(false);
   });
 
-  it("returns false when ?2pop=1 but utm_source=meta", () => {
-    window.history.replaceState({}, "", "/?2pop=1&utm_source=meta");
+  it("returns false when ?dpop=1 but utm_source=meta", () => {
+    window.history.replaceState({}, "", "/?dpop=1&utm_source=meta");
     expect(is2PopMode()).toBe(false);
   });
 
-  it("returns false when ?2pop=1 but utm_source=instagram", () => {
-    window.history.replaceState({}, "", "/?2pop=1&utm_source=instagram");
+  it("returns false when ?dpop=1 but utm_source=instagram", () => {
+    window.history.replaceState({}, "", "/?dpop=1&utm_source=instagram");
     expect(is2PopMode()).toBe(false);
   });
 
-  it("returns true when ?2pop=1 with non-FB utm_source", () => {
-    window.history.replaceState({}, "", "/?2pop=1&utm_source=google");
+  it("returns true when ?dpop=1 with non-FB utm_source", () => {
+    window.history.replaceState({}, "", "/?dpop=1&utm_source=google");
     expect(is2PopMode()).toBe(true);
   });
 });

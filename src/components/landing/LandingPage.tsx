@@ -4,10 +4,12 @@ import CityInventoryStrip from "@/components/landing/CityInventoryStrip";
 import CTASection from "@/components/landing/CTASection";
 import DestinationContent from "@/components/landing/DestinationContent";
 import FAQ from "@/components/landing/FAQ";
+import HotelDirectory from "@/components/landing/HotelDirectory";
 import IntentBrowse from "@/components/landing/IntentBrowse";
 import LandingHero from "@/components/landing/LandingHero";
 import LandingPageMeta from "@/components/landing/LandingPageMeta";
 import RelatedHotels from "@/components/landing/RelatedHotels";
+import ShortlistTray from "@/components/ShortlistTray";
 import type { SearchFormProps } from "@/components/SearchForm";
 import type { LandingPageConfig } from "@/types/landingPage";
 import { useMemo } from "react";
@@ -86,7 +88,11 @@ const LandingPage = ({ config }: LandingPageProps) => {
         />
       ) : null}
       <CTASection ctaText={config.content.ctaText} cityName={config.city.name} />
+      {showCityExtras && config.allHotels?.length ? (
+        <HotelDirectory hotels={config.allHotels} cityName={config.city.name} />
+      ) : null}
       <SiteFooter />
+      <ShortlistTray />
     </div>
   );
 };

@@ -109,7 +109,7 @@ const NearbyHotels = ({
                 aria-busy={isOpening}
                 onClick={() => void openHotel(hotel)}
                 className={cn(
-                  "group flex h-full min-w-0 flex-col overflow-hidden rounded-2xl border border-border bg-card p-0 text-left shadow-soft transition-smooth",
+                  "group flex h-full min-w-0 flex-col overflow-hidden rounded-xl border border-border bg-card p-0 text-left shadow-soft transition",
                   "hover:-translate-y-1 hover:border-primary/40 hover:shadow-elevated disabled:pointer-events-none disabled:opacity-60"
                 )}
               >

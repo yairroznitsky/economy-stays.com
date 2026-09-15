@@ -1,5 +1,6 @@
+import { handleKayakAutocomplete } from "../../server/edge/kayakAutocomplete";
+
 const ALLOWED_FUNCTIONS = new Set([
-  "hotel-affiliate-router",
   "kayak-autocomplete",
 ]);
 
@@ -34,33 +35,9 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     return;
   }
 
-  // Prefer server-only names; fall back to VITE_* when those are the only vars on Vercel.
-  const supabaseUrl =
-    process.env.SUPABASE_URL?.trim() || process.env.VITE_SUPABASE_URL?.trim();
-  const anonKey =
-    process.env.SUPABASE_ANON_KEY?.trim() ||
-    process.env.VITE_SUPABASE_ANON_KEY?.trim();
-
-  if (!supabaseUrl || !anonKey) {
-    res.status(500).json({ error: "Server configuration missing" });
-    return;
-  }
-
   try {
-    const upstream = await fetch(`${supabaseUrl}/functions/v1/${functionName}`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${anonKey}`,
-        apikey: anonKey,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(req.body ?? {}),
-    });
-
-    const text = await upstream.text();
-    res.status(upstream.status);
-    res.setHeader("Content-Type", upstream.headers.get("content-type") ?? "application/json");
-    res.end(text);
+    const result = await handleKayakAutocomplete(req.body);
+    res.status(result.status).json(result.body);
   } catch {
     res.status(502).json({ error: "Upstream request failed" });
   }

@@ -61,34 +61,34 @@ const genericFaqs = (
   const inventory = inventorySentence(cityName, stats);
   return [
     {
-      q: `How does ${readSiteName()} help me compare hotels in ${cityName}?`,
+      q: `How does ${readSiteName()} help me find a hotel in ${cityName}?`,
       a: inventory
-        ? `${inventory} Enter your destination, dates, and guests to see hotel options from established travel partners. You can adjust your search before continuing to a partner site to book.`
-        : "Enter your destination, dates, and guests to see hotel options from established travel partners. You can adjust your search before continuing to a partner site to book.",
+        ? `${inventory} Enter your dates, destination and guest count to browse hotel options from established travel partners. When you find a stay you like, continue to the partner site to book.`
+        : "Enter your dates, destination and guest count to browse hotel options from established travel partners. When you find a stay you like, continue to the partner site to book.",
     },
     {
-      q: "Do I complete my booking on this site?",
-      a: "No. We help you compare options across partner travel sites. When you are ready, you continue to the partner site to finish your reservation.",
+      q: "Do I book directly on this site?",
+      a: "No. Economy Stays helps you browse and compare accommodation options. When you're ready to reserve, you're taken to a trusted booking partner to complete your stay.",
     },
     {
-      q: "Can I change dates and guest counts before I search?",
-      a: "Yes. Update check-in, check-out, adults, children, and rooms in the search form to match your trip before comparing hotel options.",
+      q: "Can I filter by star rating or property type?",
+      a: "Yes. Use the browse panel to filter results by star rating, property type and guest score before comparing rates on partner sites.",
     },
   ];
 };
 
 const genericBenefits = () => [
   {
-    title: "Compare multiple sites",
-    text: "See hotel options from trusted travel partners in one search.",
+    title: "Browse by what matters",
+    text: "Filter accommodation by star rating, property type and guest score in one place.",
   },
   {
-    title: "Search by your dates",
-    text: "Adjust check-in, check-out, guests, and rooms to match your trip.",
+    title: "Set your exact dates",
+    text: "Adjust check-in, check-out, number of guests and rooms to match your itinerary.",
   },
   {
-    title: "Book with partners you know",
-    text: "Continue to established booking sites to complete your reservation.",
+    title: "Book with names you know",
+    text: "When you find the right stay, continue to an established booking partner to complete your reservation.",
   },
 ];
 
@@ -127,16 +127,16 @@ export const buildTemplateContent = (
 
   const introText = intent
     ? [
-        `Looking for ${intentPhrase} in ${city.name}? Comparing rates across multiple booking sites can help you find options that fit your plans while keeping your preferred dates and guest count in mind.`,
+        `Searching for ${intentPhrase} in ${city.name}? Browsing across multiple booking sites lets you compare property styles, locations and availability for your exact dates before you commit.`,
         inventory,
-        `Use the search above to compare ${intentPhrase} for your travel dates, then continue to a partner site when you are ready to book.`,
+        `Set your check-in and check-out dates above to browse ${intentPhrase} in ${city.name}, then head to a partner site when you're ready to reserve.`,
       ]
         .filter(Boolean)
         .join("\n\n")
     : [
-        `${city.name} is a popular destination for travelers comparing hotel options before they book. Searching across multiple travel sites can help you review locations, amenities, and availability for your dates.`,
+        `${city.name} draws visitors year-round, and finding the right place to stay means weighing location, style and availability together. Browsing across multiple booking sites gives you a clearer picture before you commit.`,
         inventory,
-        `Start with the search above to compare hotel rates in ${city.name}, then continue to a partner booking site to complete your reservation.`,
+        `Use the search above to explore hotel options in ${city.name} and continue to a trusted booking partner when you've found the stay that fits your trip.`,
       ]
         .filter(Boolean)
         .join("\n\n");

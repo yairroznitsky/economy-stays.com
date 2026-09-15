@@ -1,4 +1,15 @@
-export interface LandingPageFaq {
+export interface BrowseHotel {
+  id: string;
+  name: string;
+  type?: string;
+  starRating?: number;
+  rating?: number;
+  reviews?: number;
+  latitude?: number;
+  longitude?: number;
+}
+
+
   q: string;
   a: string;
 }
@@ -115,5 +126,7 @@ export interface LandingPageConfig {
   searchDefaults: LandingPageSearchDefaults;
   seo: LandingPageSeo;
   tracking: LandingPageTracking;
+  /** Up to 80 hotels in the city with coordinates, for the browse directory. */
+  allHotels?: BrowseHotel[];
 }
 

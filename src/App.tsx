@@ -33,6 +33,9 @@ const AppRoutes = () => {
           element={<SitelinkPage slug={slug} />}
         />
       ))}
+      <Route path="/stay/:countryCode/:citySlug/:themeSlug" element={<HotelLanding />} />
+      <Route path="/stay/:countryCode/:citySlug" element={<HotelLanding />} />
+      {/* legacy redirect kept for crawlers — remove after re-indexing */}
       <Route path="/hotels/:citySlug/:intentSlug" element={<HotelLanding />} />
       <Route path="/hotels/:citySlug" element={<HotelLanding />} />
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

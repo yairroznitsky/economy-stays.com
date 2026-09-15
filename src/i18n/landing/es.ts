@@ -1,36 +1,36 @@
 import type { LandingTranslations } from "./types";
 
 export const es: LandingTranslations = {
-  heroEyebrow: "Búsqueda independiente de alojamiento",
-  heroTitle: "Una forma más tranquila de comparar estancias",
+  heroEyebrow: "La confianza de viajeros en todo el mundo",
+  heroTitle: "Una búsqueda. Todos los hoteles. Tu estancia perfecta.",
   heroSubtitle:
-    "Busca hoteles, apartamentos y alquileres en un solo lugar — y reserva con socios de confianza.",
+    "Explora hoteles, apartamentos y alquileres por estrellas, valoraciones y tipo — y reserva con socios de confianza.",
   heroImageAlt:
     "Resort en acantilado con piscina infinita frente al océano al atardecer",
-  featuresTitle: (siteName) => `Por qué los viajeros usan ${siteName}`,
+  featuresTitle: (siteName) => `Por qué los viajeros eligen ${siteName}`,
   featuresSubtitle:
-    "Una sola búsqueda muestra tarifas de socios de confianza para que elijas con seguridad.",
+    "Una búsqueda conecta con opciones de socios de confianza, organizadas por estrellas, valoraciones y fechas.",
   features: [
     {
-      title: "Comparación clara de precios",
-      desc: "Consulta hoteles, apartamentos y alquileres en paralelo y elige la mejor opción para tus fechas.",
+      title: "Explora antes de reservar",
+      desc: "Filtra por categoría, tipo de alojamiento y puntuación de huéspedes para encontrar el hotel que realmente se adapta a tu viaje.",
     },
     {
-      title: "Cobertura mundial",
-      desc: "Escapadas de fin de semana, playa o estancias largas — opciones en ciudades y costas de todo el mundo.",
+      title: "Hoteles en todo el mundo",
+      desc: "Escapadas urbanas, retiros costeros o estancias largas — mostramos opciones en miles de destinos.",
     },
     {
-      title: "Socios consolidados",
-      desc: "Políticas flexibles en muchos anuncios, respaldados por socios de viaje que ya conoces.",
+      title: "Reserva con socios de confianza",
+      desc: "Continúa en sitios de reserva consolidados cuando estés listo — sin registro obligatorio ni recargo en las tarifas.",
     },
   ],
   destinationsTitle: "Destinos populares",
-  destinationsSubtitle: "Explora ciudades que los viajeros buscan esta semana.",
+  destinationsSubtitle: "Explora hoteles en las ciudades más visitadas del mundo.",
   compareRates: "Comparar tarifas",
   checkingRates: "Consultando tarifas…",
-  ctaTitle: "¿Listo para planear tu viaje?",
+  ctaTitle: "¿Listo para encontrar tu alojamiento?",
   ctaSubtitle:
-    "Usa la búsqueda de arriba para comparar estancias y continuar con tu socio de reserva preferido.",
+    "Usa la búsqueda de arriba para explorar hoteles y continuar con tu socio de reserva preferido.",
   destinationNotFound: (city) =>
     `No encontramos ${city}. Prueba buscando manualmente arriba.`,
   reviewSearch: "Revisa tu búsqueda",

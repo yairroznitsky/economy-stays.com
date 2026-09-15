@@ -1,36 +1,36 @@
 import type { LandingTranslations } from "./types";
 
 export const en: LandingTranslations = {
-  heroEyebrow: "Economy travel, zero compromise",
-  heroTitle: "Find economy stays that fit your budget",
+  heroEyebrow: "Trusted by travellers worldwide",
+  heroTitle: "One search. Every hotel. Your perfect stay.",
   heroSubtitle:
-    "Compare hotels, apartments, and rentals at economy rates — then book direct through partners you trust.",
+    "Browse hotels, apartments and rentals by star rating, reviews and type — then book through partners you know.",
   heroImageAlt:
     "Clifftop resort with infinity pool overlooking the ocean at sunset",
-  featuresTitle: (siteName) => `Why budget travelers choose ${siteName}`,
+  featuresTitle: (siteName) => `Why travellers choose ${siteName}`,
   featuresSubtitle:
-    "One search finds the best economy rates from trusted partners so your money goes further.",
+    "One search connects you to hotel options from trusted partners — organised by stars, reviews and your dates.",
   features: [
     {
-      title: "Economy-first pricing",
-      desc: "See hotels, apartments, and rentals side by side and instantly spot the most economical option for your dates.",
+      title: "Browse before you book",
+      desc: "Filter by star rating, property type and guest score to see which hotels genuinely match your trip.",
     },
     {
-      title: "Worldwide economy stays",
-      desc: "Weekend breaks, budget escapes, or longer economy stays — affordable options across cities and coastlines worldwide.",
+      title: "Hotels in every corner",
+      desc: "City breaks, coastal retreats or extended stays — we surface options across thousands of destinations worldwide.",
     },
     {
-      title: "Trusted booking partners",
-      desc: "Economy rates backed by travel partners you already know — no hidden fees, flexible policies on many listings.",
+      title: "Book through trusted partners",
+      desc: "Continue to established booking sites when you're ready — no hidden sign-up, no mark-up on rates.",
     },
   ],
-  destinationsTitle: "Popular economy destinations",
-  destinationsSubtitle: "Top cities where travelers are finding economy stays this week.",
+  destinationsTitle: "Popular destinations",
+  destinationsSubtitle: "Browse hotels in the world's most visited cities.",
   compareRates: "Compare rates",
   checkingRates: "Checking rates…",
-  ctaTitle: "Ready to find your economy stay?",
+  ctaTitle: "Ready to find your stay?",
   ctaSubtitle:
-    "Search above to compare economy rates and continue to your preferred booking partner.",
+    "Search above to browse hotel options and continue to your preferred booking partner.",
   destinationNotFound: (city) =>
     `We couldn't find ${city}. Try searching manually above.`,
   reviewSearch: "Review your search",
