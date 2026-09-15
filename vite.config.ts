@@ -52,7 +52,7 @@ const htmlEnvPlugin = (env: Record<string, string>): Plugin => ({
   transformIndexHtml(html) {
     const values = {
       VITE_SITE_NAME: env.VITE_SITE_NAME || "Economy Stays",
-      VITE_SITE_OPERATOR: env.VITE_SITE_OPERATOR || "Media Smarter",
+      VITE_SITE_OPERATOR: env.VITE_SITE_OPERATOR || "Benzerweb LTD",
       VITE_SITE_DOMAIN: env.VITE_SITE_DOMAIN || "economy-stays.com",
     };
 

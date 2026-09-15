@@ -61,6 +61,14 @@ const IndexContent = () => {
         </div>
       </section>
 
+      <TrendingDestinations
+        title={t.destinationsTitle}
+        subtitle={t.destinationsSubtitle}
+        checkIn={checkIn}
+        checkOut={checkOut}
+        surface="trending_destinations"
+      />
+
       {/* Features */}
       <section id="how" className="border-b border-border bg-secondary py-20">
         <div className="container">
@@ -89,14 +97,6 @@ const IndexContent = () => {
           </div>
         </div>
       </section>
-
-      <TrendingDestinations
-        title={t.destinationsTitle}
-        subtitle={t.destinationsSubtitle}
-        checkIn={checkIn}
-        checkOut={checkOut}
-        surface="trending_destinations"
-      />
 
       {/* CTA strip */}
       <section id="deals" className="relative overflow-hidden bg-primary py-16">

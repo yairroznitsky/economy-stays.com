@@ -1,36 +1,36 @@
 import type { LandingTranslations } from "./types";
 
 export const en: LandingTranslations = {
-  heroEyebrow: "Independent stay search",
-  heroTitle: "A calmer way to compare stays",
+  heroEyebrow: "Economy travel, zero compromise",
+  heroTitle: "Find economy stays that fit your budget",
   heroSubtitle:
-    "Search hotels, apartments, and rentals in one place — then book through partners you trust.",
+    "Compare hotels, apartments, and rentals at economy rates — then book direct through partners you trust.",
   heroImageAlt:
     "Clifftop resort with infinity pool overlooking the ocean at sunset",
-  featuresTitle: (siteName) => `Why travelers use ${siteName}`,
+  featuresTitle: (siteName) => `Why budget travelers choose ${siteName}`,
   featuresSubtitle:
-    "One search surfaces rates from trusted partners so you can choose with confidence.",
+    "One search finds the best economy rates from trusted partners so your money goes further.",
   features: [
     {
-      title: "Clear price comparison",
-      desc: "See hotels, apartments, and rentals side by side so you can pick the best option for your dates.",
+      title: "Economy-first pricing",
+      desc: "See hotels, apartments, and rentals side by side and instantly spot the most economical option for your dates.",
     },
     {
-      title: "Worldwide coverage",
-      desc: "Weekend escapes, beach breaks, or longer stays — options across cities and coastlines worldwide.",
+      title: "Worldwide economy stays",
+      desc: "Weekend breaks, budget escapes, or longer economy stays — affordable options across cities and coastlines worldwide.",
     },
     {
-      title: "Established partners",
-      desc: "Flexible policies on many listings, backed by travel partners you already know.",
+      title: "Trusted booking partners",
+      desc: "Economy rates backed by travel partners you already know — no hidden fees, flexible policies on many listings.",
     },
   ],
-  destinationsTitle: "Popular destinations",
-  destinationsSubtitle: "Explore cities travelers are searching this week.",
+  destinationsTitle: "Popular economy destinations",
+  destinationsSubtitle: "Top cities where travelers are finding economy stays this week.",
   compareRates: "Compare rates",
   checkingRates: "Checking rates…",
-  ctaTitle: "Ready to plan your trip?",
+  ctaTitle: "Ready to find your economy stay?",
   ctaSubtitle:
-    "Use the search above to compare stays and continue to your preferred booking partner.",
+    "Search above to compare economy rates and continue to your preferred booking partner.",
   destinationNotFound: (city) =>
     `We couldn't find ${city}. Try searching manually above.`,
   reviewSearch: "Review your search",

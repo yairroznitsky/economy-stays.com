@@ -4,7 +4,7 @@ Same stays. Just cheaper.
 
 Kayak-first hotel monetization flow with Supabase Edge Function routing.
 
-Economy Stays is operated by Media Smarter.
+Economy Stays is operated by Benzerweb LTD.
 
 ## Local setup
 

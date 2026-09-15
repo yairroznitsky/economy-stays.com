@@ -21,7 +21,7 @@ export const siteConfig = {
   slug,
   shortName: readEnv(import.meta.env.VITE_SITE_SHORT_NAME, name.replace(/\s+/g, "")),
   domain: readEnv(import.meta.env.VITE_SITE_DOMAIN, "economy-stays.com"),
-  operator: readEnv(import.meta.env.VITE_SITE_OPERATOR, "Media Smarter"),
+  operator: readEnv(import.meta.env.VITE_SITE_OPERATOR, "Benzerweb LTD"),
   supportEmail: readEnv(import.meta.env.VITE_SITE_SUPPORT_EMAIL, "support@economy-stays.com"),
   trackingBrand: readEnv(import.meta.env.VITE_TRACKING_BRAND, slug.replace(/-/g, "_")),
   landingIdPrefix: readEnv(import.meta.env.VITE_LANDING_ID_PREFIX, "ES-"),
@@ -39,5 +39,5 @@ export const siteConfig = {
     return `${protocol}://${domain}/`;
   },
   description:
-    "A calmer way to compare stays. Search hotels, apartments, and vacation rentals in one place and book through trusted travel partners.",
+    "Find economy stays that fit your budget. Compare hotels, apartments, and vacation rentals at economy rates and book through trusted travel partners.",
 } as const;
