@@ -1,3 +1,7 @@
+/**
+ * Local Vite dev handler for POST /api/edge/kayak-autocomplete.
+ * Production uses the self-contained copy in api/edge/[name].ts — keep in sync.
+ */
 import { getKayakAutocompleteConfig } from "./env";
 
 interface KayakAutocompleteRequest {
