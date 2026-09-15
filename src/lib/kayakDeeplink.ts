@@ -46,7 +46,7 @@ export const resolveKayakRoomCount = (rooms: number, adults: number, children: n
   return Math.max(rooms, minimumRooms);
 };
 
-const DEFAULT_KAYAK_AFFILIATE_ID = "kan_317716_594040";
+const DEFAULT_KAYAK_AFFILIATE_ID = "";
 
 const DEFAULT_KAYAK_AFFILIATE_CONFIG: KayakAffiliateConfig = {
   affiliateId: import.meta.env.VITE_KAYAK_AFFILIATE_ID?.trim() || DEFAULT_KAYAK_AFFILIATE_ID,

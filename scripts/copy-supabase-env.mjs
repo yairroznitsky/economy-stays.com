@@ -3,7 +3,6 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const sourceEnv = path.resolve(root, "..", "Cheap-Stays", ".env");
 const targetEnv = path.resolve(root, ".env");
 
 const REQUIRED = [
@@ -38,19 +37,12 @@ const upsertEnvLine = (lines, key, value) => {
   else lines.push(next);
 };
 
-if (!existsSync(sourceEnv)) {
-  console.error(
-    `Missing ${sourceEnv}. Copy Supabase keys into .env manually (see .env.example).`
-  );
-  process.exit(1);
-}
-
 if (!existsSync(targetEnv)) {
   console.error(`Missing ${targetEnv}. Copy .env.example to .env first.`);
   process.exit(1);
 }
 
-const source = parseEnv(readFileSync(sourceEnv, "utf8"));
+const source = parseEnv(readFileSync(targetEnv, "utf8"));
 
 const resolve = (key) => {
   const direct = source.get(key)?.trim();
@@ -58,27 +50,15 @@ const resolve = (key) => {
   return undefined;
 };
 
-const resolved = new Map();
-for (const key of REQUIRED) {
-  const value = resolve(key);
-  if (!value) {
-    console.error(`Cheap-Stays .env is missing a real value for ${key}`);
-    process.exit(1);
-  }
-  resolved.set(key, value);
+const missing = REQUIRED.filter((key) => !resolve(key));
+if (missing.length > 0) {
+  console.error(
+    `The following keys are missing or still placeholders in .env:\n` +
+    missing.map((k) => `  - ${k}`).join("\n") +
+    `\n\nFill them in from your Supabase project dashboard and re-run.`
+  );
+  process.exit(1);
 }
 
-resolved.set("SUPABASE_URL", resolve("SUPABASE_URL") ?? resolved.get("VITE_SUPABASE_URL"));
-resolved.set(
-  "SUPABASE_ANON_KEY",
-  resolve("SUPABASE_ANON_KEY") ?? resolved.get("VITE_SUPABASE_ANON_KEY")
-);
-
-const lines = readFileSync(targetEnv, "utf8").split(/\r?\n/);
-for (const [key, value] of resolved.entries()) {
-  upsertEnvLine(lines, key, value);
-}
-
-writeFileSync(targetEnv, `${lines.join("\n").replace(/\n?$/, "\n")}`);
-console.log("Copied Supabase credentials from ../Cheap-Stays/.env into .env");
-console.log("Restart the dev server: npm run dev");
+console.log("All required Supabase credentials are present in .env.");
+console.log("Restart the dev server if it is running: npm run dev");

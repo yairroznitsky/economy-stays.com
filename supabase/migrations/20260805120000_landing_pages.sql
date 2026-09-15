@@ -1,4 +1,4 @@
--- Landing page system for Cheap-Stays hotel ads
+-- Landing page system for Economy Stays hotel ads
 
 create extension if not exists "pgcrypto";
 

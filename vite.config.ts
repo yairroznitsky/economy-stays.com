@@ -39,7 +39,7 @@ const devEnvCheckPlugin = (env: Record<string, string>): Plugin => ({
           "",
           "Economy Stays: fix your .env before local API routes will work:",
           ...warnings.map((line) => `  - ${line}`),
-          "  Run: npm run setup:env  (copies keys from ../Cheap-Stays/.env)",
+          "  Run: npm run setup:env  (copies keys from .env.example)",
           "",
         ].join("\n")
       );

@@ -14,7 +14,7 @@ Economy Stays is operated by Benzerweb LTD.
    - copy `.env.example` to `.env`
    - set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`
    - set server-only `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` for landings / rental_clicks writes
-   - or run `npm run setup:env` to copy Supabase credentials from the sibling `../Cheap-Stays/.env`
+   - or run `npm run setup:env` to validate your Supabase credentials in `.env`
 3. Run app:
    - `npm run dev`
    - open the URL Vite prints (default `http://localhost:8080/`). If port 8080 is already in use, Vite picks another port — use that one, not an older dev server still running on 8080.
