@@ -1,4 +1,5 @@
 import { buildBookingSearchResultsUrl } from "@/lib/bookingHotels";
+import { buildCjBookingUrl } from "@/lib/cjBooking";
 import { isFacebookAdsTraffic } from "@/lib/facebookTraffic";
 import { buildKayakDeeplink } from "@/lib/kayakDeeplink";
 import {
@@ -186,19 +187,21 @@ const buildBookingRedirect = (
     throw new Error("Check-in and check-out dates are required.");
   }
 
+  const bookingInput = {
+    query: destination,
+    checkin: search.checkIn,
+    checkout: search.checkOut,
+    rooms: search.rooms ?? 1,
+    adults: search.adults ?? 2,
+    children: search.children ?? 0,
+    children_ages: search.childrenAges ?? [],
+    click_id: payload.clickId,
+    latitude: search.latitude,
+    longitude: search.longitude,
+  };
+
   return {
-    redirectUrl: buildBookingSearchResultsUrl({
-      query: destination,
-      checkin: search.checkIn,
-      checkout: search.checkOut,
-      rooms: search.rooms ?? 1,
-      adults: search.adults ?? 2,
-      children: search.children ?? 0,
-      children_ages: search.childrenAges ?? [],
-      click_id: payload.clickId,
-      latitude: search.latitude,
-      longitude: search.longitude,
-    }),
+    redirectUrl: buildCjBookingUrl(bookingInput),
     entityId: destination,
     provider: "booking",
     clickId: payload.clickId,

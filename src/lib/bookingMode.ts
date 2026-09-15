@@ -10,13 +10,14 @@ export const getHotelAffiliateRouting = (): {
   affiliateSource: AffiliateSource;
   partner: string;
 } => {
-  if (readQueryFlag("booking")) {
-    return { affiliateSource: "booking", partner: "booking-hotels" };
+  if (readQueryFlag("kayak")) {
+    return { affiliateSource: "kayak", partner: "kayak-hotels" };
   }
   if (readQueryFlag("skyscanner")) {
     return { affiliateSource: "skyscanner", partner: "skyscanner-hotels" };
   }
-  return { affiliateSource: "kayak", partner: "kayak-hotels" };
+  // Default: Booking.com via CJ affiliate
+  return { affiliateSource: "booking", partner: "booking-hotels-cj" };
 };
 
 /**
