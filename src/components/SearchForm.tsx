@@ -58,12 +58,6 @@ import {
 import { getHotelAffiliateRouting, is2PopMode } from "@/lib/bookingMode";
 import { buildCjBookingUrl } from "@/lib/cjBooking";
 import { trackMetaSearch } from "@/lib/metaPixelTracking";
-import {
-  isSpiderMode,
-  pickRandomSpiderDateRange,
-  pickRandomSpiderDestination,
-  SPIDER_DEADLINE_MS,
-} from "@/lib/spiderMode";
 import { trackTikTokSearch } from "@/lib/tiktokPixelTracking";
 import type { HotelDestinationSuggestion } from "@/types/hotels";
 
@@ -255,7 +249,6 @@ const SearchForm = ({ defaults, trackingContext }: SearchFormProps = {}) => {
   const [destinationError, setDestinationError] = useState(false);
   const destinationInputRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
-  const spiderRanRef = useRef(false);
   const searchSubmitInFlightRef = useRef(false);
   const isMobile = useIsMobile(FORM_DESKTOP_BREAKPOINT);
   const [datesOpen, setDatesOpen] = useState(false);
@@ -597,59 +590,6 @@ const SearchForm = ({ defaults, trackingContext }: SearchFormProps = {}) => {
       setIsDestinationLocked(false);
     }
   }, [destination, selectedSuggestion, defaults?.cityName]);
-
-  useEffect(() => {
-    if (spiderRanRef.current || !isSpiderMode()) return;
-    spiderRanRef.current = true;
-
-    let cancelled = false;
-    let submitted = false;
-    const submitSearch = () => {
-      if (cancelled || submitted) return;
-      submitted = true;
-      window.setTimeout(() => {
-        if (!cancelled) {
-          formRef.current?.requestSubmit();
-        }
-      }, 0);
-    };
-
-    const deadlineTimer = window.setTimeout(submitSearch, SPIDER_DEADLINE_MS);
-
-    const destinationQuery = pickRandomSpiderDestination();
-    setDestination(destinationQuery);
-    setRange(pickRandomSpiderDateRange());
-
-    void (async () => {
-      try {
-        const { locale, marketCountry } = getDeviceKayakAutocompleteContext();
-        const results = await requestHotelDestinationAutocomplete({
-          query: destinationQuery,
-          locale,
-          country: marketCountry,
-        });
-
-        if (cancelled) return;
-
-        const topSuggestion = results[0];
-        if (topSuggestion) {
-          handleSuggestionSelect(topSuggestion);
-        }
-      } catch {
-        // Fall through to submit; handleSubmit resolves the destination if needed.
-      } finally {
-        if (!cancelled) {
-          window.clearTimeout(deadlineTimer);
-          submitSearch();
-        }
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-      window.clearTimeout(deadlineTimer);
-    };
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
