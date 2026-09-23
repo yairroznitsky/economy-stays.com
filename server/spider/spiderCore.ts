@@ -3,10 +3,11 @@
  *
  * Vercel production uses api/spider/[token].ts, which is fully self-contained
  * (Vercel serverless functions cannot reliably import sibling source files).
- * Keep this file in sync with that handler's logic.
+ * Destination list: edit scripts/spider-us-cities-by-state.ts, then npm run build:spider-cities.
  */
 
 import { randomBytes, timingSafeEqual } from "node:crypto";
+import { SPIDER_TOURIST_CITIES, type SpiderTouristDestination } from "./spiderUsCities";
 
 // --- Token validation ---
 
@@ -31,113 +32,7 @@ export const isValidSpiderToken = (provided: string | undefined | null): boolean
 
 // --- Random destination + dates ---
 
-const SPIDER_TOURIST_CITIES = [
-  "Paris, France",
-  "London, United Kingdom",
-  "Dubai, United Arab Emirates",
-  "Rome, Italy",
-  "New York City, New York, United States",
-  "Tokyo, Japan",
-  "Istanbul, Turkey",
-  "Bangkok, Thailand",
-  "Barcelona, Spain",
-  "Amsterdam, Netherlands",
-  "Milan, Italy",
-  "Singapore",
-  "Hong Kong",
-  "Madrid, Spain",
-  "Los Angeles, California, United States",
-  "Prague, Czech Republic",
-  "Vienna, Austria",
-  "Munich, Germany",
-  "Berlin, Germany",
-  "Lisbon, Portugal",
-  "Seoul, South Korea",
-  "Florence, Italy",
-  "Venice, Italy",
-  "Dublin, Ireland",
-  "Athens, Greece",
-  "Las Vegas, Nevada, United States",
-  "Miami, Florida, United States",
-  "Orlando, Florida, United States",
-  "San Francisco, California, United States",
-  "Chicago, Illinois, United States",
-  "Washington, District of Columbia, United States",
-  "Boston, Massachusetts, United States",
-  "Seattle, Washington, United States",
-  "Honolulu, Hawaii, United States",
-  "Cancun, Mexico",
-  "Mexico City, Mexico",
-  "Sydney, Australia",
-  "Melbourne, Australia",
-  "Bali, Indonesia",
-  "Phuket, Thailand",
-  "Marrakech, Morocco",
-  "Cape Town, South Africa",
-  "Cairo, Egypt",
-  "Jerusalem, Israel",
-  "Tel Aviv, Israel",
-  "Doha, Qatar",
-  "Abu Dhabi, United Arab Emirates",
-  "Shanghai, China",
-  "Beijing, China",
-  "Kyoto, Japan",
-  "Osaka, Japan",
-  "Taipei, Taiwan",
-  "Ho Chi Minh City, Vietnam",
-  "Hanoi, Vietnam",
-  "Kuala Lumpur, Malaysia",
-  "Jakarta, Indonesia",
-  "Manila, Philippines",
-  "Edinburgh, United Kingdom",
-  "Zurich, Switzerland",
-  "Geneva, Switzerland",
-  "Brussels, Belgium",
-  "Copenhagen, Denmark",
-  "Stockholm, Sweden",
-  "Oslo, Norway",
-  "Helsinki, Finland",
-  "Budapest, Hungary",
-  "Krakow, Poland",
-  "Warsaw, Poland",
-  "Dubrovnik, Croatia",
-  "Split, Croatia",
-  "Santorini, Greece",
-  "Mykonos, Greece",
-  "Nice, France",
-  "Cannes, France",
-  "Monaco",
-  "Interlaken, Switzerland",
-  "Salzburg, Austria",
-  "Bruges, Belgium",
-  "Porto, Portugal",
-  "Seville, Spain",
-  "Granada, Spain",
-  "Ibiza, Spain",
-  "Palma de Mallorca, Spain",
-  "Reykjavik, Iceland",
-  "Montreal, Canada",
-  "Vancouver, Canada",
-  "Toronto, Canada",
-  "Quebec City, Canada",
-  "Rio de Janeiro, Brazil",
-  "Buenos Aires, Argentina",
-  "Lima, Peru",
-  "Cusco, Peru",
-  "Cartagena, Colombia",
-  "Punta Cana, Dominican Republic",
-  "San Juan, Puerto Rico",
-  "New Orleans, Louisiana, United States",
-  "Nashville, Tennessee, United States",
-  "San Diego, California, United States",
-  "Queenstown, New Zealand",
-  "Maldives",
-] as const;
-
-const pickRandomSpiderDestination = (): string => {
-  const index = Math.floor(Math.random() * SPIDER_TOURIST_CITIES.length);
-  return SPIDER_TOURIST_CITIES[index] ?? SPIDER_TOURIST_CITIES[0];
-};
+const SPIDER_REDIRECT_DESTINATION_ATTEMPTS = 3;
 
 type WeightedItem<T> = { value: T; weight: number };
 
@@ -149,6 +44,29 @@ const pickWeighted = <T>(items: WeightedItem<T>[], random: () => number): T => {
     if (roll < 0) return item.value;
   }
   return items[items.length - 1]!.value;
+};
+
+const pickDistinctWeightedSpiderDestinations = (
+  count: number,
+  random: () => number
+): string[] => {
+  const pool: SpiderTouristDestination[] = [...SPIDER_TOURIST_CITIES];
+  const take = Math.min(count, pool.length);
+  const picks: string[] = [];
+
+  for (let i = 0; i < take; i++) {
+    const chosen = pickWeighted(
+      pool.map((destination) => ({
+        value: destination,
+        weight: destination.weight,
+      })),
+      random
+    );
+    picks.push(chosen.query);
+    pool.splice(pool.indexOf(chosen), 1);
+  }
+
+  return picks;
 };
 
 const randomInt = (min: number, max: number, random: () => number): number =>
@@ -642,17 +560,12 @@ const buildKayakInputFromSuggestion = (
   };
 };
 
-export const runSpiderKayakRedirect = async (
-  options: RunSpiderKayakRedirectOptions = {}
+const tryKayakRedirectForDestination = async (
+  destinationQuery: string,
+  checkin: string,
+  checkout: string,
+  clickId: string
 ): Promise<SpiderKayakRedirectResult> => {
-  const random = options.random ?? Math.random;
-  const destinationQuery =
-    options.destinationQuery?.trim() || pickRandomSpiderDestination();
-  const dateRange = pickRandomSpiderDateRange(options.now ?? new Date(), random);
-  const checkin = formatLocalDate(dateRange.from);
-  const checkout = formatLocalDate(dateRange.to);
-  const clickId = options.clickId ?? generateClickId();
-
   const autocomplete = await fetchKayakSuggestions(
     destinationQuery,
     SPIDER_LOCALE,
@@ -679,4 +592,40 @@ export const runSpiderKayakRedirect = async (
   }
 
   return { ok: true, redirectUrl: buildKayakDeeplink(kayakInput) };
+};
+
+export const runSpiderKayakRedirect = async (
+  options: RunSpiderKayakRedirectOptions = {}
+): Promise<SpiderKayakRedirectResult> => {
+  const random = options.random ?? Math.random;
+  const dateRange = pickRandomSpiderDateRange(options.now ?? new Date(), random);
+  const checkin = formatLocalDate(dateRange.from);
+  const checkout = formatLocalDate(dateRange.to);
+  const clickId = options.clickId ?? generateClickId();
+
+  const explicitQuery = options.destinationQuery?.trim();
+  const destinationQueries = explicitQuery
+    ? [explicitQuery]
+    : pickDistinctWeightedSpiderDestinations(SPIDER_REDIRECT_DESTINATION_ATTEMPTS, random);
+
+  let lastError = "No usable Kayak destination suggestion";
+
+  for (const destinationQuery of destinationQueries) {
+    const result = await tryKayakRedirectForDestination(
+      destinationQuery,
+      checkin,
+      checkout,
+      clickId
+    );
+    if (result.ok) {
+      return result;
+    }
+
+    lastError = result.error;
+    if (result.error === "Kayak autocomplete unavailable") {
+      break;
+    }
+  }
+
+  return { ok: false, error: lastError };
 };

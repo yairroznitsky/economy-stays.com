@@ -7,6 +7,7 @@
     "dev": "vite",
     "setup:env": "node scripts/copy-supabase-env.mjs",
     "generate:cities-csv": "tsx scripts/generate-cities-csv.ts",
+    "build:spider-cities": "tsx scripts/build-spider-us-cities.ts",
     "import:cities": "tsx scripts/import-cities.ts",
     "seed:intents": "tsx scripts/seed-intents.ts",
     "create:pages": "tsx scripts/create-pages.ts",

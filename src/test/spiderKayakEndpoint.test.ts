@@ -135,6 +135,27 @@ describe("runSpiderKayakRedirect", () => {
     });
   });
 
+  it("retries other destinations when the first has no usable suggestions", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValueOnce({ ok: true, json: async () => [] })
+        .mockResolvedValueOnce({ ok: true, json: async () => parisKayakPayload })
+    );
+
+    const result = await runSpiderKayakRedirect({
+      now: new Date(2026, 5, 1),
+      random: () => 0,
+      clickId: "test-click-abc",
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.redirectUrl).toContain("-c5085");
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
   it("returns an error when autocomplete is unavailable", async () => {
     mockKayakFetch([], false);
 
